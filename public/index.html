@@ -187,7 +187,14 @@
   .card .ttl{cursor:pointer} .card .ttl:hover{color:var(--accent)}
   /* реальные фото Ozon (URL) в местах, где раньше были эмодзи */
   .pic{width:100%;height:100%;object-fit:contain;display:block}
-  .card .ph .pic{position:absolute;inset:0;padding:8px}
+  .card .ph{aspect-ratio:1/1.06}
+  .card .ph .pic{position:absolute;inset:0;padding:2px}
+  /* карточка в стиле Ozon */
+  .card .ribbon{position:absolute;left:0;bottom:0;background:var(--accent);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px 3px 8px;border-radius:0 10px 0 12px;z-index:2}
+  .card .ribbon.hit{background:var(--sale)}
+  .prc.disc .p{color:var(--sale)}
+  .prc .dp{color:var(--sale);font-weight:700;font-size:13px;margin-left:2px}
+  .card .rate .rv{color:var(--muted)}
   .stage .pic{padding:5%}
   .thumb .pic{padding:3px}
   .cartline .em .pic,.od-ic .pic,.ord-imgs .im .pic,.acc-ava .pic{padding:3px}
@@ -548,7 +555,7 @@ function refreshCounts(){
 function stepperOrBtn(id,q){
   return q>0
     ? `<div class="stepper"><button onclick="setQty('${id}',${q-1},event)">−</button><span class="q mono">${q} шт</span><button onclick="setQty('${id}',${q+1},event)">+</button></div>`
-    : `<button class="addbtn" onclick="setQty('${id}',1,event)">В корзину</button>`;
+    : `<button class="addbtn" onclick="setQty('${id}',1,event)">🛒 Завтра</button>`;
 }
 
 /* ---------- избранное ---------- */
@@ -579,15 +586,14 @@ function card(p){
   return `<div class="card b${p.brand}">
     <div class="ph" onclick="go('#/product/${p.id}')">
       <span class="em">${media(p.em)}</span>
-      ${p.badge?`<span class="badge ${p.badge==="хит"?"hit":""}">${p.badge==="хит"?"ХИТ":d?("−"+d+"%"):p.badge.toUpperCase()}</span>`:(d?`<span class="badge">−${d}%</span>`:"")}
       <button class="fav ${fav.has(p.id)?"on":""}" onclick="toggleFav('${p.id}',event)">${fav.has(p.id)?"♥":"♡"}</button>
-      <span class="bl">${p.brand}</span>
+      ${d?`<span class="ribbon">🔥 Скидки недели</span>`:(p.badge==="хит"?`<span class="ribbon hit">ХИТ</span>`:"")}
     </div>
     <div class="body">
-      <div class="prc"><span class="p mono">${fmt(p.price)}</span>${p.old?`<span class="old mono">${fmt(p.old)}</span>`:""}</div>
+      <div class="prc ${d?"disc":""}"><span class="p mono">${fmt(p.price)}</span>${p.old?`<span class="old mono">${fmt(p.old)}</span>`:""}${d?`<span class="dp">−${d}%</span>`:""}</div>
+      ${p.stock&&p.stock<300?`<div class="stock-l">${p.stock} шт осталось</div>`:""}
       <div class="ttl" onclick="go('#/product/${p.id}')">${esc(p.title)}</div>
-      <div class="rate"><span class="st">★</span> ${p.rate} · ${(p.rev||0).toLocaleString("ru-RU")} отз.</div>
-      ${p.stock&&p.stock<200?`<div class="stock-l">Осталось ${p.stock} шт</div>`:""}
+      <div class="rate"><span class="st">★</span> ${p.rate} · <span class="rv">${(p.rev||0).toLocaleString("ru-RU")} отзывов</span></div>
       <div class="foot" id="foot-${p.id}">${stepperOrBtn(p.id,q)}</div>
     </div></div>`;
 }
