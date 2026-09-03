@@ -280,8 +280,10 @@
   .pdp-main h1{font-family:"Unbounded";font-size:24px;line-height:1.25;margin:2px 0 8px;letter-spacing:-.01em}
   .pdp-sub{color:var(--muted);font-size:14px;margin-bottom:10px}
   .pdp-rate{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:16px}
-  .pdp-rate>span,.pdp-rate>a{white-space:nowrap}
+  .pdp-rate>span,.pdp-rate>a,.pdp-rate>b{white-space:nowrap}
   .pdp-rate .st{color:var(--star)}
+  .pdp-headcard{margin-bottom:16px;padding:20px 22px}
+  .pdp-headcard .pdp-rate{margin:12px 0 0}
   .pdp-desc{margin:18px 0;line-height:1.6}
   .specs{border-collapse:collapse;width:100%;font-size:14px}
   .specs td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}
@@ -295,7 +297,7 @@
   .bb-oldrow{display:flex;align-items:baseline;gap:8px;margin-top:4px;font-size:13px}
   .bb-old{color:var(--muted);text-decoration:line-through;font-size:16px}
   .bb-disc{background:var(--sale);color:#fff;font-weight:800;font-size:13px;padding:3px 8px;border-radius:7px}
-  .bb-later{margin-top:12px;background:var(--surface-2);border-radius:10px;padding:9px 12px;font-size:12.5px;color:var(--ink)}
+  .bb-later{margin-top:12px;background:var(--surface-2);border-radius:12px;padding:11px 14px;font-size:12.5px;color:var(--ink);display:flex;gap:8px;align-items:flex-start;line-height:1.45}
   .bb-stock{color:var(--sale);font-weight:700;font-size:13px;margin-top:6px}
   .dl{display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-size:13.5px}
   .dl b{font-weight:600}
@@ -714,8 +716,10 @@ async function viewProduct(id){
       <div class="thumbs" id="thumbs">${gal.slice(0,8).map((g,i)=>`<div class="thumb ${i?"":"on"}" onclick="pdpPic(${i})">${media(g)}</div>`).join("")}</div>
       <div class="stage" id="stage">${media(gal[0])}</div>
       <div class="pl-info">
-        <h1 class="pdp-h1">${esc(p.title)}</h1>
-      <div class="pdp-rate"><span class="st">★</span> ${p.rate||"—"} · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</a> · <span>💬 ${Math.max(1,Math.round((p.rev||0)/25))} вопросов</span> · <span class="muted">арт. ${esc(p.sku||p.id)}</span></div>
+        <div class="panel pdp-headcard">
+          <h1 class="pdp-h1">${esc(p.title)}</h1>
+          <div class="pdp-rate"><span class="st">★</span> <b>${p.rate||"—"}</b> · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</a> · <span>💬 ${Math.max(1,Math.round((p.rev||0)/25))} вопросов</span> · <span class="muted">арт. ${esc(p.sku||p.id)}</span></div>
+        </div>
       ${p.specs&&p.specs.length?`<div class="panel" style="margin-top:14px"><div class="h-sub">О товаре</div>
         <table class="specs"><tbody>${(p.specs||[]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table>
         ${p.desc?`<a class="link" style="display:inline-block;margin-top:12px" onclick="document.getElementById('descblock').scrollIntoView({behavior:'smooth'})">Перейти к описанию ↓</a>`:""}</div>`:""}
@@ -736,7 +740,7 @@ async function viewProduct(id){
         ${d?`<div class="bb-strip">🔥 Скидки недели${p.stock?` · осталось ${p.stock}`:""}</div>`:""}
         <div class="bb-price"><span class="bb-p mono">${fmt(p.price)}</span>${d?`<span class="bb-disc">−${d}%</span>`:""}</div>
         ${p.old?`<div class="bb-oldrow"><span class="bb-old mono">${fmt(p.old)}</span><span class="muted">без скидки</span></div>`:""}
-        <div class="bb-later">🕓 Оплатить позже — без % · частями по 6 · 12 · 24 мес</div>
+        <div class="bb-later"><span>🕓</span><div><b>Оплатить позже</b> — без % и переплат<br>частями на 6 · 12 · 24 мес</div></div>
         <div id="pdpFoot" style="margin-top:12px">${pdpBuy(id,q)}</div>
         <button class="btn btn-out btn-block" style="margin-top:10px" onclick="buyNow('${id}')">Купить сейчас</button>
         <button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="toggleFav('${id}',event)">${fav.has(id)?"♥ В избранном":"♡ В избранное"}</button>

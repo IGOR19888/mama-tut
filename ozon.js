@@ -105,7 +105,7 @@ async function reviewsAll() {
   } catch (e) { /* нет доступа к отзывам — не критично */ }
   return out;
 }
-function normalizeLive(inf, at, revs) {
+function normalizeLive(inf, at, revs, dict) {
   const attrs = at?.attributes || [];
   const brandRaw = attrs.find((a) => a.id === 85)?.values?.[0]?.value || "";
   const brand = brandOf(brandRaw);
@@ -118,19 +118,37 @@ function normalizeLive(inf, at, revs) {
   const rate = rev ? +(revs.reduce((s, r) => s + (r.rating || 5), 0) / rev).toFixed(1) : 4.9;
   const RU = { g: "г", kg: "кг", mg: "мг", mm: "мм", cm: "см", m: "м" };
   const u = (x) => RU[x] || x;
+  // характеристики: маппим атрибуты Ozon (числовые id) в читаемые названия по словарю
+  const NAME = dict || {};
+  const SKIP = /хештег|аннотац|pdf|видео|rich|json|^код |артикул|маркиров|оптом|^название|gtin|штрих|цена|ндс|вес с упаковкой|ключев|объедин|похожие товары|модельн|партномер|поставщик/i;
+  const seen = new Set(["Бренд"]);
   const specs = [["Бренд", brand]];
-  if (at?.weight) specs.push(["Вес", `${at.weight} ${u(at.weight_unit) || "г"}`]);
-  if (at?.height && at?.width && at?.depth) specs.push(["Габариты", `${at.height}×${at.width}×${at.depth} ${u(at.dimension_unit) || "мм"}`]);
-  if (at?.barcode) specs.push(["Штрихкод", String(at.barcode)]);
+  for (const a of attrs) {
+    const name = NAME[a.id];
+    if (!name || seen.has(name) || SKIP.test(name) || name.startsWith("#")) continue;
+    const value = (a.values || []).map((v) => v.value).filter(Boolean).join(", ");
+    if (!value || value.length > 140) continue;
+    seen.add(name); specs.push([name, value]);
+  }
+  if (at?.weight && !seen.has("Вес")) specs.push(["Вес", `${at.weight} ${u(at.weight_unit) || "г"}`]);
+  if (at?.height && at?.width && at?.depth && !seen.has("Габариты")) specs.push(["Габариты", `${at.height}×${at.width}×${at.depth} ${u(at.dimension_unit) || "мм"}`]);
+  if (at?.barcode && !seen.has("Штрихкод")) specs.push(["Штрихкод", String(at.barcode)]);
   return {
     id: inf.offer_id, sku: inf.sources?.[0]?.sku || inf.id, brand, cat: inferCat(inf.name),
     title: inf.name || "", price, old: old > price ? old : undefined,
     rate, rev, em: at?.primary_image || images[0] || "📦",
     gallery: images.length ? images : [at?.primary_image || "📦"],
-    sub: "", desc: "", specs, seller: brand === "LULU" ? "LULU (Ozon)" : "Mepsi (Ozon)",
+    sub: "", desc: "", specs: specs.slice(0, 16), seller: brand === "LULU" ? "LULU (Ozon)" : "Mepsi (Ozon)",
     stock: inf.has_fbo_stocks || inf.has_fbs_stocks ? 50 : 0,
     badge: rev >= 100 ? "хит" : undefined,
   };
+}
+// словарь атрибутов категории: id → читаемое название
+async function fetchDict(catId, typeId) {
+  const r = await call("/v1/description-category/attribute", { description_category_id: catId, type_id: typeId, language: "DEFAULT" });
+  const arr = r.result || r.attributes || [];
+  const map = {}; for (const a of arr) map[a.id] = a.name;
+  return map;
 }
 async function buildLive() {
   const listItems = await listAll();
@@ -159,7 +177,12 @@ async function buildLive() {
     (revByOffer[off] = revByOffer[off] || []).push(rv);
   }
 
-  const products = infos.map((inf) => normalizeLive(inf, attrByOffer[inf.offer_id], revByOffer[inf.offer_id] || []));
+  // словари атрибутов по уникальным (категория, тип) — для полных характеристик
+  const pairs = [...new Set(infos.map((i) => i.description_category_id + "_" + i.type_id))];
+  const dicts = {};
+  for (const pr of pairs) { const [c, t] = pr.split("_"); try { dicts[pr] = await fetchDict(+c, +t); } catch { dicts[pr] = {}; } }
+
+  const products = infos.map((inf) => normalizeLive(inf, attrByOffer[inf.offer_id], revByOffer[inf.offer_id] || [], dicts[inf.description_category_id + "_" + inf.type_id] || {}));
   const reviews = [];
   for (const [off, list] of Object.entries(revByOffer))
     for (const rv of list)
