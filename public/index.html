@@ -225,9 +225,12 @@
   .chip{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12px;padding:4px 10px;border-radius:7px}
 
   /* ---------- product page (PDP) ---------- */
-  .pdp{display:grid;grid-template-columns:minmax(0,430px) minmax(0,1fr) 340px;gap:24px;align-items:start;margin-top:8px}
+  .pdp{display:grid;grid-template-columns:76px 360px minmax(0,1fr) 320px;gap:18px;align-items:start;margin-top:8px}
+  .pdp .thumbs{display:flex;flex-direction:column;gap:10px}
   .pcol-info{min-width:0}
-  .stage{max-height:430px}
+  .pcol-buy{min-width:0}
+  .pdp-below{max-width:760px;margin-top:24px}
+  .pdp-descbody{line-height:1.65;white-space:pre-line;font-size:14px}
   .pdp-media{display:grid;grid-template-columns:64px 1fr;gap:12px}
   .thumbs{display:flex;flex-direction:column;gap:10px}
   .thumb{width:64px;height:64px;border-radius:12px;border:2px solid var(--line);background:var(--surface-2);
@@ -339,9 +342,11 @@
   .empty2{text-align:center;color:var(--muted);padding:44px 20px}
   .empty2 .big{font-size:52px;margin-bottom:10px}
 
+  .stage{max-width:100%}
   @media(max-width:900px){.pdp,.cart-grid,.checkout-grid{grid-template-columns:1fr}.acc{grid-template-columns:1fr}
-    .acc-nav{position:static}.buybox,.summary{position:static}.stat-row{grid-template-columns:1fr}}
-  @media(max-width:760px){.pdp-media{grid-template-columns:1fr}.thumbs{flex-direction:row;order:2}.stage{font-size:110px}}
+    .acc-nav{position:static}.buybox,.summary{position:static}.stat-row{grid-template-columns:1fr}
+    .pdp .thumbs{flex-direction:row;flex-wrap:wrap;order:2}.pdp-below{max-width:none}}
+  @media(max-width:760px){.thumbs{flex-direction:row;order:2}.stage{font-size:110px}}
 
   /* ---------- ЛК: группы меню, дашборд, карточка заказа (стиль Ozon в нашей палитре) ---------- */
   .acc-nav .grp{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:16px 12px 4px}
@@ -495,6 +500,9 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const getP=id=>PRODUCTS.find(p=>p.id===id);
 const isImg=v=>typeof v==="string"&&v.startsWith("http");
 const media=v=>isImg(v)?`<img class="pic" src="${esc(v)}" loading="lazy" alt="">`:(v||"📦");
+// описания Ozon приходят как HTML — превращаем в чистый текст с абзацами
+const cleanDesc=h=>String(h||"").replace(/<\s*br\s*\/?>/gi,"\n").replace(/<\/(p|li|ul|ol|div|h\d)>/gi,"\n")
+  .replace(/<li[^>]*>/gi,"• ").replace(/<[^>]+>/g,"").replace(/&nbsp;/gi," ").replace(/\n{3,}/g,"\n\n").trim();
 
 /* ---------- состояние ---------- */
 let brand="all",cat="all",q="";
@@ -655,24 +663,14 @@ async function viewProduct(id){
   VIEW().innerHTML=`
   ${crumbs([{t:"Главная",h:"#/"},{t:p.brand,h:"#/"},{t:p.cat,h:"#/"},{t:p.title}])}
   <div class="pdp b${p.brand}">
-    <div class="pcol-media">
-      <div class="pdp-media">
-        <div class="thumbs" id="thumbs">${gal.map((g,i)=>`<div class="thumb ${i?"":"on"}" onclick="pdpPic(${i})">${media(g)}</div>`).join("")}</div>
-        <div class="stage" id="stage">${media(gal[0])}</div>
-      </div>
-    </div>
+    <div class="thumbs" id="thumbs">${gal.slice(0,8).map((g,i)=>`<div class="thumb ${i?"":"on"}" onclick="pdpPic(${i})">${media(g)}</div>`).join("")}</div>
+    <div class="stage" id="stage">${media(gal[0])}</div>
     <div class="pcol-info">
       <h1 class="pdp-h1">${esc(p.title)}</h1>
-      <div class="pdp-rate"><span class="st">★</span> ${p.rate||"—"} · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${p.rev||revs.length} отзывов</a> · арт. ${esc(p.sku||p.id)}</div>
-      <div class="panel"><div class="h-sub">О товаре</div>
-        <table class="specs"><tbody>${(p.specs||[]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table></div>
-      ${p.desc?`<div class="panel" style="margin-top:16px"><div class="h-sub">Описание</div><div style="line-height:1.6;white-space:pre-line">${esc(p.desc)}</div></div>`:""}
-      <div class="panel" style="margin-top:16px" id="revs">
-        <div class="reviews-head"><div><div class="big-rate">${p.rate||"—"}</div><div class="st" style="font-size:13px">${"★".repeat(Math.round(p.rate||5))}${"☆".repeat(5-Math.round(p.rate||5))}</div></div>
-          <div><div style="font-weight:700">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</div>
-          ${user?`<button class="btn btn-out btn-sm" style="margin-top:8px" onclick="openReview('${p.id}')">Оставить отзыв</button>`:`<div class="muted" style="font-size:13px;margin-top:6px">Войдите, чтобы оставить отзыв</div>`}</div></div>
-        <div id="revList">${revs.length?revs.map(reviewHTML).join(""):`<div class="muted">Отзывов пока нет — будьте первым!</div>`}</div>
-      </div>
+      <div class="pdp-rate"><span class="st">★</span> ${p.rate||"—"} · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</a> · арт. ${esc(p.sku||p.id)}</div>
+      <div class="panel" style="margin-top:14px"><div class="h-sub">О товаре</div>
+        <table class="specs"><tbody>${(p.specs||[]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table>
+        ${p.desc?`<a class="link" style="display:inline-block;margin-top:12px" onclick="document.getElementById('descblock').scrollIntoView({behavior:'smooth'})">Перейти к описанию ↓</a>`:""}</div>
     </div>
     <div class="pcol-buy">
       <div class="buybox">
@@ -695,8 +693,17 @@ async function viewProduct(id){
       </div>
     </div>
   </div>
-  ${rel.length?`<div class="section-t" style="margin-top:34px">Похожее от ${esc(p.brand)}</div>
-    <div class="prod-scroll">${rel.map(card).join("")}</div>`:""}`;
+  <div class="pdp-below">
+    ${p.desc?`<div class="panel" id="descblock"><div class="h-sub">Описание</div><div class="pdp-descbody">${esc(cleanDesc(p.desc))}</div></div>`:""}
+    <div class="panel" style="margin-top:16px" id="revs">
+      <div class="reviews-head"><div><div class="big-rate">${p.rate||"—"}</div><div class="st" style="font-size:13px">${"★".repeat(Math.round(p.rate||5))}${"☆".repeat(5-Math.round(p.rate||5))}</div></div>
+        <div><div style="font-weight:700">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</div>
+        ${user?`<button class="btn btn-out btn-sm" style="margin-top:8px" onclick="openReview('${p.id}')">Оставить отзыв</button>`:`<div class="muted" style="font-size:13px;margin-top:6px">Войдите, чтобы оставить отзыв</div>`}</div></div>
+      <div id="revList">${revs.length?revs.map(reviewHTML).join(""):`<div class="muted">Отзывов пока нет — будьте первым!</div>`}</div>
+    </div>
+    ${rel.length?`<div class="section-t" style="margin-top:24px">Похожее от ${esc(p.brand)}</div>
+      <div class="prod-scroll">${rel.map(card).join("")}</div>`:""}
+  </div>`;
 }
 function pdpBuy(id,q){
   return q>0
