@@ -1,221 +1,369 @@
-<!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Магазин</title>
+<title>Mepsi & LULU</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Unbounded:wght@600;700;800&display=swap">
 <style>
   :root{
-    --bg:#f6f7f9; --surface:#fff; --ink:#161a20; --muted:#697180; --line:#e2e6eb;
-    --accent:#6d3bf5; --accent-ink:#fff; --good:#1f9d57;
-    --shadow:0 1px 2px rgba(20,24,32,.05),0 10px 30px rgba(20,24,32,.06);
+    --bg:#F4F7FF; --surface:#FFFFFF; --surface-2:#EDF2FF; --ink:#111633; --muted:#5c668c; --line:#e2e8fb;
+    --accent:#0033A1; --action:#005BFF; --accent-soft:#DCE7FF;
+    --sale:#E5197D; --good:#12A150; --amber:#E08A00; --star:#F5A623;
+    --lav:#D2AEFF; --pink:#FFB4E2; --peach:#FABBA2; --sky:#95CFFF; --mint:#8FE3D7;
+    --shadow:0 1px 2px rgba(17,22,51,.05),0 8px 24px rgba(17,22,51,.06);
+    --shadow-lg:0 16px 44px rgba(17,22,51,.16);
+    --r:14px;
   }
-  @media (prefers-color-scheme:dark){:root{
-    --bg:#0d1014; --surface:#161b22; --ink:#e8ebef; --muted:#8a94a2; --line:#262d38;
-    --accent:#8b5cf6; --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.4);
-  }}
+  :root[data-brand="lulu"]{ --accent:#6D28D9; --action:#7C3AED; --accent-soft:#EDE4FF; }
+  :root:not([data-theme="light"]){@media(prefers-color-scheme:dark){
+    --bg:#0a0e1f; --surface:#111733; --surface-2:#182046; --ink:#eaefff; --muted:#98a2c8; --line:#242d55;
+    --accent:#4d84ff; --action:#5a9bff; --accent-soft:#1a2450;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.4); --shadow-lg:0 18px 48px rgba(0,0,0,.5);
+  }
+  :root[data-brand="lulu"]:not([data-theme="light"]){@media(prefers-color-scheme:dark){--accent:#a78bfa;--action:#b79cff;--accent-soft:#2a1e52}}}
+  :root[data-theme="dark"]{
+    --bg:#0a0e1f; --surface:#111733; --surface-2:#182046; --ink:#eaefff; --muted:#98a2c8; --line:#242d55;
+    --accent:#4d84ff; --action:#5a9bff; --accent-soft:#1a2450;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.4); --shadow-lg:0 18px 48px rgba(0,0,0,.5);
+  }
+  :root[data-theme="dark"][data-brand="lulu"]{--accent:#a78bfa;--action:#b79cff;--accent-soft:#2a1e52}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
-  header{position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--line);
-    display:flex;align-items:center;gap:16px;padding:14px 20px}
-  .logo{font-weight:800;font-size:20px;letter-spacing:-.02em}
-  .logo span{color:var(--accent)}
-  header .sp{flex:1}
-  .cart-btn{position:relative;background:var(--accent);color:var(--accent-ink);border:none;
-    border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;font-size:15px}
-  .badge{position:absolute;top:-7px;right:-7px;background:var(--ink);color:var(--surface);
-    border-radius:20px;font-size:11px;font-weight:700;min-width:20px;height:20px;
-    display:flex;align-items:center;justify-content:center;padding:0 5px}
-  main{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
-  h1{font-size:28px;margin:0 0 4px}
-  .lead{color:var(--muted);margin:0 0 24px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;
-    box-shadow:var(--shadow);display:flex;flex-direction:column}
-  .thumb{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:64px;
-    background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent)}
-  .card .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
-  .card .title{font-weight:700;font-size:16px}
-  .card .desc{color:var(--muted);font-size:13px;flex:1}
-  .card .row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
-  .price{font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
-  .add{background:transparent;border:1.5px solid var(--accent);color:var(--accent);
-    border-radius:9px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:14px}
-  .add:hover{background:var(--accent);color:var(--accent-ink)}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Onest",system-ui,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased}
+  .mono{font-variant-numeric:tabular-nums}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+  button{font-family:inherit}
 
-  /* корзина */
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:.2s;z-index:20}
+  /* ---------- header ---------- */
+  header{position:sticky;top:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line)}
+  .topbar{font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;gap:18px;align-items:center;height:34px}
+  .topbar a{color:var(--muted);text-decoration:none}
+  .topbar .sp{flex:1}
+  .mainbar .wrap{display:flex;align-items:center;gap:16px;height:68px}
+  .logo{display:flex;flex-direction:column;text-decoration:none;flex:none;line-height:1}
+  .logo .nm{font-family:"Unbounded",sans-serif;font-weight:800;font-size:22px;letter-spacing:-.02em;color:var(--ink)}
+  .logo .nm b{color:var(--accent)} .logo .nm i{font-style:normal;color:#6D28D9}
+  .logo .tag{font-size:10.5px;color:var(--muted);margin-top:3px;font-weight:600;letter-spacing:.01em}
+  .catbtn{flex:none;display:flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;
+    height:44px;padding:0 18px;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer}
+  .catbtn:hover{filter:brightness(1.08)}
+  .search{flex:1;display:flex;align-items:center;background:var(--surface-2);border:2px solid transparent;
+    border-radius:11px;height:44px;padding:0 6px 0 14px;transition:border-color .15s}
+  .search:focus-within{border-color:var(--action);background:var(--surface)}
+  .search input{flex:1;border:none;background:transparent;font:inherit;font-size:15px;color:var(--ink);outline:none}
+  .search .go{background:var(--action);color:#fff;border:none;height:34px;padding:0 16px;border-radius:8px;font-weight:700;cursor:pointer}
+  .acts{display:flex;gap:6px;flex:none}
+  .act{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;
+    color:var(--muted);font-size:11px;padding:6px 8px;border-radius:9px;position:relative;min-width:54px}
+  .act:hover{color:var(--accent);background:var(--surface-2)}
+  .act .ic{font-size:20px}
+  .act .badge{position:absolute;top:2px;right:8px;background:var(--sale);color:#fff;font-size:10px;font-weight:700;
+    min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+  .trust{background:var(--accent-soft);border-bottom:1px solid var(--line)}
+  .trust .wrap{display:flex;gap:20px;flex-wrap:wrap;height:auto;padding-top:7px;padding-bottom:7px;font-size:12.5px;font-weight:600;color:var(--accent)}
+  .trust span{display:flex;align-items:center;gap:5px}
+
+  /* brand switch */
+  .brandbar .wrap{display:flex;gap:8px;height:52px;align-items:center;overflow-x:auto}
+  .btab{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;
+    padding:8px 18px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
+  .btab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btab .s{font-weight:500;font-size:11px;opacity:.8;margin-left:6px}
+
+  main{padding:20px 0 80px}
+  .section-t{font-family:"Unbounded",sans-serif;font-weight:700;font-size:20px;letter-spacing:-.01em;margin:26px 0 14px;display:flex;align-items:baseline;gap:10px}
+  .section-t .all{margin-left:auto;font-family:"Onest";font-size:13px;font-weight:600;color:var(--action);cursor:pointer}
+
+  /* promo */
+  .promos{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .promo{border-radius:18px;padding:22px;min-height:150px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;color:#15183a}
+  .promo.m{background:linear-gradient(120deg,#95CFFF,#D8E5FF)}
+  .promo.l{background:linear-gradient(120deg,#D2AEFF,#FFD9F1)}
+  .promo h3{font-family:"Unbounded";font-size:22px;margin:0 0 6px;letter-spacing:-.01em}
+  .promo p{margin:0 0 14px;font-size:14px;max-width:30ch;font-weight:500}
+  .promo .b{align-self:flex-start;background:#15183a;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:700;cursor:pointer}
+  .promo .em{position:absolute;right:16px;bottom:8px;font-size:76px;opacity:.9}
+
+  /* special offers */
+  .specials{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .special{background:var(--surface);border:1.5px solid var(--accent);border-radius:16px;padding:18px;display:flex;gap:16px;align-items:center;box-shadow:var(--shadow)}
+  .special .big{font-size:52px;flex:none}
+  .special h4{margin:0 0 4px;font-size:16px;font-weight:700}
+  .special p{margin:0 0 10px;font-size:13px;color:var(--muted)}
+  .special .tag{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:11px;padding:3px 9px;border-radius:6px;margin-bottom:8px}
+  .special .b{background:var(--action);color:#fff;border:none;border-radius:9px;padding:9px 15px;font-weight:700;font-size:13px;cursor:pointer}
+
+  /* category chips */
+  .cats{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 4px}
+  .cat{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 15px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+  .cat.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+
+  /* product grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:8px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;
+    transition:transform .18s cubic-bezier(.2,0,0,1),box-shadow .18s,border-color .18s}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--accent-soft)}
+  .card .ph{aspect-ratio:1;position:relative;display:flex;align-items:center;justify-content:center;font-size:66px;overflow:hidden}
+  .card .ph .em{transition:transform .3s cubic-bezier(.2,0,0,1)}
+  .card:hover .ph .em{transform:scale(1.06)}
+  .bMepsi .ph{background:linear-gradient(135deg,#DCE7FF,#F0EBFF)}
+  .bLULU .ph{background:linear-gradient(135deg,#EDE4FF,#FFE4F6)}
+  .card .badge{position:absolute;top:9px;left:9px;background:var(--sale);color:#fff;font-weight:700;font-size:12px;padding:3px 8px;border-radius:7px}
+  .card .badge.hit{background:var(--accent)}
+  .card .fav{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.92);
+    border:none;cursor:pointer;font-size:16px;line-height:1;color:#c9ccdd;display:flex;align-items:center;justify-content:center}
+  .card .fav.on{color:var(--sale)}
+  .card .bl{position:absolute;left:9px;bottom:9px;font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    background:rgba(255,255,255,.9);padding:2px 7px;border-radius:6px}
+  .bMepsi .bl{color:#0033A1} .bLULU .bl{color:#6D28D9}
+  .card .body{padding:11px 12px 12px;display:flex;flex-direction:column;flex:1}
+  .card .prc{display:flex;align-items:baseline;gap:6px}
+  .card .p{font-weight:800;font-size:20px;color:var(--accent);letter-spacing:-.01em}
+  .card .old{font-size:12.5px;color:var(--muted);text-decoration:line-through}
+  .card .ttl{font-size:13px;color:var(--ink);margin:6px 0;line-height:1.35;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:35px}
+  .card .rate{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .card .rate .st{color:var(--star)}
+  .card .foot{margin-top:auto;padding-top:10px}
+  .addbtn{width:100%;border:none;border-radius:9px;background:var(--action);color:#fff;font-weight:700;padding:11px;font-size:14px;cursor:pointer;
+    transition:transform .12s cubic-bezier(.34,1.56,.64,1),filter .12s}
+  .addbtn:hover{filter:brightness(1.08)} .addbtn:active{transform:scale(.97)}
+  .stepper{display:flex;align-items:center;justify-content:space-between;background:var(--accent-soft);border-radius:9px;padding:4px}
+  .stepper button{width:34px;height:34px;border:none;background:var(--surface);border-radius:7px;font-size:18px;font-weight:700;color:var(--accent);cursor:pointer;box-shadow:var(--shadow)}
+  .stepper .q{font-weight:700;color:var(--accent)}
+
+  /* drawers */
+  .overlay{position:fixed;inset:0;background:rgba(10,14,31,.5);opacity:0;pointer-events:none;transition:.2s;z-index:40}
   .overlay.open{opacity:1;pointer-events:auto}
-  .drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,100%);background:var(--surface);
-    box-shadow:var(--shadow);transform:translateX(100%);transition:.25s;z-index:30;display:flex;flex-direction:column}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(440px,100%);background:var(--bg);z-index:50;
+    transform:translateX(100%);transition:transform .28s cubic-bezier(.2,0,0,1);display:flex;flex-direction:column;box-shadow:var(--shadow-lg)}
   .drawer.open{transform:none}
-  .drawer h2{margin:0;padding:18px 20px;border-bottom:1px solid var(--line);font-size:18px;
-    display:flex;align-items:center;justify-content:space-between}
+  .drawer h2{margin:0;padding:18px 20px;font-family:"Unbounded";font-size:19px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--surface)}
   .drawer .close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1}
-  .items{flex:1;overflow:auto;padding:8px 20px}
-  .line{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-  .line .em{font-size:32px}
-  .line .info{flex:1}
-  .line .t{font-weight:600;font-size:14px}
-  .line .p{color:var(--muted);font-size:13px}
-  .qty{display:flex;align-items:center;gap:8px}
-  .qty button{width:28px;height:28px;border:1px solid var(--line);background:var(--bg);border-radius:7px;
-    cursor:pointer;font-size:16px;color:var(--ink)}
-  .qty span{min-width:20px;text-align:center;font-variant-numeric:tabular-nums}
-  .empty{color:var(--muted);text-align:center;padding:40px 0}
-  .foot{border-top:1px solid var(--line);padding:16px 20px}
-  .total{display:flex;justify-content:space-between;font-weight:800;font-size:18px;margin-bottom:12px}
-  .checkout{width:100%;background:var(--accent);color:var(--accent-ink);border:none;border-radius:11px;
-    padding:14px;font-weight:700;font-size:16px;cursor:pointer}
-  .checkout:disabled{opacity:.5;cursor:not-allowed}
-  form{display:flex;flex-direction:column;gap:10px}
-  form input,form textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;
-    background:var(--bg);color:var(--ink);font:inherit}
-  form textarea{resize:vertical;min-height:60px}
-  .back{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0;margin-bottom:4px;text-align:left}
-  .ok{text-align:center;padding:30px 20px}
-  .ok .big{font-size:48px}
-  .ok h3{margin:8px 0}
-  .hint{font-size:13px;color:var(--muted)}
+  .drawer .items{flex:1;overflow:auto;padding:12px 16px}
+  .cline{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .cline .em{width:56px;height:56px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:30px;flex:none}
+  .cline .t{font-size:13px;line-height:1.3}
+  .cline .cp{font-weight:800;color:var(--accent);margin-top:4px}
+  .cline .mini{display:flex;align-items:center;gap:8px;margin-top:6px}
+  .cline .mini button{width:26px;height:26px;border:1px solid var(--line);background:var(--surface);border-radius:6px;cursor:pointer;font-size:15px;color:var(--ink)}
+  .cfoot{border-top:1px solid var(--line);padding:16px 20px;background:var(--surface)}
+  .cfoot .row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px;color:var(--muted)}
+  .cfoot .total{font-size:20px;font-weight:800;color:var(--ink)}
+  .cfoot .checkout{width:100%;margin-top:12px;border:none;border-radius:11px;background:var(--action);color:#fff;font-weight:700;font-size:16px;padding:14px;cursor:pointer}
+  .empty{text-align:center;color:var(--muted);padding:50px 20px}
+
+  /* orders */
+  .order{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .order .oh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .order .on{font-weight:700;font-size:14px} .order .od{font-size:12px;color:var(--muted)}
+  .status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+  .status.done{background:#dff3e6;color:#12A150} .status.way{background:#dce7ff;color:#005BFF} .status.pack{background:#fdeccb;color:#b37500}
+  .order .oi{display:flex;gap:6px;margin:8px 0}
+  .order .oi span{width:38px;height:38px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:20px}
+  .order .osum{font-weight:800;color:var(--ink)}
+  .track{display:flex;gap:0;margin-top:10px}
+  .track .stp{flex:1;text-align:center;font-size:10px;color:var(--muted);position:relative}
+  .track .stp::before{content:"";display:block;width:11px;height:11px;border-radius:50%;background:var(--line);margin:0 auto 4px}
+  .track .stp.act::before{background:var(--action)} .track .stp.act{color:var(--action);font-weight:700}
+  .track .stp::after{content:"";position:absolute;top:5px;left:-50%;width:100%;height:2px;background:var(--line);z-index:-1}
+  .track .stp:first-child::after{display:none}
+  .track .stp.act::after{background:var(--action)}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);
+    padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:var(--shadow-lg)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .theme-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
+  @media(max-width:760px){.promos,.specials{grid-template-columns:1fr}.topbar{display:none}.logo .tag{display:none}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.act span:not(.badge){display:none}.act{min-width:40px}}
 </style>
-</head>
-<body>
+
 <header>
-  <div class="logo">Мой<span>Магазин</span></div>
-  <div class="sp"></div>
-  <button class="cart-btn" id="openCart">Корзина <span class="badge" id="badge" hidden>0</span></button>
+  <div class="topbar"><div class="wrap">
+    <span>📍 Москва</span><a href="#">Пункты выдачи</a><a href="#">Оплата и доставка</a><a href="#">Помощь</a>
+    <span class="sp"></span><a href="#">Стать оптовым клиентом</a>
+    <button class="theme-btn" id="theme" title="Тема">◐</button>
+  </div></div>
+  <div class="mainbar"><div class="wrap">
+    <a class="logo" href="#"><span class="nm"><b>Mepsi</b> & <i>LULU</i></span><span class="tag">Официальный магазин · напрямую от производителя</span></a>
+    <button class="catbtn">☰ Каталог</button>
+    <div class="search"><input id="q" placeholder="Искать: подгузники, шампунь, набор…"><button class="go">Найти</button></div>
+    <div class="acts">
+      <button class="act" onclick="openD('orders')"><span class="ic">📦</span><span>Заказы</span></button>
+      <button class="act"><span class="ic">❤️</span><span>Избранное</span><span class="badge" id="favBadge" hidden>0</span></button>
+      <button class="act" onclick="openD('cart')"><span class="ic">🛒</span><span>Корзина</span><span class="badge" id="cartBadge" hidden>0</span></button>
+    </div>
+  </div></div>
+  <div class="trust"><div class="wrap">
+    <span>✓ Официальный магазин</span><span>✓ Напрямую от производителя</span><span>✓ Оригинал, гарантия качества</span><span>✓ Доставка по всей России</span>
+  </div></div>
+  <div class="brandbar"><div class="wrap" id="brandTabs">
+    <button class="btab on" data-b="all">Все товары</button>
+    <button class="btab" data-b="Mepsi">Mepsi <span class="s">15 лет · подгузники и гигиена</span></button>
+    <button class="btab" data-b="LULU">LULU <span class="s">премиум-уход · 2500+ отзывов</span></button>
+  </div></div>
 </header>
 
-<main>
-  <h1>Каталог</h1>
-  <p class="lead">Демо-товары — замени их в <code>data/products.json</code>.</p>
+<main class="wrap">
+  <div id="hero">
+    <div class="promos" style="margin-top:16px">
+      <div class="promo m"><h3>Mepsi</h3><p>Подгузники и гигиена напрямую от производителя. Честная цена без наценки маркетплейсов.</p><button class="b" onclick="setBrand('Mepsi')">Смотреть Mepsi</button><span class="em">🧷</span></div>
+      <div class="promo l"><h3>LULU</h3><p>Премиальный детский уход из «Золотого Яблока» и «Детского мира» — теперь напрямую.</p><button class="b" onclick="setBrand('LULU')">Смотреть LULU</button><span class="em">🧴</span></div>
+    </div>
+
+    <div class="section-t">✨ Только у нас</div>
+    <div class="specials">
+      <div class="special"><div class="big">🎁</div><div><span class="tag">нет на маркетплейсах</span><h4>Набор Mepsi + LULU «Всё для малыша»</h4><p>Подгузники Mepsi + шампунь и крем LULU в одной коробке. Выгоднее, чем по отдельности.</p><button class="b" onclick="toast('Набор добавим в каталог 🎁')">2 990 ₽ · собрать набор</button></div></div>
+      <div class="special"><div class="big">🔁</div><div><span class="tag">−15% и бесплатная доставка</span><h4>Подписка на подгузники Mepsi</h4><p>Привозим нужный размер каждый месяц. Отменить можно в любой момент.</p><button class="b" onclick="toast('Подписка — скоро 🔁')">Оформить подписку</button></div></div>
+    </div>
+  </div>
+
+  <div class="section-t" id="catalogTitle">Каталог <span class="all" id="resCount"></span></div>
+  <div class="cats" id="cats"></div>
   <div class="grid" id="grid"></div>
+  <div class="empty" id="noRes" hidden>Ничего не нашлось 🔍 Попробуй другой запрос.</div>
 </main>
 
-<div class="overlay" id="overlay"></div>
-<aside class="drawer" id="drawer" aria-label="Корзина">
-  <h2>Корзина <button class="close" id="closeCart">×</button></h2>
-  <div class="items" id="cartItems"></div>
-  <div class="foot" id="cartFoot"></div>
+<div class="overlay" id="overlay" onclick="closeD()"></div>
+<aside class="drawer" id="drawer">
+  <h2 id="drawerTitle">Корзина <button class="close" onclick="closeD()">×</button></h2>
+  <div class="items" id="drawerBody"></div>
+  <div class="cfoot" id="drawerFoot"></div>
 </aside>
 
+<div class="toast" id="toast"></div>
+
 <script>
-const fmt = n => n.toLocaleString("ru-RU") + " ₽";
-let products = [];
-let cart = load();
-let stage = "cart"; // cart | checkout | done
+const FALLBACK=[
+ {id:"m1",brand:"Mepsi",cat:"Подгузники",title:"Подгузники-трусики Comfort, размер 4, 44 шт",price:1743,old:2490,rate:4.9,rev:1280,em:"🧷",badge:"хит"},
+ {id:"m2",brand:"Mepsi",cat:"Салфетки",title:"Влажные салфетки Sensitive, 120 шт",price:199,rate:4.8,rev:860,em:"🧻"},
+ {id:"m3",brand:"Mepsi",cat:"Подгузники",title:"Подгузники Newborn, размер 1, 28 шт",price:890,rate:4.9,rev:2100,em:"🧷",badge:"хит"},
+ {id:"m4",brand:"Mepsi",cat:"Стирка",title:"Гель для стирки детского белья, 2 л",price:640,rate:4.9,rev:920,em:"🧴"},
+ {id:"m5",brand:"Mepsi",cat:"Уход",title:"Крем под подгузник с пантенолом, 75 мл",price:320,old:420,rate:4.7,rev:300,em:"🧴"},
+ {id:"m6",brand:"Mepsi",cat:"Купание",title:"Пенка для купания без слёз, 300 мл",price:380,rate:4.8,rev:510,em:"🫧"},
+ {id:"m7",brand:"Mepsi",cat:"Салфетки",title:"Салфетки влажные Travel, 20 шт × 3",price:149,rate:4.7,rev:240,em:"🧻"},
+ {id:"m8",brand:"Mepsi",cat:"Подгузники",title:"Подгузники Comfort, размер 5, 38 шт",price:1690,rate:4.9,rev:760,em:"🧷"},
+ {id:"l1",brand:"LULU",cat:"Купание",title:"Детский шампунь-гель 2 в 1, 400 мл",price:690,rate:4.9,rev:2500,em:"🧴",badge:"хит"},
+ {id:"l2",brand:"LULU",cat:"Уход",title:"Крем детский универсальный, 150 мл",price:550,old:720,rate:4.9,rev:840,em:"🧴"},
+ {id:"l3",brand:"LULU",cat:"Купание",title:"Пена для ванны нежная, 500 мл",price:620,rate:4.8,rev:610,em:"🛁"},
+ {id:"l4",brand:"LULU",cat:"Уход",title:"Масло для массажа малыша, 200 мл",price:780,rate:4.8,rev:320,em:"🍶",badge:"новинка"},
+ {id:"l5",brand:"LULU",cat:"Купание",title:"Шампунь без слёз, 250 мл",price:480,rate:4.9,rev:1100,em:"🧴"},
+ {id:"l6",brand:"LULU",cat:"Уход",title:"Молочко для тела детское, 300 мл",price:590,rate:4.8,rev:430,em:"🧴"},
+ {id:"l7",brand:"LULU",cat:"Уход",title:"Мыло-крем жидкое увлажняющее, 300 мл",price:390,rate:4.7,rev:380,em:"🧼"},
+ {id:"l8",brand:"LULU",cat:"Наборы",title:"Подарочный набор LULU, 5 предметов",price:2490,old:3200,rate:4.9,rev:210,em:"🎀",badge:"новинка"},
+];
+let PRODUCTS=FALLBACK.slice();
+const fmt=n=>n.toLocaleString("ru-RU")+" ₽";
+const disc=p=>p.old?Math.round((p.old-p.price)/p.old*100):0;
+let brand="all",cat="all",q="",cart={},fav=new Set(),drawer=null;
 
-function load(){ try{return JSON.parse(localStorage.getItem("cart"))||{};}catch{return {};} }
-function save(){ try{localStorage.setItem("cart",JSON.stringify(cart));}catch{} }
-
-async function init(){
-  try{ products = await (await fetch("/api/products")).json(); }
-  catch{ products = []; }
-  renderGrid(); renderCart();
+function filtered(){
+  return PRODUCTS.filter(p=>
+    (brand==="all"||p.brand===brand)&&
+    (cat==="all"||p.cat===cat)&&
+    (!q||p.title.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)));
 }
+function cartCount(){return Object.values(cart).reduce((a,b)=>a+b,0)}
+function cartTotal(){return Object.entries(cart).reduce((s,[id,q])=>s+(PRODUCTS.find(p=>p.id===id).price*q),0)}
 
+function renderCats(){
+  const src=PRODUCTS.filter(p=>brand==="all"||p.brand===brand);
+  const cs=["all",...new Set(src.map(p=>p.cat))];
+  document.getElementById("cats").innerHTML=cs.map(c=>
+    `<button class="cat ${c===cat?"on":""}" onclick="setCat('${c}')">${c==="all"?"Все категории":c}</button>`).join("");
+}
+function card(p){
+  const d=disc(p), q=cart[p.id]||0;
+  return `<div class="card b${p.brand}">
+    <div class="ph">
+      <span class="em">${p.em}</span>
+      ${p.badge?`<span class="badge ${p.badge==="хит"?"hit":""}">${p.badge==="хит"?"ХИТ":d?("−"+d+"%"):p.badge.toUpperCase()}</span>`:(d?`<span class="badge">−${d}%</span>`:"")}
+      <button class="fav ${fav.has(p.id)?"on":""}" onclick="toggleFav('${p.id}')">${fav.has(p.id)?"♥":"♡"}</button>
+      <span class="bl">${p.brand}</span>
+    </div>
+    <div class="body">
+      <div class="prc"><span class="p mono">${fmt(p.price)}</span>${p.old?`<span class="old mono">${fmt(p.old)}</span>`:""}</div>
+      <div class="ttl">${p.title}</div>
+      <div class="rate"><span class="st">★</span> ${p.rate} · ${p.rev.toLocaleString("ru-RU")} отз.</div>
+      <div class="foot" id="foot-${p.id}">${stepperOrBtn(p.id,q)}</div>
+    </div></div>`;
+}
+function stepperOrBtn(id,q){
+  return q>0
+    ? `<div class="stepper"><button onclick="setQty('${id}',${q-1})">−</button><span class="q mono">${q} шт</span><button onclick="setQty('${id}',${q+1})">+</button></div>`
+    : `<button class="addbtn" onclick="setQty('${id}',1)">В корзину</button>`;
+}
 function renderGrid(){
-  document.getElementById("grid").innerHTML = products.map(p=>`
-    <div class="card">
-      <div class="thumb">${p.emoji||"📦"}</div>
-      <div class="body">
-        <div class="title">${esc(p.title)}</div>
-        <div class="desc">${esc(p.desc||"")}</div>
-        <div class="row">
-          <span class="price">${fmt(p.price)}</span>
-          <button class="add" data-id="${p.id}">В корзину</button>
-        </div>
-      </div>
+  const list=filtered();
+  document.getElementById("grid").innerHTML=list.map(card).join("");
+  document.getElementById("noRes").hidden=list.length>0;
+  document.getElementById("resCount").textContent=list.length?`${list.length} товаров`:"";
+}
+function refreshCounts(){
+  const cb=document.getElementById("cartBadge"),c=cartCount();
+  cb.textContent=c;cb.hidden=c===0;
+}
+
+function setBrand(b){
+  brand=b;cat="all";
+  document.documentElement.setAttribute("data-brand",b==="LULU"?"lulu":"");
+  document.querySelectorAll(".btab").forEach(t=>t.classList.toggle("on",t.dataset.b===b));
+  document.getElementById("hero").style.display=b==="all"?"":"none";
+  renderCats();renderGrid();window.scrollTo({top:0,behavior:"smooth"});
+}
+function setCat(c){cat=c;renderCats();renderGrid()}
+function setQty(id,n){
+  if(n<=0)delete cart[id];else cart[id]=n;
+  const f=document.getElementById("foot-"+id);if(f)f.innerHTML=stepperOrBtn(id,cart[id]||0);
+  refreshCounts(); if(drawer==="cart")renderDrawer();
+  if(n===1)toast("Добавлено в корзину 🛒");
+}
+function toggleFav(id){
+  fav.has(id)?fav.delete(id):fav.add(id);
+  const b=document.querySelector(`#foot-${id}`)?.closest(".card").querySelector(".fav");
+  const el=[...document.querySelectorAll(".card")].find(c=>c.querySelector(`[onclick*="'${id}'"]`));
+  renderGrid();
+}
+document.getElementById("q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();
+  document.getElementById("hero").style.display=q?"none":(brand==="all"?"":"none");renderGrid()});
+document.getElementById("brandTabs").addEventListener("click",e=>{const t=e.target.closest(".btab");if(t)setBrand(t.dataset.b)});
+
+/* drawers */
+function openD(kind){drawer=kind;document.getElementById("overlay").classList.add("open");
+  document.getElementById("drawer").classList.add("open");renderDrawer()}
+function closeD(){drawer=null;document.getElementById("overlay").classList.remove("open");document.getElementById("drawer").classList.remove("open")}
+function renderDrawer(){
+  const title=document.getElementById("drawerTitle"),body=document.getElementById("drawerBody"),foot=document.getElementById("drawerFoot");
+  if(drawer==="cart"){
+    title.innerHTML=`Корзина <button class="close" onclick="closeD()">×</button>`;
+    const lines=Object.entries(cart).map(([id,q])=>({p:PRODUCTS.find(x=>x.id===id),q}));
+    if(!lines.length){body.innerHTML=`<div class="empty">Корзина пуста 🛒<br>Добавь товары из каталога.</div>`;foot.innerHTML="";return}
+    body.innerHTML=lines.map(({p,q})=>`<div class="cline">
+      <div class="em">${p.em}</div>
+      <div style="flex:1"><div class="t">${p.title}</div><div class="cp mono">${fmt(p.price*q)}</div>
+        <div class="mini"><button onclick="setQty('${p.id}',${q-1})">−</button><span class="mono">${q} шт</span><button onclick="setQty('${p.id}',${q+1})">+</button></div>
+      </div></div>`).join("");
+    foot.innerHTML=`<div class="row"><span>Товаров: ${cartCount()}</span><span>Доставка: бесплатно</span></div>
+      <div class="row"><span>Итого</span><span class="total mono">${fmt(cartTotal())}</span></div>
+      <button class="checkout" onclick="toast('Заказ оформлен ✅ (демо)');cart={};refreshCounts();renderGrid();renderDrawer()">Оформить заказ</button>`;
+  } else {
+    title.innerHTML=`Мои заказы <button class="close" onclick="closeD()">×</button>`;
+    body.innerHTML=ORDERS.map(o=>`<div class="order">
+      <div class="oh"><div><div class="on">Заказ ${o.no}</div><div class="od">${o.date}</div></div><span class="status ${o.st}">${o.label}</span></div>
+      <div class="oi">${o.items.map(e=>`<span>${e}</span>`).join("")}</div>
+      <div class="track">${o.steps.map((s,i)=>`<div class="stp ${i<=o.at?"act":""}">${s}</div>`).join("")}</div>
+      <div class="oh" style="margin-top:10px;margin-bottom:0"><span class="od">${o.count} товара</span><span class="osum mono">${fmt(o.sum)}</span></div>
     </div>`).join("");
-  document.querySelectorAll(".add").forEach(b=>b.onclick=()=>{ addToCart(b.dataset.id); openCart(); });
-}
-
-function addToCart(id){ cart[id]=(cart[id]||0)+1; save(); renderCart(); }
-function setQty(id,q){ if(q<=0) delete cart[id]; else cart[id]=q; save(); renderCart(); }
-function cartLines(){ return Object.entries(cart).map(([id,qty])=>({p:products.find(x=>x.id===id),qty})).filter(x=>x.p); }
-function cartTotal(){ return cartLines().reduce((s,l)=>s+l.p.price*l.qty,0); }
-function cartCount(){ return Object.values(cart).reduce((s,q)=>s+q,0); }
-
-function renderCart(){
-  const badge=document.getElementById("badge"), c=cartCount();
-  badge.textContent=c; badge.hidden=c===0;
-  const items=document.getElementById("cartItems"), foot=document.getElementById("cartFoot");
-  const lines=cartLines();
-
-  if(stage==="done"){
-    items.innerHTML=`<div class="ok"><div class="big">✅</div><h3>Заказ принят!</h3>
-      <p class="hint">Мы свяжемся с тобой по телефону для подтверждения.</p></div>`;
-    foot.innerHTML=`<button class="checkout" id="again">Вернуться в каталог</button>`;
-    document.getElementById("again").onclick=()=>{ stage="cart"; renderCart(); closeCart(); };
-    return;
-  }
-
-  if(!lines.length){
-    items.innerHTML=`<div class="empty">Пусто. Добавь товары из каталога.</div>`;
-    foot.innerHTML=""; stage="cart"; return;
-  }
-
-  if(stage==="cart"){
-    items.innerHTML=lines.map(l=>`
-      <div class="line">
-        <div class="em">${l.p.emoji||"📦"}</div>
-        <div class="info"><div class="t">${esc(l.p.title)}</div><div class="p">${fmt(l.p.price)}</div></div>
-        <div class="qty">
-          <button data-m="${l.p.id}">−</button><span>${l.qty}</span><button data-pl="${l.p.id}">+</button>
-        </div>
-      </div>`).join("");
-    items.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>setQty(b.dataset.m,cart[b.dataset.m]-1));
-    items.querySelectorAll("[data-pl]").forEach(b=>b.onclick=()=>setQty(b.dataset.pl,cart[b.dataset.pl]+1));
-    foot.innerHTML=`<div class="total"><span>Итого</span><span>${fmt(cartTotal())}</span></div>
-      <button class="checkout" id="toCheckout">Оформить заказ</button>`;
-    document.getElementById("toCheckout").onclick=()=>{ stage="checkout"; renderCart(); };
-    return;
-  }
-
-  // stage === checkout
-  items.innerHTML=`
-    <button class="back" id="back">← назад в корзину</button>
-    <form id="orderForm">
-      <input name="name" placeholder="Имя" required>
-      <input name="phone" placeholder="Телефон" required>
-      <input name="address" placeholder="Адрес доставки">
-      <textarea name="comment" placeholder="Комментарий к заказу"></textarea>
-    </form>`;
-  foot.innerHTML=`<div class="total"><span>К оплате</span><span>${fmt(cartTotal())}</span></div>
-    <button class="checkout" id="send">Подтвердить заказ</button>`;
-  document.getElementById("back").onclick=()=>{ stage="cart"; renderCart(); };
-  document.getElementById("send").onclick=submitOrder;
-}
-
-async function submitOrder(){
-  const f=document.getElementById("orderForm");
-  if(!f.reportValidity()) return;
-  const btn=document.getElementById("send"); btn.disabled=true; btn.textContent="Отправляем…";
-  const payload={
-    name:f.name.value, phone:f.phone.value, address:f.address.value, comment:f.comment.value,
-    items:cartLines().map(l=>({id:l.p.id, qty:l.qty}))
-  };
-  try{
-    const r=await fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-    const data=await r.json();
-    if(!r.ok) throw new Error(data.error||"Ошибка");
-    cart={}; save(); stage="done"; renderCart();
-  }catch(e){
-    btn.disabled=false; btn.textContent="Подтвердить заказ";
-    alert("Не удалось оформить: "+e.message);
+    foot.innerHTML="";
   }
 }
+const ORDERS=[
+ {no:"№2495",date:"Сегодня, 11:20",st:"pack",label:"Собирается",items:["🧴","🎀"],count:2,sum:3040,steps:["Оформлен","Собирается","В пути","Доставлен"],at:1},
+ {no:"№2490",date:"Вчера",st:"way",label:"В пути",items:["🎁","🧷"],count:2,sum:2990,steps:["Оформлен","Собирается","В пути","Доставлен"],at:2},
+ {no:"№2481",date:"28 августа",st:"done",label:"Доставлен",items:["🧷","🧴","🧻"],count:3,sum:2933,steps:["Оформлен","Собирается","В пути","Доставлен"],at:3},
+];
 
-const overlay=document.getElementById("overlay"), drawer=document.getElementById("drawer");
-function openCart(){ overlay.classList.add("open"); drawer.classList.add("open"); }
-function closeCart(){ overlay.classList.remove("open"); drawer.classList.remove("open"); }
-document.getElementById("openCart").onclick=openCart;
-document.getElementById("closeCart").onclick=closeCart;
-overlay.onclick=closeCart;
+let toastT;
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2600)}
+document.getElementById("theme").onclick=()=>{const r=document.documentElement,c=r.getAttribute("data-theme");
+  const sd=matchMedia("(prefers-color-scheme:dark)").matches;r.setAttribute("data-theme",c?(c==="dark"?"light":"dark"):(sd?"light":"dark"))};
 
-function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-init();
+(async()=>{try{const r=await fetch("/api/products");const d=await r.json();if(Array.isArray(d)&&d.length)PRODUCTS=d;}catch(e){}renderCats();renderGrid();refreshCounts();})();
 </script>
-</body>
-</html>
