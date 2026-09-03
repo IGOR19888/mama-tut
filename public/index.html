@@ -173,6 +173,146 @@
   .theme-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
   @media(max-width:760px){.promos,.specials{grid-template-columns:1fr}.topbar{display:none}.logo .tag{display:none}
     .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.act span:not(.badge){display:none}.act{min-width:40px}}
+
+  /* ============ ДОБАВЛЕНО: страницы, ЛК, вход — в том же дизайне ============ */
+  a{color:inherit}
+  .link{color:var(--action);cursor:pointer;text-decoration:none;font-weight:600}
+  .link:hover{text-decoration:underline}
+  .crumbs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted);margin:16px 0 4px}
+  .crumbs a{cursor:pointer;color:var(--muted);text-decoration:none}
+  .crumbs a:hover{color:var(--accent)}
+  .crumbs .sep{opacity:.5}
+  .card .ph{cursor:pointer}
+  .card .ttl{cursor:pointer} .card .ttl:hover{color:var(--accent)}
+
+  /* form controls */
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .field label{font-size:13px;font-weight:600;color:var(--muted)}
+  .inp{width:100%;height:46px;border:2px solid var(--line);background:var(--surface);border-radius:11px;
+    padding:0 14px;font:inherit;font-size:15px;color:var(--ink);outline:none;transition:border-color .15s}
+  textarea.inp{height:auto;padding:12px 14px;min-height:80px;resize:vertical}
+  .inp:focus{border-color:var(--action)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn{border:none;border-radius:11px;padding:13px 20px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;
+    transition:transform .12s,filter .12s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--action);color:#fff}.btn-primary:hover{filter:brightness(1.08)}
+  .btn-ink{background:var(--ink);color:var(--bg)}
+  .btn-ghost{background:var(--surface-2);color:var(--ink)}.btn-ghost:hover{filter:brightness(.97)}
+  .btn-out{background:transparent;border:2px solid var(--line);color:var(--ink)}.btn-out:hover{border-color:var(--accent)}
+  .btn-block{width:100%}
+  .btn-sm{padding:8px 14px;font-size:13px;border-radius:9px}
+  .btn-danger{background:transparent;color:var(--sale);border:2px solid transparent}.btn-danger:hover{background:#fdecf4}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+  .panel + .panel{margin-top:16px}
+  .h-title{font-family:"Unbounded",sans-serif;font-weight:700;font-size:24px;letter-spacing:-.01em;margin:14px 0 16px}
+  .h-sub{font-size:16px;font-weight:700;margin:0 0 12px}
+  .muted{color:var(--muted)}
+  .chip{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12px;padding:4px 10px;border-radius:7px}
+
+  /* ---------- product page (PDP) ---------- */
+  .pdp{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:26px;align-items:start;margin-top:8px}
+  .pdp-media{display:grid;grid-template-columns:64px 1fr;gap:12px}
+  .thumbs{display:flex;flex-direction:column;gap:10px}
+  .thumb{width:64px;height:64px;border-radius:12px;border:2px solid var(--line);background:var(--surface-2);
+    display:flex;align-items:center;justify-content:center;font-size:30px;cursor:pointer}
+  .thumb.on{border-color:var(--accent)}
+  .stage{aspect-ratio:1;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:150px;position:relative}
+  .pdp.bMepsi .stage,.pdp.bMepsi .thumb.on{background:linear-gradient(135deg,#DCE7FF,#F0EBFF)}
+  .pdp.bLULU .stage,.pdp.bLULU .thumb.on{background:linear-gradient(135deg,#EDE4FF,#FFE4F6)}
+  .pdp-main h1{font-family:"Unbounded";font-size:24px;line-height:1.25;margin:2px 0 8px;letter-spacing:-.01em}
+  .pdp-sub{color:var(--muted);font-size:14px;margin-bottom:10px}
+  .pdp-rate{display:flex;gap:14px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:16px}
+  .pdp-rate .st{color:var(--star)}
+  .pdp-desc{margin:18px 0;line-height:1.6}
+  .specs{border-collapse:collapse;width:100%;font-size:14px}
+  .specs td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+  .specs td:first-child{color:var(--muted);width:45%}
+  .specs td:last-child{font-weight:600}
+  .buybox{position:sticky;top:150px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  .buybox .p{font-family:"Unbounded";font-weight:800;font-size:30px;color:var(--accent);letter-spacing:-.02em}
+  .buybox .old{color:var(--muted);text-decoration:line-through;font-size:16px;margin-left:8px}
+  .buybox .save{color:var(--sale);font-weight:700;font-size:13px;margin:6px 0 12px}
+  .buybox .cb{display:flex;gap:8px;font-size:13px;color:var(--muted);margin:10px 0;align-items:center}
+  .reviews-head{display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+  .big-rate{font-family:"Unbounded";font-size:48px;font-weight:800;line-height:1}
+  .review{border-bottom:1px solid var(--line);padding:14px 0}
+  .review .ra{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .review .an{font-weight:700;font-size:14px}
+  .review .rs{color:var(--star);font-size:14px}
+  .review .rp{font-size:13px;margin:4px 0}
+  .prod-scroll{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 12px}
+  .prod-scroll .card{min-width:200px;max-width:200px}
+
+  /* ---------- cart / checkout ---------- */
+  .cart-grid,.checkout-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start;margin-top:8px}
+  .cartline{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);align-items:center}
+  .cartline .em{width:76px;height:76px;border-radius:12px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:40px;flex:none}
+  .cartline .ci{flex:1;min-width:0}
+  .cartline .ct{font-size:14px;line-height:1.35;margin-bottom:6px}
+  .cartline .cpr{font-weight:800;color:var(--accent);font-size:17px}
+  .cartline .oldp{color:var(--muted);text-decoration:line-through;font-size:13px;margin-left:6px;font-weight:400}
+  .summary{position:sticky;top:150px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+  .summary .r{display:flex;justify-content:space-between;margin-bottom:10px;font-size:14px;color:var(--muted)}
+  .summary .r b{color:var(--ink)}
+  .summary .grand{display:flex;justify-content:space-between;align-items:baseline;font-size:20px;font-weight:800;margin:14px 0;padding-top:14px;border-top:1px solid var(--line)}
+  .summary .grand .mono{font-family:"Unbounded"}
+  .opt{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;margin-bottom:10px;transition:border-color .15s}
+  .opt.on{border-color:var(--accent);background:var(--accent-soft)}
+  .opt .rdot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none;margin-top:1px;position:relative}
+  .opt.on .rdot{border-color:var(--accent)}
+  .opt.on .rdot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--accent)}
+  .opt .ot{font-weight:700;font-size:14px}.opt .od{font-size:13px;color:var(--muted)}
+  .step-h{display:flex;align-items:center;gap:10px;margin:20px 0 12px;font-weight:700;font-size:16px}
+  .step-h .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+
+  /* ---------- account (ЛК) ---------- */
+  .acc{display:grid;grid-template-columns:250px 1fr;gap:22px;margin-top:8px;align-items:start}
+  .acc-nav{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:var(--shadow);position:sticky;top:150px}
+  .acc-user{display:flex;gap:12px;align-items:center;padding:12px 12px 14px;border-bottom:1px solid var(--line);margin-bottom:8px}
+  .acc-ava{width:46px;height:46px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none}
+  .acc-user .nm{font-weight:700;font-size:14px}.acc-user .em2{font-size:12px;color:var(--muted)}
+  .acc-nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;color:var(--ink);text-decoration:none}
+  .acc-nav a:hover{background:var(--surface-2)}
+  .acc-nav a.on{background:var(--accent);color:#fff}
+  .acc-nav a .c{margin-left:auto;font-size:12px;background:var(--surface-2);color:var(--muted);border-radius:8px;padding:1px 8px}
+  .acc-nav a.on .c{background:rgba(255,255,255,.25);color:#fff}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+  .stat .v{font-family:"Unbounded";font-weight:800;font-size:24px}.stat .l{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .listrow{display:flex;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+  .listrow:last-child{border-bottom:none}
+  .toggle{width:44px;height:26px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;flex:none;transition:.2s}
+  .toggle.on{background:var(--good)}
+  .toggle::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+  .toggle.on::after{left:21px}
+  .chan{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+  .chan .ico{font-size:22px;width:26px;text-align:center}
+  .chan .cn{font-weight:600;font-size:14px}.chan .cv{font-size:12.5px;color:var(--muted)}
+  .badge-ok{color:var(--good);font-weight:700;font-size:13px}
+
+  /* ---------- auth modal ---------- */
+  .modal-wrap{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;
+    background:rgba(10,14,31,.55);opacity:0;pointer-events:none;transition:.2s}
+  .modal-wrap.open{opacity:1;pointer-events:auto}
+  .modal{width:min(420px,100%);background:var(--bg);border-radius:20px;box-shadow:var(--shadow-lg);padding:26px;
+    transform:translateY(14px);transition:transform .25s cubic-bezier(.2,0,0,1);max-height:92vh;overflow:auto}
+  .modal-wrap.open .modal{transform:none}
+  .modal h2{font-family:"Unbounded";font-size:22px;margin:0 0 4px}
+  .modal .lead{color:var(--muted);font-size:14px;margin-bottom:18px}
+  .auth-tabs{display:flex;gap:6px;background:var(--surface-2);padding:5px;border-radius:12px;margin-bottom:18px}
+  .auth-tabs button{flex:1;border:none;background:none;padding:9px 4px;border-radius:9px;font:inherit;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .auth-tabs button .ti{font-size:18px}
+  .auth-tabs button.on{background:var(--surface);color:var(--accent);box-shadow:var(--shadow)}
+  .modal .close-x{float:right;background:none;border:none;font-size:24px;color:var(--muted);cursor:pointer;line-height:1;margin:-6px -6px 0 0}
+  .demo-code{background:var(--accent-soft);color:var(--accent);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;margin-bottom:14px;text-align:center}
+  .social-note{font-size:12.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5}
+  .empty2{text-align:center;color:var(--muted);padding:44px 20px}
+  .empty2 .big{font-size:52px;margin-bottom:10px}
+
+  @media(max-width:900px){.pdp,.cart-grid,.checkout-grid{grid-template-columns:1fr}.acc{grid-template-columns:1fr}
+    .acc-nav{position:static}.buybox,.summary{position:static}.stat-row{grid-template-columns:1fr}}
+  @media(max-width:760px){.pdp-media{grid-template-columns:1fr}.thumbs{flex-direction:row;order:2}.stage{font-size:110px}}
 </style>
 
 <header>
@@ -182,13 +322,13 @@
     <button class="theme-btn" id="theme" title="Тема">◐</button>
   </div></div>
   <div class="mainbar"><div class="wrap">
-    <a class="logo" href="#"><span class="nm"><b>Mepsi</b> & <i>LULU</i></span><span class="tag">Официальный магазин · напрямую от производителя</span></a>
-    <button class="catbtn">☰ Каталог</button>
+    <a class="logo" href="#/" onclick="go('#/');return false"><span class="nm"><b>Mepsi</b> & <i>LULU</i></span><span class="tag">Официальный магазин · напрямую от производителя</span></a>
+    <button class="catbtn" onclick="go('#/');setTimeout(()=>document.getElementById('catalogTitle')?.scrollIntoView({behavior:'smooth'}),50)">☰ Каталог</button>
     <div class="search"><input id="q" placeholder="Искать: подгузники, шампунь, набор…"><button class="go">Найти</button></div>
     <div class="acts">
-      <button class="act" onclick="openD('orders')"><span class="ic">📦</span><span>Заказы</span></button>
-      <button class="act"><span class="ic">❤️</span><span>Избранное</span><span class="badge" id="favBadge" hidden>0</span></button>
-      <button class="act" onclick="openD('cart')"><span class="ic">🛒</span><span>Корзина</span><span class="badge" id="cartBadge" hidden>0</span></button>
+      <button class="act" id="accBtn" onclick="go('#/account/orders')"><span class="ic">👤</span><span id="accLabel">Войти</span></button>
+      <button class="act" onclick="go('#/favorites')"><span class="ic">❤️</span><span>Избранное</span><span class="badge" id="favBadge" hidden>0</span></button>
+      <button class="act" onclick="openCart()"><span class="ic">🛒</span><span>Корзина</span><span class="badge" id="cartBadge" hidden>0</span></button>
     </div>
   </div></div>
   <div class="trust"><div class="wrap">
@@ -202,6 +342,7 @@
 </header>
 
 <main class="wrap">
+ <div id="view-home">
   <div id="hero">
     <div class="promos" style="margin-top:16px">
       <div class="promo m"><h3>Mepsi</h3><p>Подгузники и гигиена напрямую от производителя. Честная цена без наценки маркетплейсов.</p><button class="b" onclick="setBrand('Mepsi')">Смотреть Mepsi</button><span class="em">🧷</span></div>
@@ -219,6 +360,8 @@
   <div class="cats" id="cats"></div>
   <div class="grid" id="grid"></div>
   <div class="empty" id="noRes" hidden>Ничего не нашлось 🔍 Попробуй другой запрос.</div>
+ </div>
+ <div id="view-route" hidden></div>
 </main>
 
 <div class="overlay" id="overlay" onclick="closeD()"></div>
@@ -227,6 +370,10 @@
   <div class="items" id="drawerBody"></div>
   <div class="cfoot" id="drawerFoot"></div>
 </aside>
+
+<div class="modal-wrap" id="authModal">
+  <div class="modal" id="authBox"></div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -249,20 +396,77 @@ const FALLBACK=[
  {id:"l7",brand:"LULU",cat:"Уход",title:"Мыло-крем жидкое увлажняющее, 300 мл",price:390,rate:4.7,rev:380,em:"🧼"},
  {id:"l8",brand:"LULU",cat:"Наборы",title:"Подарочный набор LULU, 5 предметов",price:2490,old:3200,rate:4.9,rev:210,em:"🎀",badge:"новинка"},
 ];
+/* ==================== Mepsi & LULU — клиентское приложение ==================== */
 let PRODUCTS=FALLBACK.slice();
-const fmt=n=>n.toLocaleString("ru-RU")+" ₽";
+const fmt=n=>Math.round(n).toLocaleString("ru-RU")+" ₽";
 const disc=p=>p.old?Math.round((p.old-p.price)/p.old*100):0;
-let brand="all",cat="all",q="",cart={},fav=new Set(),drawer=null;
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const getP=id=>PRODUCTS.find(p=>p.id===id);
 
+/* ---------- состояние ---------- */
+let brand="all",cat="all",q="";
+let cart=JSON.parse(localStorage.getItem("mt_cart")||"{}");
+let fav=new Set(JSON.parse(localStorage.getItem("mt_fav")||"[]"));
+let reviewed=new Set(JSON.parse(localStorage.getItem("mt_reviewed")||"[]"));
+let token=localStorage.getItem("mt_token")||null;
+let user=null;               // публичный профиль (или null)
+let CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0}; // состояние оформления
+
+const saveCart=()=>localStorage.setItem("mt_cart",JSON.stringify(cart));
+const saveFav=()=>localStorage.setItem("mt_fav",JSON.stringify([...fav]));
+
+/* ---------- API ---------- */
+async function api(method,path,body){
+  const h={};if(token)h["Authorization"]="Bearer "+token;
+  if(body)h["Content-Type"]="application/json";
+  const r=await fetch(path,{method,headers:h,body:body?JSON.stringify(body):undefined});
+  let d={};try{d=await r.json()}catch{}
+  if(!r.ok)throw new Error(d.error||"Ошибка");
+  return d;
+}
+
+/* ---------- корзина ---------- */
+const cartCount=()=>Object.values(cart).reduce((a,b)=>a+b,0);
+const cartLines=()=>Object.entries(cart).map(([id,q])=>({p:getP(id),q})).filter(x=>x.p);
+const cartSubtotal=()=>cartLines().reduce((s,{p,q})=>s+p.price*q,0);
+function setQty(id,n,ev){
+  if(ev)ev.stopPropagation();
+  if(n<=0)delete cart[id];else cart[id]=n;
+  saveCart();
+  const f=document.getElementById("foot-"+id);if(f)f.innerHTML=stepperOrBtn(id,cart[id]||0);
+  refreshCounts();
+  const route=parseRoute();
+  if(route.name==="cart"||route.name==="checkout")render();
+  if(n===1)toast("Добавлено в корзину 🛒");
+}
+function refreshCounts(){
+  const cb=document.getElementById("cartBadge"),c=cartCount();
+  cb.textContent=c;cb.hidden=c===0;
+  const fb=document.getElementById("favBadge");fb.textContent=fav.size;fb.hidden=fav.size===0;
+}
+function stepperOrBtn(id,q){
+  return q>0
+    ? `<div class="stepper"><button onclick="setQty('${id}',${q-1},event)">−</button><span class="q mono">${q} шт</span><button onclick="setQty('${id}',${q+1},event)">+</button></div>`
+    : `<button class="addbtn" onclick="setQty('${id}',1,event)">В корзину</button>`;
+}
+
+/* ---------- избранное ---------- */
+async function toggleFav(id,ev){
+  if(ev)ev.stopPropagation();
+  if(fav.has(id)){fav.delete(id);if(user)api("DELETE","/api/favorites/"+id).catch(()=>{});}
+  else{fav.add(id);if(user)api("POST","/api/favorites/"+id).catch(()=>{});}
+  saveFav();refreshCounts();
+  const r=parseRoute();
+  if(r.name==="home")renderGrid();else render();
+}
+
+/* ---------- home (витрина — дизайн без изменений) ---------- */
 function filtered(){
   return PRODUCTS.filter(p=>
     (brand==="all"||p.brand===brand)&&
     (cat==="all"||p.cat===cat)&&
     (!q||p.title.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)));
 }
-function cartCount(){return Object.values(cart).reduce((a,b)=>a+b,0)}
-function cartTotal(){return Object.entries(cart).reduce((s,[id,q])=>s+(PRODUCTS.find(p=>p.id===id).price*q),0)}
-
 function renderCats(){
   const src=PRODUCTS.filter(p=>brand==="all"||p.brand===brand);
   const cs=["all",...new Set(src.map(p=>p.cat))];
@@ -272,23 +476,18 @@ function renderCats(){
 function card(p){
   const d=disc(p), q=cart[p.id]||0;
   return `<div class="card b${p.brand}">
-    <div class="ph">
+    <div class="ph" onclick="go('#/product/${p.id}')">
       <span class="em">${p.em}</span>
       ${p.badge?`<span class="badge ${p.badge==="хит"?"hit":""}">${p.badge==="хит"?"ХИТ":d?("−"+d+"%"):p.badge.toUpperCase()}</span>`:(d?`<span class="badge">−${d}%</span>`:"")}
-      <button class="fav ${fav.has(p.id)?"on":""}" onclick="toggleFav('${p.id}')">${fav.has(p.id)?"♥":"♡"}</button>
+      <button class="fav ${fav.has(p.id)?"on":""}" onclick="toggleFav('${p.id}',event)">${fav.has(p.id)?"♥":"♡"}</button>
       <span class="bl">${p.brand}</span>
     </div>
     <div class="body">
       <div class="prc"><span class="p mono">${fmt(p.price)}</span>${p.old?`<span class="old mono">${fmt(p.old)}</span>`:""}</div>
-      <div class="ttl">${p.title}</div>
-      <div class="rate"><span class="st">★</span> ${p.rate} · ${p.rev.toLocaleString("ru-RU")} отз.</div>
+      <div class="ttl" onclick="go('#/product/${p.id}')">${esc(p.title)}</div>
+      <div class="rate"><span class="st">★</span> ${p.rate} · ${(p.rev||0).toLocaleString("ru-RU")} отз.</div>
       <div class="foot" id="foot-${p.id}">${stepperOrBtn(p.id,q)}</div>
     </div></div>`;
-}
-function stepperOrBtn(id,q){
-  return q>0
-    ? `<div class="stepper"><button onclick="setQty('${id}',${q-1})">−</button><span class="q mono">${q} шт</span><button onclick="setQty('${id}',${q+1})">+</button></div>`
-    : `<button class="addbtn" onclick="setQty('${id}',1)">В корзину</button>`;
 }
 function renderGrid(){
   const list=filtered();
@@ -296,74 +495,514 @@ function renderGrid(){
   document.getElementById("noRes").hidden=list.length>0;
   document.getElementById("resCount").textContent=list.length?`${list.length} товаров`:"";
 }
-function refreshCounts(){
-  const cb=document.getElementById("cartBadge"),c=cartCount();
-  cb.textContent=c;cb.hidden=c===0;
-}
-
 function setBrand(b){
-  brand=b;cat="all";
+  brand=b;cat="all";go("#/");
   document.documentElement.setAttribute("data-brand",b==="LULU"?"lulu":"");
   document.querySelectorAll(".btab").forEach(t=>t.classList.toggle("on",t.dataset.b===b));
   document.getElementById("hero").style.display=b==="all"?"":"none";
   renderCats();renderGrid();window.scrollTo({top:0,behavior:"smooth"});
 }
 function setCat(c){cat=c;renderCats();renderGrid()}
-function setQty(id,n){
-  if(n<=0)delete cart[id];else cart[id]=n;
-  const f=document.getElementById("foot-"+id);if(f)f.innerHTML=stepperOrBtn(id,cart[id]||0);
-  refreshCounts(); if(drawer==="cart")renderDrawer();
-  if(n===1)toast("Добавлено в корзину 🛒");
-}
-function toggleFav(id){
-  fav.has(id)?fav.delete(id):fav.add(id);
-  const b=document.querySelector(`#foot-${id}`)?.closest(".card").querySelector(".fav");
-  const el=[...document.querySelectorAll(".card")].find(c=>c.querySelector(`[onclick*="'${id}'"]`));
-  renderGrid();
-}
 document.getElementById("q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();
+  if(parseRoute().name!=="home"){go("#/");}
   document.getElementById("hero").style.display=q?"none":(brand==="all"?"":"none");renderGrid()});
 document.getElementById("brandTabs").addEventListener("click",e=>{const t=e.target.closest(".btab");if(t)setBrand(t.dataset.b)});
 
-/* drawers */
-function openD(kind){drawer=kind;document.getElementById("overlay").classList.add("open");
-  document.getElementById("drawer").classList.add("open");renderDrawer()}
-function closeD(){drawer=null;document.getElementById("overlay").classList.remove("open");document.getElementById("drawer").classList.remove("open")}
-function renderDrawer(){
-  const title=document.getElementById("drawerTitle"),body=document.getElementById("drawerBody"),foot=document.getElementById("drawerFoot");
-  if(drawer==="cart"){
-    title.innerHTML=`Корзина <button class="close" onclick="closeD()">×</button>`;
-    const lines=Object.entries(cart).map(([id,q])=>({p:PRODUCTS.find(x=>x.id===id),q}));
-    if(!lines.length){body.innerHTML=`<div class="empty">Корзина пуста 🛒<br>Добавь товары из каталога.</div>`;foot.innerHTML="";return}
-    body.innerHTML=lines.map(({p,q})=>`<div class="cline">
-      <div class="em">${p.em}</div>
-      <div style="flex:1"><div class="t">${p.title}</div><div class="cp mono">${fmt(p.price*q)}</div>
-        <div class="mini"><button onclick="setQty('${p.id}',${q-1})">−</button><span class="mono">${q} шт</span><button onclick="setQty('${p.id}',${q+1})">+</button></div>
-      </div></div>`).join("");
-    foot.innerHTML=`<div class="row"><span>Товаров: ${cartCount()}</span><span>Доставка: бесплатно</span></div>
-      <div class="row"><span>Итого</span><span class="total mono">${fmt(cartTotal())}</span></div>
-      <button class="checkout" onclick="toast('Заказ оформлен ✅ (демо)');cart={};refreshCounts();renderGrid();renderDrawer()">Оформить заказ</button>`;
-  } else {
-    title.innerHTML=`Мои заказы <button class="close" onclick="closeD()">×</button>`;
-    body.innerHTML=ORDERS.map(o=>`<div class="order">
-      <div class="oh"><div><div class="on">Заказ ${o.no}</div><div class="od">${o.date}</div></div><span class="status ${o.st}">${o.label}</span></div>
-      <div class="oi">${o.items.map(e=>`<span>${e}</span>`).join("")}</div>
-      <div class="track">${o.steps.map((s,i)=>`<div class="stp ${i<=o.at?"act":""}">${s}</div>`).join("")}</div>
-      <div class="oh" style="margin-top:10px;margin-bottom:0"><span class="od">${o.count} товара</span><span class="osum mono">${fmt(o.sum)}</span></div>
-    </div>`).join("");
-    foot.innerHTML="";
-  }
-}
-const ORDERS=[
- {no:"№2495",date:"Сегодня, 11:20",st:"pack",label:"Собирается",items:["🧴","🎀"],count:2,sum:3040,steps:["Оформлен","Собирается","В пути","Доставлен"],at:1},
- {no:"№2490",date:"Вчера",st:"way",label:"В пути",items:["🎁","🧷"],count:2,sum:2990,steps:["Оформлен","Собирается","В пути","Доставлен"],at:2},
- {no:"№2481",date:"28 августа",st:"done",label:"Доставлен",items:["🧷","🧴","🧻"],count:3,sum:2933,steps:["Оформлен","Собирается","В пути","Доставлен"],at:3},
-];
+/* ---------- быстрая корзина (шторка) ---------- */
+function openCart(){go("#/cart")}
+function closeD(){document.getElementById("overlay").classList.remove("open");document.getElementById("drawer").classList.remove("open")}
 
+/* ==================== РОУТЕР ==================== */
+function go(hash){if(location.hash===hash)render();else location.hash=hash}
+function parseRoute(){
+  const h=location.hash.replace(/^#/,"")||"/";
+  const parts=h.split("/").filter(Boolean); // ["product","m1"]
+  if(!parts.length)return{name:"home"};
+  const[a,b]=parts;
+  if(a==="product")return{name:"product",id:b};
+  if(a==="cart")return{name:"cart"};
+  if(a==="checkout")return{name:"checkout"};
+  if(a==="favorites")return{name:"favorites"};
+  if(a==="account")return{name:"account",section:b||"orders"};
+  return{name:"home"};
+}
+const VIEW=()=>document.getElementById("view-route");
+async function render(){
+  const r=parseRoute();
+  const home=document.getElementById("view-home"),vr=VIEW();
+  if(r.name==="home"){home.hidden=false;vr.hidden=true;vr.innerHTML="";renderCats();renderGrid();return}
+  home.hidden=true;vr.hidden=false;
+  vr.innerHTML=`<div class="empty2">Загрузка…</div>`;
+  window.scrollTo({top:0});
+  try{
+    if(r.name==="product")await viewProduct(r.id);
+    else if(r.name==="cart")viewCart();
+    else if(r.name==="checkout")await viewCheckout();
+    else if(r.name==="favorites")viewFavorites();
+    else if(r.name==="account")await viewAccount(r.section);
+  }catch(e){vr.innerHTML=`<div class="empty2"><div class="big">⚠️</div>${esc(e.message)}</div>`}
+}
+window.addEventListener("hashchange",render);
+
+/* ==================== КАРТОЧКА ТОВАРА (PDP) ==================== */
+function crumbs(arr){return `<div class="crumbs">`+arr.map((x,i)=>i<arr.length-1
+  ?`<a onclick="go('${x.h}')">${esc(x.t)}</a><span class="sep">›</span>`:`<span>${esc(x.t)}</span>`).join("")+`</div>`}
+async function viewProduct(id){
+  let p=getP(id);
+  try{p=await api("GET","/api/products/"+id)}catch{}
+  if(!p){VIEW().innerHTML=`<div class="empty2"><div class="big">🔍</div>Товар не найден</div>`;return}
+  const gal=p.gallery&&p.gallery.length?p.gallery:[p.em];
+  const revs=p.reviews||[];
+  const d=disc(p),q=cart[id]||0;
+  const rel=PRODUCTS.filter(x=>x.brand===p.brand&&x.id!==p.id).slice(0,6);
+  VIEW().innerHTML=`
+  ${crumbs([{t:"Главная",h:"#/"},{t:p.brand,h:"#/"},{t:p.cat,h:"#/"},{t:p.title}])}
+  <div class="pdp b${p.brand}">
+    <div>
+      <div class="pdp-media">
+        <div class="thumbs" id="thumbs">${gal.map((g,i)=>`<div class="thumb ${i?"":"on"}" onclick="pdpPic(${i})">${g}</div>`).join("")}</div>
+        <div class="stage" id="stage">${gal[0]}</div>
+      </div>
+      <div class="pdp-desc panel"><div class="h-sub">Описание</div>${esc(p.desc||p.sub||"")}</div>
+      ${p.specs?`<div class="panel" style="margin-top:16px"><div class="h-sub">Характеристики</div>
+        <table class="specs"><tbody>${p.specs.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table></div>`:""}
+      <div class="panel" style="margin-top:16px" id="revs">
+        <div class="reviews-head"><div><div class="big-rate">${p.rate||"—"}</div><div class="muted" style="font-size:12px">★★★★★</div></div>
+          <div><div style="font-weight:700">${(p.rev||revs.length)} отзывов</div>
+          ${user?`<button class="btn btn-out btn-sm" style="margin-top:8px" onclick="openReview('${p.id}')">Оставить отзыв</button>`:`<div class="muted" style="font-size:13px;margin-top:6px">Войдите, чтобы оставить отзыв</div>`}</div></div>
+        <div id="revList">${revs.length?revs.map(reviewHTML).join(""):`<div class="muted">Отзывов пока нет — будьте первым!</div>`}</div>
+      </div>
+    </div>
+    <div>
+      <div class="buybox">
+        <div class="pdp-sub">${esc(p.brand)} · арт. ${esc(p.sku||p.id)}</div>
+        <h1 style="font-size:18px;font-family:Unbounded;margin:2px 0 10px">${esc(p.title)}</h1>
+        <div><span class="p mono">${fmt(p.price)}</span>${p.old?`<span class="old mono">${fmt(p.old)}</span>`:""}</div>
+        ${d?`<div class="save">Скидка ${d}% · выгода ${fmt(p.old-p.price)}</div>`:""}
+        <div class="cb"><span>💜</span> Кэшбэк ${Math.round(p.price*0.05)} баллов</div>
+        <div class="cb"><span>🚚</span> Доставка бесплатно, 2–3 дня</div>
+        <div class="cb"><span>✓</span> В наличии: ${p.stock||"много"} шт</div>
+        <div id="pdpFoot" style="margin-top:14px">${pdpBuy(id,q)}</div>
+        <button class="btn btn-out btn-block" style="margin-top:10px" onclick="toggleFav('${id}',event)">${fav.has(id)?"♥ В избранном":"♡ В избранное"}</button>
+      </div>
+    </div>
+  </div>
+  ${rel.length?`<div class="section-t" style="margin-top:34px">С этим товаром берут</div>
+    <div class="prod-scroll">${rel.map(card).join("")}</div>`:""}`;
+}
+function pdpBuy(id,q){
+  return q>0
+    ? `<div class="stepper" style="height:48px">${["−",q,"+"].map((x,i)=>i===1?`<span class="q mono">${q} шт</span>`:`<button onclick="setPdp('${id}',${i===0?q-1:q+1})">${x}</button>`).join("")}</div>
+       <button class="btn btn-ink btn-block" style="margin-top:10px" onclick="go('#/cart')">Перейти в корзину</button>`
+    : `<button class="btn btn-primary btn-block" style="height:48px" onclick="setPdp('${id}',1)">В корзину</button>`;
+}
+function setPdp(id,n){setQty(id,n);const f=document.getElementById("pdpFoot");if(f)f.innerHTML=pdpBuy(id,cart[id]||0)}
+function pdpPic(i){const g=[...document.querySelectorAll("#thumbs .thumb")];const stage=document.getElementById("stage");
+  g.forEach((t,k)=>t.classList.toggle("on",k===i));if(g[i])stage.textContent=g[i].textContent}
+function reviewHTML(r){return `<div class="review">
+  <div class="ra"><span class="an">${esc(r.author||"Покупатель")}</span><span class="rs">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</span></div>
+  ${r.pros?`<div class="rp"><b>Плюсы:</b> ${esc(r.pros)}</div>`:""}${r.cons?`<div class="rp"><b>Минусы:</b> ${esc(r.cons)}</div>`:""}
+  <div class="rp">${esc(r.text||"")}</div></div>`}
+
+/* ==================== КОРЗИНА ==================== */
+function viewCart(){
+  const lines=cartLines();
+  if(!lines.length){VIEW().innerHTML=`${crumbs([{t:"Главная",h:"#/"},{t:"Корзина"}])}
+    <div class="empty2"><div class="big">🛒</div><div class="h-sub">Корзина пуста</div>
+    <div class="muted" style="margin-bottom:16px">Добавьте товары из каталога</div>
+    <button class="btn btn-primary" onclick="go('#/')">В каталог</button></div>`;return}
+  const sub=cartSubtotal();
+  VIEW().innerHTML=`${crumbs([{t:"Главная",h:"#/"},{t:"Корзина"}])}
+  <h1 class="h-title">Корзина · ${cartCount()} тов.</h1>
+  <div class="cart-grid">
+    <div class="panel">
+      ${lines.map(({p,q})=>`<div class="cartline">
+        <div class="em" onclick="go('#/product/${p.id}')" style="cursor:pointer">${p.em}</div>
+        <div class="ci"><div class="ct" style="cursor:pointer" onclick="go('#/product/${p.id}')">${esc(p.title)}</div>
+          <div class="cpr">${fmt(p.price*q)}${p.old?`<span class="oldp">${fmt(p.old*q)}</span>`:""}</div></div>
+        <div class="stepper" style="width:120px">${["−",q,"+"].map((x,i)=>i===1?`<span class="q mono">${q}</span>`:`<button onclick="setQty('${p.id}',${i===0?q-1:q+1},event)">${x}</button>`).join("")}</div>
+        <button class="btn btn-danger btn-sm" onclick="setQty('${p.id}',0,event)">✕</button>
+      </div>`).join("")}
+    </div>
+    <div class="summary">
+      <div class="r"><span>Товары (${cartCount()})</span><b>${fmt(sub)}</b></div>
+      <div class="r"><span>Доставка</span><b style="color:var(--good)">бесплатно</b></div>
+      <div class="grand"><span>Итого</span><span class="mono">${fmt(sub)}</span></div>
+      <button class="btn btn-primary btn-block" onclick="go('#/checkout')">Оформить заказ</button>
+      <div class="muted" style="font-size:12px;text-align:center;margin-top:10px">Кэшбэк ${Math.round(sub*0.05)} баллов на счёт</div>
+    </div>
+  </div>`;
+}
+
+/* ==================== ОФОРМЛЕНИЕ (checkout + доставка) ==================== */
+async function viewCheckout(){
+  const lines=cartLines();
+  if(!lines.length){go("#/cart");return}
+  if(!user){openAuth("#/checkout");VIEW().innerHTML=`<div class="empty2"><div class="big">🔐</div>Войдите, чтобы оформить заказ</div>`;return}
+  if(!CO.address&&user.addresses.length)CO.address=(user.addresses.find(a=>a.isDefault)||user.addresses[0]).id;
+  if(!CO.card&&user.cards.length)CO.card=(user.cards.find(c=>c.isDefault)||user.cards[0]).id;
+  const sub=cartSubtotal();
+  let discount=0;
+  if(CO.promo)discount=CO.promo.type==="percent"?Math.round(sub*CO.promo.value/100):CO.promo.value;
+  const maxPts=Math.min(user.points,sub-discount);const pts=Math.min(CO.points,maxPts);
+  const total=Math.max(0,sub-discount-pts);
+  const addr=user.addresses.find(a=>a.id===CO.address);
+  VIEW().innerHTML=`${crumbs([{t:"Главная",h:"#/"},{t:"Корзина",h:"#/cart"},{t:"Оформление"}])}
+  <h1 class="h-title">Оформление заказа</h1>
+  <div class="checkout-grid">
+    <div>
+      <div class="panel">
+        <div class="step-h"><span class="n">1</span> Способ получения</div>
+        <div class="opt ${CO.delivery==="courier"?"on":""}" onclick="CO.delivery='courier';render()"><span class="rdot"></span><div><div class="ot">🚚 Курьером до двери</div><div class="od">2–3 дня · бесплатно</div></div></div>
+        <div class="opt ${CO.delivery==="pickup"?"on":""}" onclick="CO.delivery='pickup';render()"><span class="rdot"></span><div><div class="ot">🏬 В пункт выдачи</div><div class="od">1–2 дня · бесплатно · 3200+ ПВЗ</div></div></div>
+      </div>
+      <div class="panel">
+        <div class="step-h"><span class="n">2</span> ${CO.delivery==="pickup"?"Пункт выдачи":"Адрес доставки"}</div>
+        ${user.addresses.length?user.addresses.map(a=>`<div class="opt ${CO.address===a.id?"on":""}" onclick="CO.address='${a.id}';render()">
+          <span class="rdot"></span><div><div class="ot">${esc(a.title)}</div><div class="od">${esc([a.city,a.street,a.house&&"д."+a.house,a.flat&&"кв."+a.flat].filter(Boolean).join(", "))}</div></div></div>`).join(""):`<div class="muted" style="margin-bottom:10px">Нет сохранённых адресов</div>`}
+        <button class="btn btn-out btn-sm" onclick="go('#/account/addresses')">+ Добавить адрес</button>
+      </div>
+      <div class="panel">
+        <div class="step-h"><span class="n">3</span> Оплата</div>
+        <div class="opt ${CO.payMethod==="card"?"on":""}" onclick="CO.payMethod='card';render()"><span class="rdot"></span><div><div class="ot">💳 Картой онлайн</div><div class="od">${user.cards.length?"•••• "+user.cards[0].last4:"Быстро и безопасно"}</div></div></div>
+        <div class="opt ${CO.payMethod==="cod"?"on":""}" onclick="CO.payMethod='cod';render()"><span class="rdot"></span><div><div class="ot">💵 При получении</div><div class="od">Наличными или картой курьеру</div></div></div>
+      </div>
+      <div class="panel">
+        <div class="step-h"><span class="n">4</span> Промокод и баллы</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input class="inp" id="promoInp" placeholder="Промокод (напр. MALYSH)" value="${CO.promo?esc(CO.promo.code):""}" style="flex:1">
+          <button class="btn btn-ghost" onclick="applyPromo()">Применить</button></div>
+        ${CO.promo?`<div class="chip">✓ ${esc(CO.promo.code)} · ${esc(CO.promo.label)}</div>`:""}
+        <div class="field" style="margin-top:12px"><label>Списать баллы (доступно ${user.points})</label>
+          <input class="inp" type="number" min="0" max="${maxPts}" value="${pts}" onchange="CO.points=Math.max(0,Math.min(${maxPts},+this.value||0));render()"></div>
+      </div>
+    </div>
+    <div class="summary">
+      <div class="r"><span>Товары (${cartCount()})</span><b>${fmt(sub)}</b></div>
+      ${discount?`<div class="r"><span>Скидка</span><b style="color:var(--sale)">−${fmt(discount)}</b></div>`:""}
+      ${pts?`<div class="r"><span>Баллы</span><b style="color:var(--sale)">−${fmt(pts)}</b></div>`:""}
+      <div class="r"><span>Доставка</span><b style="color:var(--good)">бесплатно</b></div>
+      <div class="grand"><span>Итого</span><span class="mono">${fmt(total)}</span></div>
+      <button class="btn btn-primary btn-block" ${CO.delivery!=="pickup"&&!addr?"disabled style=opacity:.5":""} onclick="placeOrder()">Подтвердить заказ</button>
+      <div class="muted" style="font-size:12px;text-align:center;margin-top:10px">Начислим ${Math.round(total*0.05)} баллов кэшбэка</div>
+    </div>
+  </div>`;
+}
+async function applyPromo(){
+  const code=document.getElementById("promoInp").value.trim();
+  if(!code){CO.promo=null;render();return}
+  try{const p=await api("POST","/api/promo/apply",{code});CO.promo=p;toast("Промокод применён ✓")}
+  catch(e){CO.promo=null;toast(e.message)}
+  render();
+}
+async function placeOrder(){
+  const lines=cartLines();
+  try{
+    const res=await api("POST","/api/orders",{items:lines.map(({p,q})=>({id:p.id,qty:q})),
+      promo:CO.promo?.code||null,pointsUsed:CO.points||0,
+      delivery:{method:CO.delivery,address:user.addresses.find(a=>a.id===CO.address)||null},
+      payment:{method:CO.payMethod}});
+    user=res.user;cart={};saveCart();refreshCounts();CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0};
+    toast("Заказ оформлен ✅");go("#/account/orders");
+  }catch(e){toast(e.message)}
+}
+
+/* ==================== ИЗБРАННОЕ ==================== */
+function viewFavorites(){
+  const list=[...fav].map(getP).filter(Boolean);
+  VIEW().innerHTML=`${crumbs([{t:"Главная",h:"#/"},{t:"Избранное"}])}
+  <h1 class="h-title">Избранное · ${list.length}</h1>
+  ${list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty2"><div class="big">❤️</div><div class="muted">Пока пусто. Жмите ♡ на товарах.</div></div>`}`;
+}
+
+/* ==================== ЛИЧНЫЙ КАБИНЕТ ==================== */
+const ACC_NAV=[["orders","🛍","Мои заказы"],["returns","↩️","Возвраты"],["reviews","⭐","Отзывы и оценки"],
+  ["favorites","❤️","Избранное"],["points","💜","Баллы и счёт"],["profile","👤","Профиль"],
+  ["addresses","📍","Адреса"],["cards","💳","Оплата"],["settings","🔔","Настройки"],["security","🔐","Безопасность"]];
+async function viewAccount(section){
+  if(!user){openAuth("#/account/"+section);
+    VIEW().innerHTML=`<div class="empty2"><div class="big">🔐</div><div class="h-sub">Войдите в аккаунт</div>
+    <div class="muted" style="margin-bottom:16px">Телефон, почта, Telegram или MAX</div>
+    <button class="btn btn-primary" onclick="openAuth('#/account/${section}')">Войти или зарегистрироваться</button></div>`;return}
+  if(section==="favorites"){go("#/favorites");return}
+  const nm=user.name||user.phone||user.email||"Покупатель";
+  const nav=`<nav class="acc-nav">
+    <div class="acc-user"><div class="acc-ava">${(nm[0]||"?").toUpperCase()}</div>
+      <div><div class="nm">${esc(nm)}</div><div class="em2">${esc(user.phone||user.email||"")}</div></div></div>
+    ${ACC_NAV.map(([k,i,t])=>`<a class="${k===section?"on":""}" onclick="go('#/account/${k}')"><span>${i}</span>${t}
+      ${k==="points"?`<span class="c">${user.points}</span>`:""}${k==="favorites"?`<span class="c">${fav.size}</span>`:""}</a>`).join("")}
+  </nav>`;
+  let content="<div class='empty2'>Загрузка…</div>";
+  VIEW().innerHTML=`${crumbs([{t:"Главная",h:"#/"},{t:"Личный кабинет"}])}<div class="acc">${nav}<div id="accContent">${content}</div></div>`;
+  const el=document.getElementById("accContent");
+  try{
+    if(section==="orders")el.innerHTML=await secOrders();
+    else if(section==="returns")el.innerHTML=await secReturns();
+    else if(section==="reviews")el.innerHTML=await secReviews();
+    else if(section==="points")el.innerHTML=await secPoints();
+    else if(section==="profile")el.innerHTML=secProfile();
+    else if(section==="addresses")el.innerHTML=secAddresses();
+    else if(section==="cards")el.innerHTML=secCards();
+    else if(section==="settings")el.innerHTML=secSettings();
+    else if(section==="security")el.innerHTML=secSecurity();
+    else el.innerHTML=await secOrders();
+  }catch(e){el.innerHTML=`<div class="empty2">⚠️ ${esc(e.message)}</div>`}
+}
+const STEPS=["Оформлен","Собирается","В пути","Доставлен"];
+const stIdx=s=>({created:0,assembling:1,shipping:2,delivered:3}[s]??0);
+function orderHTML(o){
+  const at=o.status==="cancelled"?-1:stIdx(o.status);
+  const dt=new Date(o.createdAt).toLocaleDateString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"});
+  return `<div class="order">
+    <div class="oh"><div><div class="on">Заказ ${esc(o.id)}</div><div class="od">${dt}</div></div>
+      <span class="status ${o.status==="delivered"?"done":o.status==="shipping"?"way":o.status==="cancelled"?"":"pack"}">${esc(o.statusLabel)}</span></div>
+    <div class="oi">${o.items.map(e=>`<span title="${esc(e.title)}">${e.em||"📦"}</span>`).join("")}</div>
+    ${o.status!=="cancelled"?`<div class="track">${STEPS.map((s,i)=>`<div class="stp ${i<=at?"act":""}">${s}</div>`).join("")}</div>`:""}
+    <div class="oh" style="margin-top:12px;margin-bottom:0"><span class="od">${o.items.length} поз. · ${esc(o.eta||"")}</span><span class="osum mono">${fmt(o.total)}</span></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="repeatOrder('${o.id}')">Повторить</button>
+      ${o.status==="delivered"?`<button class="btn btn-out btn-sm" onclick="startReturn('${o.id}')">Оформить возврат</button>`:""}
+      ${["created","assembling"].includes(o.status)?`<button class="btn btn-danger btn-sm" onclick="cancelOrder('${o.id}')">Отменить</button>`:""}
+    </div></div>`;
+}
+async function secOrders(){
+  const orders=await api("GET","/api/orders");
+  if(!orders.length)return `<div class="empty2"><div class="big">🛍</div><div class="h-sub">Заказов пока нет</div>
+    <button class="btn btn-primary" onclick="go('#/')" style="margin-top:8px">За покупками</button></div>`;
+  return `<h1 class="h-title">Мои заказы</h1>${orders.map(orderHTML).join("")}`;
+}
+async function cancelOrder(id){if(!confirm("Отменить заказ?"))return;try{await api("POST","/api/orders/"+id+"/cancel");toast("Заказ отменён");viewAccount("orders")}catch(e){toast(e.message)}}
+async function repeatOrder(id){try{const o=await api("GET","/api/orders/"+id);o.items.forEach(it=>{cart[it.id]=(cart[it.id]||0)+it.qty});saveCart();refreshCounts();toast("Товары добавлены в корзину 🛒");go("#/cart")}catch(e){toast(e.message)}}
+async function startReturn(orderId){const reason=prompt("Причина возврата:");if(!reason)return;try{await api("POST","/api/returns",{orderId,reason});toast("Заявка на возврат создана");viewAccount("returns")}catch(e){toast(e.message)}}
+async function secReturns(){
+  const list=await api("GET","/api/returns");
+  return `<h1 class="h-title">Возвраты</h1>${list.length?list.map(r=>`<div class="order">
+    <div class="oh"><div class="on">Возврат по заказу ${esc(r.orderId||"—")}</div><span class="status pack">${esc(r.statusLabel)}</span></div>
+    <div class="muted" style="font-size:13px;margin-top:6px">Причина: ${esc(r.reason)}</div></div>`).join(""):
+    `<div class="empty2"><div class="big">↩️</div><div class="muted">Возвратов нет. Оформить можно из доставленного заказа.</div></div>`}`;
+}
+async function secReviews(){
+  const orders=await api("GET","/api/orders").catch(()=>[]);
+  const delivered=orders.filter(o=>o.status==="delivered").flatMap(o=>o.items);
+  const waiting=[...new Map(delivered.filter(i=>!reviewed.has(i.id)).map(i=>[i.id,i])).values()];
+  return `<h1 class="h-title">Отзывы и оценки</h1>
+  <div class="panel"><div class="h-sub">Ждут вашей оценки (${waiting.length})</div>
+    ${waiting.length?waiting.map(i=>`<div class="listrow"><div class="em" style="width:48px;height:48px;background:var(--surface-2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px">${i.em||"📦"}</div>
+      <div style="flex:1"><div style="font-size:14px">${esc(i.title)}</div></div>
+      <button class="btn btn-primary btn-sm" onclick="openReview('${i.id}')">Оценить</button></div>`).join(""):`<div class="muted">Нет товаров, ждущих отзыва</div>`}</div>
+  <div class="panel"><div class="h-sub">Мои отзывы (${reviewed.size})</div>
+    ${reviewed.size?[...reviewed].map(id=>{const p=getP(id);return p?`<div class="listrow"><span style="font-size:22px">${p.em}</span><div style="flex:1;font-size:14px">${esc(p.title)}</div><span class="badge-ok">✓ оценён</span></div>`:""}).join(""):`<div class="muted">Вы ещё не оставляли отзывов</div>`}</div>`;
+}
+async function secPoints(){
+  const orders=await api("GET","/api/orders").catch(()=>[]);
+  const hist=orders.flatMap(o=>[o.pointsEarned?{d:o.createdAt,t:"Кэшбэк за "+o.id,v:+o.pointsEarned}:null,
+    o.pointsUsed?{d:o.createdAt,t:"Списание в "+o.id,v:-o.pointsUsed}:null].filter(Boolean));
+  return `<h1 class="h-title">Баллы и счёт</h1>
+  <div class="stat-row">
+    <div class="stat"><div class="v">${user.points}</div><div class="l">баллов на счету</div></div>
+    <div class="stat"><div class="v">5%</div><div class="l">кэшбэк с заказа</div></div>
+    <div class="stat"><div class="v">1 ₽</div><div class="l">= 1 балл</div></div></div>
+  <div class="panel"><div class="h-sub">История начислений</div>
+    ${hist.length?hist.map(h=>`<div class="listrow"><div style="flex:1"><div style="font-size:14px">${esc(h.t)}</div>
+      <div class="muted" style="font-size:12px">${new Date(h.d).toLocaleDateString("ru-RU")}</div></div>
+      <b style="color:${h.v>0?"var(--good)":"var(--sale)"}">${h.v>0?"+":""}${h.v}</b></div>`).join(""):
+      `<div class="muted">Пока нет операций. Баллы начисляются за заказы.</div>`}</div>`;
+}
+function secProfile(){
+  const ch=[["phone","📱","Телефон"],["email","✉️","Почта"],["telegram","✈️","Telegram"],["max","🟣","MAX"]];
+  return `<h1 class="h-title">Профиль</h1>
+  <div class="panel"><div class="h-sub">Личные данные</div>
+    <div class="row2"><div class="field"><label>Имя</label><input class="inp" id="pf_first" value="${esc(user.firstName)}"></div>
+      <div class="field"><label>Фамилия</label><input class="inp" id="pf_last" value="${esc(user.lastName)}"></div></div>
+    <div class="row2"><div class="field"><label>Дата рождения</label><input class="inp" id="pf_bd" type="date" value="${esc(user.birthday)}"></div>
+      <div class="field"><label>Пол</label><select class="inp" id="pf_gender">
+        <option value="" ${!user.gender?"selected":""}>—</option>
+        <option value="Женский" ${user.gender==="Женский"?"selected":""}>Женский</option>
+        <option value="Мужской" ${user.gender==="Мужской"?"selected":""}>Мужской</option></select></div></div>
+    <button class="btn btn-primary" onclick="saveProfile()">Сохранить</button></div>
+  <div class="panel"><div class="h-sub">Способы входа</div>
+    ${ch.map(([k,i,t])=>`<div class="chan"><span class="ico">${i}</span>
+      <div style="flex:1"><div class="cn">${t}</div><div class="cv">${user[k]?esc(user[k]):"не привязан"}</div></div>
+      ${user[k]?`<span class="badge-ok">✓ привязан</span>`:`<button class="btn btn-out btn-sm" onclick="openAuth(null,'${k}')">Привязать</button>`}</div>`).join("")}</div>`;
+}
+async function saveProfile(){
+  try{const res=await api("PUT","/api/profile",{firstName:document.getElementById("pf_first").value,
+    lastName:document.getElementById("pf_last").value,birthday:document.getElementById("pf_bd").value,
+    gender:document.getElementById("pf_gender").value});user=res.user;toast("Сохранено ✓");renderHeaderAuth()}catch(e){toast(e.message)}
+}
+function secAddresses(){
+  return `<h1 class="h-title">Мои адреса</h1>
+  ${user.addresses.map(a=>`<div class="panel" style="display:flex;justify-content:space-between;align-items:center">
+    <div><div style="font-weight:700">${esc(a.title)} ${a.isDefault?'<span class="chip">по умолчанию</span>':""}</div>
+      <div class="muted" style="font-size:13px;margin-top:4px">${esc([a.city,a.street,a.house&&"д."+a.house,a.flat&&"кв."+a.flat].filter(Boolean).join(", "))}</div></div>
+    <div style="display:flex;gap:6px">${a.isDefault?"":`<button class="btn btn-out btn-sm" onclick="setDefaultAddr('${a.id}')">Основной</button>`}
+      <button class="btn btn-danger btn-sm" onclick="delAddr('${a.id}')">Удалить</button></div></div>`).join("")}
+  <div class="panel"><div class="h-sub">Новый адрес</div>
+    <div class="field"><label>Название (Дом, Работа…)</label><input class="inp" id="ad_title" placeholder="Дом"></div>
+    <div class="row2"><div class="field"><label>Город</label><input class="inp" id="ad_city" placeholder="Москва"></div>
+      <div class="field"><label>Улица</label><input class="inp" id="ad_street" placeholder="Ленина"></div></div>
+    <div class="row2"><div class="field"><label>Дом</label><input class="inp" id="ad_house"></div>
+      <div class="field"><label>Квартира</label><input class="inp" id="ad_flat"></div></div>
+    <button class="btn btn-primary" onclick="addAddr()">Добавить адрес</button></div>`;
+}
+async function addAddr(){const g=id=>document.getElementById(id).value;
+  if(!g("ad_city")||!g("ad_street"))return toast("Укажите город и улицу");
+  try{const res=await api("POST","/api/addresses",{title:g("ad_title")||"Адрес",city:g("ad_city"),street:g("ad_street"),house:g("ad_house"),flat:g("ad_flat")});user=res.user;toast("Адрес добавлен");viewAccount("addresses")}catch(e){toast(e.message)}}
+async function delAddr(id){try{const res=await api("DELETE","/api/addresses/"+id);user=res.user;viewAccount("addresses")}catch(e){toast(e.message)}}
+async function setDefaultAddr(id){try{const res=await api("PUT","/api/addresses/"+id,{isDefault:true});user=res.user;viewAccount("addresses")}catch(e){toast(e.message)}}
+function secCards(){
+  return `<h1 class="h-title">Способы оплаты</h1>
+  ${user.cards.map(c=>`<div class="panel" style="display:flex;justify-content:space-between;align-items:center">
+    <div style="display:flex;gap:12px;align-items:center"><span style="font-size:26px">💳</span>
+      <div><div style="font-weight:700">${esc(c.brand)} •••• ${esc(c.last4)}</div><div class="muted" style="font-size:13px">${esc(c.exp||"")}</div></div></div>
+    <button class="btn btn-danger btn-sm" onclick="delCard('${c.id}')">Удалить</button></div>`).join("")}
+  <div class="panel"><div class="h-sub">Добавить карту</div>
+    <div class="field"><label>Номер карты</label><input class="inp" id="cd_num" placeholder="0000 0000 0000 0000" maxlength="19"></div>
+    <div class="row2"><div class="field"><label>Держатель</label><input class="inp" id="cd_holder" placeholder="IVAN IVANOV"></div>
+      <div class="field"><label>Срок</label><input class="inp" id="cd_exp" placeholder="12/28"></div></div>
+    <button class="btn btn-primary" onclick="addCard()">Привязать карту</button>
+    <div class="muted" style="font-size:12px;margin-top:10px">Демо: данные карты не сохраняются, храним только последние 4 цифры.</div></div>`;
+}
+async function addCard(){const g=id=>document.getElementById(id).value;
+  if((g("cd_num").replace(/\D/g,"")).length<4)return toast("Введите номер карты");
+  try{const res=await api("POST","/api/cards",{number:g("cd_num"),holder:g("cd_holder"),exp:g("cd_exp")});user=res.user;toast("Карта привязана");viewAccount("cards")}catch(e){toast(e.message)}}
+async function delCard(id){try{const res=await api("DELETE","/api/cards/"+id);user=res.user;viewAccount("cards")}catch(e){toast(e.message)}}
+function secSettings(){
+  const s=user.settings||{};const t=[["email","Новости и акции на почту"],["sms","SMS о статусе заказа"],["push","Push-уведомления"],["telegram","Уведомления в Telegram"]];
+  return `<h1 class="h-title">Настройки уведомлений</h1><div class="panel">
+    ${t.map(([k,l])=>`<div class="listrow"><div style="flex:1;font-size:14px">${l}</div>
+      <div class="toggle ${s[k]?"on":""}" onclick="toggleSetting('${k}',this)"></div></div>`).join("")}</div>`;
+}
+async function toggleSetting(k,el){el.classList.toggle("on");const on=el.classList.contains("on");
+  try{const res=await api("PUT","/api/profile/settings",{settings:{[k]:on}});user=res.user}catch(e){toast(e.message)}}
+function secSecurity(){
+  const ch=[["phone","📱","Телефон"],["email","✉️","Почта"],["telegram","✈️","Telegram"],["max","🟣","MAX"]];
+  return `<h1 class="h-title">Безопасность</h1>
+  <div class="panel"><div class="h-sub">Привязанные аккаунты</div>
+    ${ch.filter(([k])=>user[k]).map(([k,i,t])=>`<div class="chan"><span class="ico">${i}</span><div style="flex:1"><div class="cn">${t}</div><div class="cv">${esc(user[k])}</div></div><span class="badge-ok">✓</span></div>`).join("")||`<div class="muted">Нет привязок</div>`}</div>
+  <div class="panel"><div class="h-sub">Текущая сессия</div>
+    <div class="muted" style="font-size:13px;margin-bottom:12px">Вы вошли на этом устройстве. Аккаунт создан ${new Date(user.createdAt).toLocaleDateString("ru-RU")}.</div>
+    <button class="btn btn-out" onclick="logout()">Выйти из аккаунта</button></div>`;
+}
+
+/* отзыв (модалка через prompt-подобную панель в auth-модалке) */
+function openReview(pid){
+  const p=getP(pid);authIntent=null;
+  document.getElementById("authBox").innerHTML=`<button class="close-x" onclick="closeAuth()">×</button>
+    <h2>Оценить товар</h2><div class="lead">${esc(p?p.title:"")}</div>
+    <div class="field"><label>Оценка</label><select class="inp" id="rv_rate">${[5,4,3,2,1].map(n=>`<option value="${n}">${"★".repeat(n)} (${n})</option>`).join("")}</select></div>
+    <div class="field"><label>Достоинства</label><input class="inp" id="rv_pros"></div>
+    <div class="field"><label>Недостатки</label><input class="inp" id="rv_cons"></div>
+    <div class="field"><label>Комментарий</label><textarea class="inp" id="rv_text"></textarea></div>
+    <button class="btn btn-primary btn-block" onclick="submitReview('${pid}')">Отправить отзыв</button>`;
+  document.getElementById("authModal").classList.add("open");
+}
+async function submitReview(pid){
+  try{await api("POST","/api/reviews",{productId:pid,rating:+document.getElementById("rv_rate").value,
+    pros:document.getElementById("rv_pros").value,cons:document.getElementById("rv_cons").value,text:document.getElementById("rv_text").value});
+    reviewed.add(pid);localStorage.setItem("mt_reviewed",JSON.stringify([...reviewed]));
+    closeAuth();toast("Спасибо за отзыв! ⭐");const r=parseRoute();render();
+  }catch(e){toast(e.message)}
+}
+
+/* ==================== АВТОРИЗАЦИЯ (4 канала) ==================== */
+let authIntent=null;   // куда вернуться после входа
+let authLinkMode=null; // если задан канал — режим привязки в профиле
+let authMethod="phone",authStage="ident",authIdent="",authDemoCode="";
+function openAuth(intent,linkChannel){
+  authIntent=intent||null;authLinkMode=linkChannel||null;
+  authMethod=linkChannel||"phone";authStage="ident";authIdent="";authDemoCode="";
+  renderAuth();document.getElementById("authModal").classList.add("open");
+}
+function closeAuth(){document.getElementById("authModal").classList.remove("open")}
+document.getElementById("authModal").addEventListener("click",e=>{if(e.target.id==="authModal")closeAuth()});
+function renderAuth(){
+  const box=document.getElementById("authBox");
+  const link=!!authLinkMode;
+  const tabs=[["phone","📱","Телефон"],["email","✉️","Почта"],["telegram","✈️","Telegram"],["max","🟣","MAX"]];
+  const tabsHTML=link?"":`<div class="auth-tabs">${tabs.map(([m,i,t])=>`<button class="${m===authMethod?"on":""}" onclick="setAuthMethod('${m}')"><span class="ti">${i}</span>${t}</button>`).join("")}</div>`;
+  let form="";
+  if(authMethod==="phone"||authMethod==="email"){
+    const isPhone=authMethod==="phone";
+    if(authStage==="ident"){
+      form=`<div class="field"><label>${isPhone?"Номер телефона":"Электронная почта"}</label>
+        <input class="inp" id="au_ident" placeholder="${isPhone?"+7 900 000-00-00":"you@mail.ru"}" value="${esc(authIdent)}"></div>
+        <button class="btn btn-primary btn-block" onclick="requestCode()">Получить код</button>`;
+    }else{
+      form=`${authDemoCode?`<div class="demo-code">Демо-код: <b>${authDemoCode}</b> (или введите 0000)</div>`:""}
+        <div class="field"><label>Код из ${isPhone?"SMS":"письма"} на ${esc(authIdent)}</label>
+        <input class="inp" id="au_code" placeholder="0000" maxlength="4" inputmode="numeric"></div>
+        <button class="btn btn-primary btn-block" onclick="verifyCode()">${link?"Привязать":"Войти"}</button>
+        <div class="social-note"><a class="link" onclick="authStage='ident';renderAuth()">← Изменить ${isPhone?"номер":"почту"}</a></div>`;
+    }
+  }else{ // telegram / max
+    const nm=authMethod==="telegram"?"Telegram":"MAX";
+    form=`<div class="field"><label>Ваш ${nm} (username)</label>
+      <input class="inp" id="au_handle" placeholder="@username"></div>
+      <button class="btn btn-primary btn-block" onclick="socialLogin()">${link?"Привязать":"Продолжить через "+nm}</button>
+      <div class="social-note">Демо: в реальном магазине откроется официальная авторизация ${nm}.<br>Просто введите любой ник, чтобы ${link?"привязать":"войти"}.</div>`;
+  }
+  box.innerHTML=`<button class="close-x" onclick="closeAuth()">×</button>
+    <h2>${link?"Привязать "+({phone:"телефон",email:"почту",telegram:"Telegram",max:"MAX"}[authMethod]):"Вход и регистрация"}</h2>
+    <div class="lead">${link?"Добавьте способ входа к аккаунту":"Войдите или зарегистрируйтесь — аккаунт создастся автоматически"}</div>
+    ${tabsHTML}${form}`;
+}
+function setAuthMethod(m){authMethod=m;authStage="ident";authIdent="";authDemoCode="";renderAuth()}
+async function requestCode(){
+  authIdent=document.getElementById("au_ident").value.trim();
+  if(!authIdent)return toast("Введите "+(authMethod==="phone"?"телефон":"почту"));
+  try{const r=await api("POST","/api/auth/request-code",{method:authMethod,identifier:authIdent});
+    authDemoCode=r.demoCode;authStage="code";renderAuth();
+  }catch(e){toast(e.message)}
+}
+async function verifyCode(){
+  const code=document.getElementById("au_code").value.trim();
+  if(authLinkMode){
+    try{const r=await api("POST","/api/profile/link",{method:authMethod,identifier:authIdent,code});user=r.user;closeAuth();toast("Привязано ✓");viewAccount("profile")}catch(e){toast(e.message)}
+    return;
+  }
+  try{const r=await api("POST","/api/auth/verify-code",{method:authMethod,identifier:authIdent,code});
+    await onLogin(r);
+  }catch(e){toast(e.message)}
+}
+async function socialLogin(){
+  const handle=document.getElementById("au_handle").value.trim();
+  if(!handle)return toast("Введите ник");
+  if(authLinkMode){
+    try{const r=await api("POST","/api/profile/link",{method:authMethod,handle});user=r.user;closeAuth();toast("Привязано ✓");viewAccount("profile")}catch(e){toast(e.message)}
+    return;
+  }
+  try{const r=await api("POST","/api/auth/social",{method:authMethod,handle});await onLogin(r)}catch(e){toast(e.message)}
+}
+async function onLogin(r){
+  token=r.token;localStorage.setItem("mt_token",token);user=r.user;
+  // синхронизируем локальное избранное на сервер
+  for(const id of fav){try{await api("POST","/api/favorites/"+id)}catch{}}
+  if(user.favorites)user.favorites.forEach(id=>fav.add(id));
+  saveFav();refreshCounts();renderHeaderAuth();closeAuth();
+  toast(r.isNew?"Аккаунт создан ✅":"С возвращением! 👋");
+  if(authIntent){const t=authIntent;authIntent=null;go(t)}else render();
+}
+async function logout(){
+  try{await api("POST","/api/auth/logout")}catch{}
+  token=null;user=null;localStorage.removeItem("mt_token");renderHeaderAuth();toast("Вы вышли");go("#/");
+}
+function renderHeaderAuth(){
+  const lbl=document.getElementById("accLabel");
+  lbl.textContent=user?(user.firstName||user.name||"Кабинет"):"Войти";
+}
+
+/* ==================== служебное ==================== */
 let toastT;
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2600)}
 document.getElementById("theme").onclick=()=>{const r=document.documentElement,c=r.getAttribute("data-theme");
   const sd=matchMedia("(prefers-color-scheme:dark)").matches;r.setAttribute("data-theme",c?(c==="dark"?"light":"dark"):(sd?"light":"dark"))};
 
-(async()=>{try{const r=await fetch("/api/products");const d=await r.json();if(Array.isArray(d)&&d.length)PRODUCTS=d;}catch(e){}renderCats();renderGrid();refreshCounts();})();
+/* ==================== старт ==================== */
+(async()=>{
+  try{const d=await (await fetch("/api/products")).json();if(Array.isArray(d)&&d.length)PRODUCTS=d;}catch(e){}
+  if(token){try{const r=await api("GET","/api/auth/me");user=r.user;if(!user){token=null;localStorage.removeItem("mt_token")}
+    else if(user.favorites)user.favorites.forEach(id=>fav.add(id));}catch{token=null;localStorage.removeItem("mt_token")}}
+  saveFav();renderHeaderAuth();refreshCounts();render();
+})();
 </script>

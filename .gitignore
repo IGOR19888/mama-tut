@@ -1,5 +1,10 @@
-# данные заказов — не храним в репозитории (пишутся в Volume на сервере)
+# изменяемые данные — не храним в репозитории (пишутся в Volume на сервере)
 data/orders.json
+data/users.json
+data/sessions.json
+data/otp.json
+data/returns.json
+data/reviews.json
 
 # системное
 .DS_Store
