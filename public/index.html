@@ -313,6 +313,68 @@
   @media(max-width:900px){.pdp,.cart-grid,.checkout-grid{grid-template-columns:1fr}.acc{grid-template-columns:1fr}
     .acc-nav{position:static}.buybox,.summary{position:static}.stat-row{grid-template-columns:1fr}}
   @media(max-width:760px){.pdp-media{grid-template-columns:1fr}.thumbs{flex-direction:row;order:2}.stage{font-size:110px}}
+
+  /* ---------- ЛК: группы меню, дашборд, карточка заказа (стиль Ozon в нашей палитре) ---------- */
+  .acc-nav .grp{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:16px 12px 4px}
+  .acc-nav .grp:first-child{padding-top:6px}
+  .acc-tabs{display:flex;gap:8px;margin:2px 0 20px}
+  .acc-tabs button{border:none;background:var(--surface-2);color:var(--ink);border-radius:999px;padding:9px 20px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+  .acc-tabs button.on{background:var(--ink);color:var(--bg)}
+  .dash-h{font-family:"Unbounded";font-weight:700;font-size:19px;margin:22px 0 12px}
+  .dash-h:first-child{margin-top:0}
+  .fin{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .fin .card-vis{width:230px;height:132px;border-radius:16px;padding:16px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;
+    background:linear-gradient(135deg,var(--accent),#6D28D9);box-shadow:var(--shadow)}
+  .fin .card-vis .lbl{font-size:13px;opacity:.85;font-weight:600}
+  .fin .card-vis .bal{font-family:"Unbounded";font-weight:800;font-size:28px}
+  .fin .card-vis .br{font-weight:800;letter-spacing:.04em;font-size:15px;align-self:flex-end}
+  .rate-row{display:flex;gap:6px;font-size:26px;color:var(--line);cursor:pointer}
+  .rate-row span{transition:.1s}.rate-row span:hover,.rate-row span.on{color:var(--star)}
+  .rec-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;transition:.15s}
+  .rec-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+
+  .code-banner{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;display:flex;gap:14px;align-items:center}
+  .code-banner .ico{font-size:26px}
+  .code-banner .code{font-family:"Unbounded";font-weight:800;font-size:19px;letter-spacing:.03em}
+  .code-banner .hint{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+  .ord-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);cursor:pointer;transition:.15s}
+  .ord-card:hover{border-color:var(--accent-soft);box-shadow:var(--shadow-lg)}
+  .ord-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .ord-status{font-weight:800;font-size:15px}
+  .ord-status.can-pick{color:var(--good)} .ord-status.on-way{color:var(--action)} .ord-status.canceled{color:var(--muted)}
+  .ord-imgs{display:flex;gap:8px;margin:10px 0}
+  .ord-imgs .im{width:52px;height:52px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:26px}
+
+  /* order detail */
+  .od-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start;margin-top:6px}
+  .od-block{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .od-block:last-child{border-bottom:none}
+  .od-ic{width:38px;height:38px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}
+  .od-block .ot{font-weight:700;font-size:14px}.od-block .os{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.45}
+  .od-side{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  .od-side .r{display:flex;justify-content:space-between;margin-bottom:9px;font-size:14px;color:var(--muted)}
+  .od-side .r b{color:var(--ink)}
+  .od-side .paid{display:flex;justify-content:space-between;font-size:16px;font-weight:800;padding-top:12px;border-top:1px solid var(--line);margin-top:4px}
+  .codebox{background:var(--accent-soft);border-radius:14px;padding:16px;margin-top:14px;text-align:center}
+  .codebox .lbl{font-size:12.5px;color:var(--accent);font-weight:600;margin-bottom:6px}
+  .codebox .c{font-family:"Unbounded";font-weight:800;font-size:24px;letter-spacing:.03em;color:var(--accent)}
+  .codebox .hint{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  .row-link{display:flex;justify-content:space-between;align-items:center;padding:14px 4px;border-top:1px solid var(--line);cursor:pointer;font-weight:600;font-size:14px}
+  .row-link:hover{color:var(--accent)}
+
+  /* демо-карта ПВЗ */
+  .pvz-map{height:220px;border-radius:14px;position:relative;overflow:hidden;margin-bottom:12px;
+    background:linear-gradient(135deg,#e8eef7,#dbe6f5);border:1px solid var(--line)}
+  :root[data-theme="dark"] .pvz-map,:root:not([data-theme="light"]) .pvz-map{background:linear-gradient(135deg,#18204a,#141a3a)}
+  .pvz-map .road{position:absolute;background:var(--surface);opacity:.7}
+  .pvz-pin{position:absolute;transform:translate(-50%,-100%);background:var(--action);color:#fff;font-size:11px;font-weight:800;
+    border-radius:999px 999px 999px 2px;padding:4px 8px;cursor:pointer;box-shadow:var(--shadow);white-space:nowrap;border:2px solid #fff}
+  .pvz-pin.on{background:var(--sale);z-index:2;transform:translate(-50%,-100%) scale(1.12)}
+  .pvz-item{display:flex;gap:12px;align-items:flex-start;padding:12px;border:2px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer}
+  .pvz-item.on{border-color:var(--accent);background:var(--accent-soft)}
+  .pvz-item .rt{color:var(--star);font-weight:700;font-size:13px}
+  @media(max-width:900px){.od-grid{grid-template-columns:1fr}}
 </style>
 
 <header>
@@ -326,7 +388,7 @@
     <button class="catbtn" onclick="go('#/');setTimeout(()=>document.getElementById('catalogTitle')?.scrollIntoView({behavior:'smooth'}),50)">☰ Каталог</button>
     <div class="search"><input id="q" placeholder="Искать: подгузники, шампунь, набор…"><button class="go">Найти</button></div>
     <div class="acts">
-      <button class="act" id="accBtn" onclick="go('#/account/orders')"><span class="ic">👤</span><span id="accLabel">Войти</span></button>
+      <button class="act" id="accBtn" onclick="go('#/account/main')"><span class="ic">👤</span><span id="accLabel">Войти</span></button>
       <button class="act" onclick="go('#/favorites')"><span class="ic">❤️</span><span>Избранное</span><span class="badge" id="favBadge" hidden>0</span></button>
       <button class="act" onclick="openCart()"><span class="ic">🛒</span><span>Корзина</span><span class="badge" id="cartBadge" hidden>0</span></button>
     </div>
@@ -410,7 +472,7 @@ let fav=new Set(JSON.parse(localStorage.getItem("mt_fav")||"[]"));
 let reviewed=new Set(JSON.parse(localStorage.getItem("mt_reviewed")||"[]"));
 let token=localStorage.getItem("mt_token")||null;
 let user=null;               // публичный профиль (или null)
-let CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0}; // состояние оформления
+let CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0,pickup:"p1"}; // состояние оформления
 
 const saveCart=()=>localStorage.setItem("mt_cart",JSON.stringify(cart));
 const saveFav=()=>localStorage.setItem("mt_fav",JSON.stringify([...fav]));
@@ -523,7 +585,8 @@ function parseRoute(){
   if(a==="cart")return{name:"cart"};
   if(a==="checkout")return{name:"checkout"};
   if(a==="favorites")return{name:"favorites"};
-  if(a==="account")return{name:"account",section:b||"orders"};
+  if(a==="order")return{name:"orderDetail",id:b};
+  if(a==="account")return{name:"account",section:b||"main"};
   return{name:"home"};
 }
 const VIEW=()=>document.getElementById("view-route");
@@ -539,6 +602,7 @@ async function render(){
     else if(r.name==="cart")viewCart();
     else if(r.name==="checkout")await viewCheckout();
     else if(r.name==="favorites")viewFavorites();
+    else if(r.name==="orderDetail")await viewOrderDetail(r.id);
     else if(r.name==="account")await viewAccount(r.section);
   }catch(e){vr.innerHTML=`<div class="empty2"><div class="big">⚠️</div>${esc(e.message)}</div>`}
 }
@@ -639,6 +703,7 @@ async function viewCheckout(){
   const lines=cartLines();
   if(!lines.length){go("#/cart");return}
   if(!user){openAuth("#/checkout");VIEW().innerHTML=`<div class="empty2"><div class="big">🔐</div>Войдите, чтобы оформить заказ</div>`;return}
+  if(!CO.pickup)CO.pickup="p1";
   if(!CO.address&&user.addresses.length)CO.address=(user.addresses.find(a=>a.isDefault)||user.addresses[0]).id;
   if(!CO.card&&user.cards.length)CO.card=(user.cards.find(c=>c.isDefault)||user.cards[0]).id;
   const sub=cartSubtotal();
@@ -658,9 +723,20 @@ async function viewCheckout(){
       </div>
       <div class="panel">
         <div class="step-h"><span class="n">2</span> ${CO.delivery==="pickup"?"Пункт выдачи":"Адрес доставки"}</div>
-        ${user.addresses.length?user.addresses.map(a=>`<div class="opt ${CO.address===a.id?"on":""}" onclick="CO.address='${a.id}';render()">
+        ${CO.delivery==="pickup"?`
+          <div class="pvz-map">
+            <div class="road" style="left:0;right:0;top:46%;height:8px"></div>
+            <div class="road" style="top:0;bottom:0;left:40%;width:8px"></div>
+            <div class="road" style="top:0;bottom:0;left:70%;width:6px"></div>
+            ${PVZ.map(v=>`<div class="pvz-pin ${CO.pickup===v.id?"on":""}" style="left:${v.x}%;top:${v.y}%" onclick="selectPvz('${v.id}')">📦 ${v.rate}</div>`).join("")}
+          </div>
+          ${PVZ.map(v=>`<div class="pvz-item ${CO.pickup===v.id?"on":""}" onclick="selectPvz('${v.id}')">
+            <span class="rdot" style="margin-top:2px"></span>
+            <div style="flex:1"><div class="ot">${esc(v.name)}</div><div class="od">${esc(v.addr)} · ${esc(v.hours)}</div></div>
+            <span class="rt">★ ${v.rate}</span></div>`).join("")}`
+        :`${user.addresses.length?user.addresses.map(a=>`<div class="opt ${CO.address===a.id?"on":""}" onclick="CO.address='${a.id}';render()">
           <span class="rdot"></span><div><div class="ot">${esc(a.title)}</div><div class="od">${esc([a.city,a.street,a.house&&"д."+a.house,a.flat&&"кв."+a.flat].filter(Boolean).join(", "))}</div></div></div>`).join(""):`<div class="muted" style="margin-bottom:10px">Нет сохранённых адресов</div>`}
-        <button class="btn btn-out btn-sm" onclick="go('#/account/addresses')">+ Добавить адрес</button>
+        <button class="btn btn-out btn-sm" onclick="go('#/account/addresses')">+ Добавить адрес</button>`}
       </div>
       <div class="panel">
         <div class="step-h"><span class="n">3</span> Оплата</div>
@@ -688,6 +764,14 @@ async function viewCheckout(){
     </div>
   </div>`;
 }
+/* демо-пункты выдачи Mepsi */
+const PVZ=[
+  {id:"p1",name:"Пункт выдачи Mepsi",addr:"Советская ул., 59",hours:"09:00–21:00",rate:4.97,x:38,y:30},
+  {id:"p2",name:"Пункт выдачи Mepsi",addr:"ул. Ленина, 12",hours:"10:00–20:00",rate:4.94,x:64,y:40},
+  {id:"p3",name:"Пункт выдачи Mepsi",addr:"Комсомольская ул., 7",hours:"09:00–22:00",rate:4.99,x:52,y:64},
+  {id:"p4",name:"Пункт выдачи Mepsi",addr:"ТЦ «Малыш», Крестьянская 3",hours:"10:00–21:00",rate:4.92,x:26,y:70},
+];
+function selectPvz(id){CO.pickup=id;render()}
 async function applyPromo(){
   const code=document.getElementById("promoInp").value.trim();
   if(!code){CO.promo=null;render();return}
@@ -697,13 +781,17 @@ async function applyPromo(){
 }
 async function placeOrder(){
   const lines=cartLines();
+  const pvz=PVZ.find(v=>v.id===CO.pickup);
+  const deliveryObj=CO.delivery==="pickup"
+    ? {method:"pickup",point:pvz||null,address:pvz?{city:"",street:pvz.addr,house:"",flat:""}:null}
+    : {method:"courier",address:user.addresses.find(a=>a.id===CO.address)||null};
   try{
     const res=await api("POST","/api/orders",{items:lines.map(({p,q})=>({id:p.id,qty:q})),
       promo:CO.promo?.code||null,pointsUsed:CO.points||0,
-      delivery:{method:CO.delivery,address:user.addresses.find(a=>a.id===CO.address)||null},
-      payment:{method:CO.payMethod}});
-    user=res.user;cart={};saveCart();refreshCounts();CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0};
-    toast("Заказ оформлен ✅");go("#/account/orders");
+      delivery:deliveryObj,payment:{method:CO.payMethod},
+      eta:CO.delivery==="pickup"?"1–2 дня":"2–3 дня"});
+    user=res.user;cart={};saveCart();refreshCounts();CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0,pickup:"p1"};
+    toast("Заказ оформлен ✅ Начислим баллы после получения");go("#/order/"+res.order.id);
   }catch(e){toast(e.message)}
 }
 
@@ -715,65 +803,161 @@ function viewFavorites(){
   ${list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty2"><div class="big">❤️</div><div class="muted">Пока пусто. Жмите ♡ на товарах.</div></div>`}`;
 }
 
-/* ==================== ЛИЧНЫЙ КАБИНЕТ ==================== */
-const ACC_NAV=[["orders","🛍","Мои заказы"],["returns","↩️","Возвраты"],["reviews","⭐","Отзывы и оценки"],
-  ["favorites","❤️","Избранное"],["points","💜","Баллы и счёт"],["profile","👤","Профиль"],
-  ["addresses","📍","Адреса"],["cards","💳","Оплата"],["settings","🔔","Настройки"],["security","🔐","Безопасность"]];
+/* ==================== ЛИЧНЫЙ КАБИНЕТ (структура Ozon в палитре Mepsi) ==================== */
+const ACC_GROUPS=[
+  ["Личная информация",[["main","🏠","Главная"],["points","💜","Баллы и бонусы"],["cards","💳","Способы оплаты"],["profile","👤","Профиль"]]],
+  ["Заказы",[["cartlink","🛒","Моя корзина"],["orders","📦","Мои заказы"],["returns","↩️","Мои возвраты"],["favorites","❤️","Избранное"]]],
+  ["Отзывы и вопросы",[["reviews","⭐","Мои отзывы"]]],
+  ["Настройки и помощь",[["addresses","📍","Адреса доставки"],["settings","🔔","Настройки"],["security","🔐","Безопасность"]]],
+];
+const STEPS=["Оформлен","Собирается","В пути","Доставлен"];
+const stIdx=s=>({created:0,assembling:1,shipping:2,delivered:3}[s]??0);
+// код получения в ПВЗ — как у Ozon: "1878 7046 4 * 4410"
+function pickupCode(o){const d=(o.id||"").replace(/\D/g,"").padEnd(13,"0");return `${d.slice(0,4)} ${d.slice(4,8)} ${d.slice(8,9)} * ${d.slice(-4)}`}
+const ordStatus=o=>o.status==="cancelled"?["Отменён","canceled"]:o.status==="delivered"?["Получен","can-pick"]:
+  o.status==="shipping"?[(o.delivery_info?.method==="pickup"?"Можно забирать":"В пути"),(o.delivery_info?.method==="pickup"?"can-pick":"on-way")]:
+  o.status==="assembling"?["Собирается","on-way"]:["Оформлен","on-way"];
+
 async function viewAccount(section){
   if(!user){openAuth("#/account/"+section);
-    VIEW().innerHTML=`<div class="empty2"><div class="big">🔐</div><div class="h-sub">Войдите в аккаунт</div>
-    <div class="muted" style="margin-bottom:16px">Телефон, почта, Telegram или MAX</div>
+    VIEW().innerHTML=`<div class="empty2"><div class="big">🔐</div><div class="h-sub">Войдите в личный кабинет</div>
+    <div class="muted" style="margin-bottom:16px">Телефон, почта, Telegram или MAX — с заботой о вас</div>
     <button class="btn btn-primary" onclick="openAuth('#/account/${section}')">Войти или зарегистрироваться</button></div>`;return}
   if(section==="favorites"){go("#/favorites");return}
+  if(section==="cartlink"){go("#/cart");return}
   const nm=user.name||user.phone||user.email||"Покупатель";
   const nav=`<nav class="acc-nav">
     <div class="acc-user"><div class="acc-ava">${(nm[0]||"?").toUpperCase()}</div>
-      <div><div class="nm">${esc(nm)}</div><div class="em2">${esc(user.phone||user.email||"")}</div></div></div>
-    ${ACC_NAV.map(([k,i,t])=>`<a class="${k===section?"on":""}" onclick="go('#/account/${k}')"><span>${i}</span>${t}
-      ${k==="points"?`<span class="c">${user.points}</span>`:""}${k==="favorites"?`<span class="c">${fav.size}</span>`:""}</a>`).join("")}
+      <div><div class="nm">${esc(nm)}</div><div class="em2"><a class="link" onclick="go('#/account/profile')">Изменить профиль</a></div></div></div>
+    ${ACC_GROUPS.map(([g,items])=>`<div class="grp">${g}</div>`+items.map(([k,i,t])=>{
+      const target=k==="cartlink"?"#/cart":k==="favorites"?"#/favorites":"#/account/"+k;
+      const cnt=k==="points"?user.points:k==="favorites"?fav.size:k==="cartlink"?cartCount():null;
+      return `<a class="${k===section?"on":""}" onclick="go('${target}')"><span>${i}</span>${t}${cnt?`<span class="c">${cnt}</span>`:""}</a>`;}).join("")).join("")}
   </nav>`;
-  let content="<div class='empty2'>Загрузка…</div>";
-  VIEW().innerHTML=`${crumbs([{t:"Главная",h:"#/"},{t:"Личный кабинет"}])}<div class="acc">${nav}<div id="accContent">${content}</div></div>`;
+  VIEW().innerHTML=`${crumbs([{t:"Главная",h:"#/"},{t:"Личный кабинет"}])}<div class="acc">${nav}<div id="accContent"><div class="empty2">Загрузка…</div></div></div>`;
   const el=document.getElementById("accContent");
   try{
-    if(section==="orders")el.innerHTML=await secOrders();
-    else if(section==="returns")el.innerHTML=await secReturns();
-    else if(section==="reviews")el.innerHTML=await secReviews();
-    else if(section==="points")el.innerHTML=await secPoints();
-    else if(section==="profile")el.innerHTML=secProfile();
-    else if(section==="addresses")el.innerHTML=secAddresses();
-    else if(section==="cards")el.innerHTML=secCards();
-    else if(section==="settings")el.innerHTML=secSettings();
-    else if(section==="security")el.innerHTML=secSecurity();
-    else el.innerHTML=await secOrders();
+    const F={main:secMain,orders:secOrders,returns:secReturns,reviews:secReviews,points:secPoints,
+      profile:secProfile,addresses:secAddresses,cards:secCards,settings:secSettings,security:secSecurity};
+    el.innerHTML=await (F[section]||secMain)();
   }catch(e){el.innerHTML=`<div class="empty2">⚠️ ${esc(e.message)}</div>`}
 }
-const STEPS=["Оформлен","Собирается","В пути","Доставлен"];
-const stIdx=s=>({created:0,assembling:1,shipping:2,delivered:3}[s]??0);
-function orderHTML(o){
-  const at=o.status==="cancelled"?-1:stIdx(o.status);
-  const dt=new Date(o.createdAt).toLocaleDateString("ru-RU",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"});
-  return `<div class="order">
-    <div class="oh"><div><div class="on">Заказ ${esc(o.id)}</div><div class="od">${dt}</div></div>
-      <span class="status ${o.status==="delivered"?"done":o.status==="shipping"?"way":o.status==="cancelled"?"":"pack"}">${esc(o.statusLabel)}</span></div>
-    <div class="oi">${o.items.map(e=>`<span title="${esc(e.title)}">${e.em||"📦"}</span>`).join("")}</div>
-    ${o.status!=="cancelled"?`<div class="track">${STEPS.map((s,i)=>`<div class="stp ${i<=at?"act":""}">${s}</div>`).join("")}</div>`:""}
-    <div class="oh" style="margin-top:12px;margin-bottom:0"><span class="od">${o.items.length} поз. · ${esc(o.eta||"")}</span><span class="osum mono">${fmt(o.total)}</span></div>
-    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-      <button class="btn btn-ghost btn-sm" onclick="repeatOrder('${o.id}')">Повторить</button>
-      ${o.status==="delivered"?`<button class="btn btn-out btn-sm" onclick="startReturn('${o.id}')">Оформить возврат</button>`:""}
-      ${["created","assembling"].includes(o.status)?`<button class="btn btn-danger btn-sm" onclick="cancelOrder('${o.id}')">Отменить</button>`:""}
-    </div></div>`;
+
+/* ---- Дашборд «Главная» ---- */
+async function secMain(){
+  const orders=await api("GET","/api/orders").catch(()=>[]);
+  const active=orders.find(o=>["created","assembling","shipping"].includes(o.status));
+  const delivered=orders.filter(o=>o.status==="delivered").flatMap(o=>o.items);
+  const waiting=[...new Map(delivered.filter(i=>!reviewed.has(i.id)).map(i=>[i.id,i])).values()];
+  const wi=waiting[0];
+  const recs=PRODUCTS.filter(p=>p.rate>=4.8).slice(0,10);
+  return `<h1 class="h-title">Здравствуйте, ${esc(user.firstName||nmShort())}</h1>
+  <div class="dash-h">Заказы</div>
+  ${active?`<div class="ord-card" onclick="go('#/order/${active.id}')">
+    <div class="ord-top"><span class="ord-status ${ordStatus(active)[1]}">${ordStatus(active)[0]}</span><span class="od">${dOrd(active.createdAt)}</span></div>
+    <div class="muted" style="font-size:13px">${active.delivery_info?.method==="pickup"?"Пункт выдачи Mepsi":"Курьером до двери"} · до ${active.eta||"2–3 дней"}</div>
+    <div class="ord-imgs">${active.items.slice(0,6).map(i=>`<div class="im">${i.em||"📦"}</div>`).join("")}</div>
+    <div class="ord-top" style="margin:0"><span class="od">${active.items.length} поз.</span><span class="osum mono" style="font-weight:800">${fmt(active.total)}</span></div>
+  </div>`:`<div class="panel"><div class="muted">Активных заказов нет.</div>
+    <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="go('#/')">За покупками</button></div>`}
+
+  <div class="dash-h">Финансы</div>
+  <div class="fin">
+    <div class="card-vis"><div class="lbl">Mepsi Карта · баллы</div><div class="bal">${user.points}</div><div class="br">MEPSI&nbsp;•&nbsp;LULU</div></div>
+    <div><div class="muted" style="font-size:13px;max-width:26ch;margin-bottom:10px">1 балл = 1 ₽. Кэшбэк 5% с каждого заказа, копится автоматически.</div>
+      <button class="btn btn-out btn-sm" onclick="go('#/account/points')">История начислений</button></div>
+  </div>
+
+  <div class="dash-h">Оцените покупки</div>
+  ${wi?`<div class="panel" style="display:flex;gap:16px;align-items:center">
+    <div class="od-ic" style="width:56px;height:56px;font-size:28px">${wi.em||"📦"}</div>
+    <div style="flex:1"><div style="font-size:14px;margin-bottom:6px">${esc(wi.title)}</div>
+      <div class="rate-row">${[1,2,3,4,5].map(n=>`<span onclick="openReview('${wi.id}')">★</span>`).join("")}</div></div>
+  </div>`:`<div class="panel"><div class="muted">Нет товаров, ожидающих оценку.</div></div>`}
+
+  <div class="dash-h">Подобрали по вашим интересам</div>
+  <div class="grid">${recs.map(card).join("")}</div>`;
 }
+function nmShort(){return (user.name||user.phone||user.email||"Покупатель").split(" ")[0]}
+const dOrd=iso=>new Date(iso).toLocaleDateString("ru-RU",{day:"numeric",month:"long"});
+
+/* ---- Мои заказы: вкладки Актуальные/Завершённые + код получения ---- */
+let ordersTab="active";
+function setOrdersTab(t){ordersTab=t;viewAccount("orders")}
+function ordCardMini(o){const[st,cls]=ordStatus(o);
+  return `<div class="ord-card" onclick="go('#/order/${o.id}')">
+    <div class="ord-top"><span class="ord-status ${cls}">${st}</span><span class="od">${dOrd(o.createdAt)}</span></div>
+    <div class="muted" style="font-size:13px">Заказ ${esc(o.id)} · ${o.delivery_info?.method==="pickup"?"Пункт выдачи":"Курьером"}</div>
+    <div class="ord-imgs">${o.items.slice(0,6).map(i=>`<div class="im" title="${esc(i.title)}">${i.em||"📦"}</div>`).join("")}</div>
+    <div class="ord-top" style="margin:0"><span class="od">${o.items.length} поз. · до ${esc(o.eta||"")}</span><span class="osum mono" style="font-weight:800">${fmt(o.total)}</span></div>
+  </div>`;}
 async function secOrders(){
   const orders=await api("GET","/api/orders");
-  if(!orders.length)return `<div class="empty2"><div class="big">🛍</div><div class="h-sub">Заказов пока нет</div>
+  if(!orders.length)return `<div class="empty2"><div class="big">📦</div><div class="h-sub">Заказов пока нет</div>
     <button class="btn btn-primary" onclick="go('#/')" style="margin-top:8px">За покупками</button></div>`;
-  return `<h1 class="h-title">Мои заказы</h1>${orders.map(orderHTML).join("")}`;
+  const active=orders.filter(o=>["created","assembling","shipping"].includes(o.status));
+  const done=orders.filter(o=>["delivered","cancelled"].includes(o.status));
+  const list=ordersTab==="active"?active:done;
+  const pick=active.find(o=>o.delivery_info?.method==="pickup")||active[0];
+  return `<h1 class="h-title">Мои заказы</h1>
+  ${pick?`<div class="code-banner"><span class="ico">🔑</span><div>
+    <div class="code">${pickupCode(pick)}</div>
+    <div class="hint">Код для получений и возвратов в пунктах выдачи Mepsi. Обновляется ежедневно.</div></div></div>`:""}
+  <div class="acc-tabs">
+    <button class="${ordersTab==="active"?"on":""}" onclick="setOrdersTab('active')">Актуальные ${active.length?"· "+active.length:""}</button>
+    <button class="${ordersTab==="done"?"on":""}" onclick="setOrdersTab('done')">Завершённые ${done.length?"· "+done.length:""}</button>
+  </div>
+  ${list.length?list.map(ordCardMini).join(""):`<div class="empty2"><div class="muted">${ordersTab==="active"?"Нет актуальных заказов":"Нет завершённых заказов"}</div></div>`}`;
 }
-async function cancelOrder(id){if(!confirm("Отменить заказ?"))return;try{await api("POST","/api/orders/"+id+"/cancel");toast("Заказ отменён");viewAccount("orders")}catch(e){toast(e.message)}}
+
+/* ---- Страница заказа (как у Ozon) ---- */
+async function viewOrderDetail(id){
+  if(!user){openAuth("#/order/"+id);VIEW().innerHTML=`<div class="empty2"><div class="big">🔐</div>Войдите, чтобы увидеть заказ</div>`;return}
+  const o=await api("GET","/api/orders/"+id);
+  const[st,cls]=ordStatus(o);
+  const pk=o.delivery_info?.method==="pickup";
+  const addr=o.delivery_info?.address;
+  const addrStr=addr?[addr.city,addr.street,addr.house&&"д. "+addr.house,addr.flat&&"кв. "+addr.flat].filter(Boolean).join(", "):"—";
+  VIEW().innerHTML=`
+  <div class="crumbs"><a onclick="go('#/account/orders')">← К списку заказов</a></div>
+  <h1 class="h-title" style="margin-top:4px">Заказ от ${dOrd(o.createdAt)}</h1>
+  <div class="od-grid">
+    <div class="panel">
+      <div class="od-block"><div class="od-ic">📍</div><div>
+        <div class="ot">${o.status==="delivered"?"Доставлено":pk?"Доставим в пункт выдачи":"Доставим курьером"} <span class="ord-status ${cls}" style="font-size:13px">· ${st}</span></div>
+        <div class="os">${pk?"Пункт выдачи Mepsi":"Курьером до двери"}<br>${esc(addrStr)}</div></div></div>
+      <div class="od-block"><div class="od-ic">👤</div><div>
+        <div class="ot">Получатель</div><div class="os">${esc(user.name||user.phone||"Покупатель")}${pk?"<br>Забрать может любой человек по коду получения":""}</div></div></div>
+      ${o.items.map(i=>`<div class="od-block"><div class="od-ic" style="font-size:24px">${i.em||"📦"}</div>
+        <div style="flex:1"><div class="ot">${esc(i.title)}</div><div class="os">${i.qty} шт × ${fmt(i.price)}</div></div>
+        <div style="font-weight:800">${fmt(i.price*i.qty)}</div></div>`).join("")}
+    </div>
+    <div>
+      <div class="od-side">
+        <div class="h-sub" style="margin-bottom:14px">Ваш заказ</div>
+        <div class="muted" style="font-size:12.5px;margin-bottom:12px">№ ${esc(o.id)} · ${o.items.length} тов.</div>
+        <div class="r"><span>Товары</span><b>${fmt(o.subtotal)}</b></div>
+        ${o.discount?`<div class="r"><span>Скидка</span><b style="color:var(--sale)">−${fmt(o.discount)}</b></div>`:""}
+        ${o.pointsUsed?`<div class="r"><span>Баллы</span><b style="color:var(--sale)">−${fmt(o.pointsUsed)}</b></div>`:""}
+        <div class="r"><span>Доставка</span><b style="color:var(--good)">Без доплат</b></div>
+        <div class="paid"><span>${o.status==="cancelled"?"Отменён":"Оплачено"}</span><span class="mono">${fmt(o.total)}</span></div>
+        ${o.status!=="cancelled"?`<div class="codebox"><div class="lbl">🔑 Получите товары по коду</div>
+          <div class="c">${pickupCode(o)}</div>
+          <div class="hint">Обновляется ежедневно. Если кто-то получает заказ за вас — убедитесь, что у него актуальный код.</div></div>`:""}
+        <div class="row-link" onclick="toast('Раздел «Вопросы по заказу» — скоро')">Вопросы по заказу <span>›</span></div>
+        <div class="row-link" onclick="toast('Чек отправлен на почту (демо)')">Чеки по заказу <span>›</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+        <button class="btn btn-ghost" onclick="repeatOrder('${o.id}')">Повторить заказ</button>
+        ${o.status==="delivered"?`<button class="btn btn-out" onclick="startReturn('${o.id}')">Оформить возврат</button>`:""}
+        ${["created","assembling"].includes(o.status)?`<button class="btn btn-danger" onclick="cancelOrder('${o.id}')">Отменить заказ</button>`:""}
+      </div>
+    </div>
+  </div>`;
+}
+async function cancelOrder(id){if(!confirm("Отменить заказ?"))return;try{await api("POST","/api/orders/"+id+"/cancel");toast("Заказ отменён");go("#/account/orders")}catch(e){toast(e.message)}}
 async function repeatOrder(id){try{const o=await api("GET","/api/orders/"+id);o.items.forEach(it=>{cart[it.id]=(cart[it.id]||0)+it.qty});saveCart();refreshCounts();toast("Товары добавлены в корзину 🛒");go("#/cart")}catch(e){toast(e.message)}}
-async function startReturn(orderId){const reason=prompt("Причина возврата:");if(!reason)return;try{await api("POST","/api/returns",{orderId,reason});toast("Заявка на возврат создана");viewAccount("returns")}catch(e){toast(e.message)}}
+async function startReturn(orderId){const reason=prompt("Причина возврата:");if(!reason)return;try{await api("POST","/api/returns",{orderId,reason});toast("Заявка на возврат создана");go("#/account/returns")}catch(e){toast(e.message)}}
 async function secReturns(){
   const list=await api("GET","/api/returns");
   return `<h1 class="h-title">Возвраты</h1>${list.length?list.map(r=>`<div class="order">
