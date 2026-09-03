@@ -765,6 +765,7 @@ async function viewProduct(id){
   let p=getP(id);
   try{p=await api("GET","/api/products/"+id)}catch{}
   if(!p){VIEW().innerHTML=`<div class="empty2"><div class="big">🔍</div>Товар не найден</div>`;return}
+  document.documentElement.setAttribute("data-brand",p.brand==="LULU"?"lulu":"");
   const gal=p.gallery&&p.gallery.length?p.gallery:[p.em];
   _PGAL=gal;
   const revs=p.reviews||[];
@@ -823,7 +824,7 @@ async function viewProduct(id){
       </div>
       <div class="buybox" style="margin-top:14px">
         <div class="h-sub" style="margin-bottom:4px">Доставка и возврат</div>
-        <div class="dl2"><span class="dl-ic">📍</span><div class="dl-b"><b>Москва</b><div class="muted">Со склада Mepsi · напрямую от производителя</div></div><span class="dl-arr">›</span></div>
+        <div class="dl2"><span class="dl-ic">📍</span><div class="dl-b"><b>Москва</b><div class="muted">Со склада ${esc(p.brand)} · напрямую от производителя</div></div><span class="dl-arr">›</span></div>
         <div class="dl2"><span class="dl-ic">✅</span><div class="dl-b"><b>В наличии</b> — <span class="dl-stock">осталось ${p.stock||8} шт!</span></div></div>
         <div class="dl2"><span class="dl-ic">🚚</span><div class="dl-b"><b>Курьером — завтра</b><div class="muted">бесплатно</div></div><span class="dl-tag">Входит в заказ</span></div>
         <div class="dl2"><span class="dl-ic">🏬</span><div class="dl-b"><b>Пункты выдачи — 1–2 дня</b><div class="muted">бесплатно</div></div></div>

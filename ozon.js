@@ -5,18 +5,24 @@
 // Ключи (секрет, только из окружения; НИКОГДА не коммитить): OZON_CLIENT_ID, OZON_API_KEY
 const https = require("https");
 
-const CLIENT_ID = process.env.OZON_CLIENT_ID || "";
-const API_KEY = process.env.OZON_API_KEY || "";
-const MODE = CLIENT_ID && API_KEY ? "live" : "demo";
+// Аккаунты Ozon (по одному на бренд-магазин). Данные объединяются в один каталог.
+const CABS = [];
+if (process.env.OZON_CLIENT_ID && process.env.OZON_API_KEY)
+  CABS.push({ clientId: process.env.OZON_CLIENT_ID, apiKey: process.env.OZON_API_KEY, brand: "Mepsi" });
+if (process.env.OZON_CLIENT_ID_LULU && process.env.OZON_API_KEY_LULU)
+  CABS.push({ clientId: process.env.OZON_CLIENT_ID_LULU, apiKey: process.env.OZON_API_KEY_LULU, brand: "LULU" });
+const MODE = CABS.length ? "live" : "demo";
+const _offerCred = {}; // offer_id → аккаунт (для ленивой загрузки описания)
 
-// ---------- низкоуровневый POST к Ozon ----------
-function call(path, body) {
+// ---------- низкоуровневый POST к Ozon (для конкретного аккаунта) ----------
+function call(path, body, cred) {
+  cred = cred || CABS[0] || {};
   return new Promise((resolve, reject) => {
     const data = JSON.stringify(body || {});
     const req = https.request("https://api-seller.ozon.ru" + path, {
       method: "POST",
       headers: {
-        "Client-Id": CLIENT_ID, "Api-Key": API_KEY,
+        "Client-Id": cred.clientId, "Api-Key": cred.apiKey,
         "Content-Type": "application/json", "Content-Length": Buffer.byteLength(data),
       },
     }, (res) => {
@@ -75,10 +81,10 @@ function normalizeDemoReview(r, productId) {
 function demoRaw() { try { return require("./data/ozon-demo.json"); } catch { return []; } }
 
 // ---------- LIVE: сбор из реальных ручек Ozon ----------
-async function listAll() {
+async function listAll(cred) {
   let items = [], last_id = "";
   for (let guard = 0; guard < 10; guard++) {
-    const r = await call("/v3/product/list", { filter: { visibility: "ALL" }, limit: 1000, last_id });
+    const r = await call("/v3/product/list", { filter: { visibility: "ALL" }, limit: 1000, last_id }, cred);
     const res = r.result || {};
     const page = res.items || [];
     items = items.concat(page);
@@ -100,11 +106,11 @@ async function mapLimit(arr, limit, fn) {
   });
   await Promise.all(workers);
 }
-async function reviewsAll() {
+async function reviewsAll(cred) {
   let out = [], last_id = "";
   try {
     for (let guard = 0; guard < 30; guard++) {
-      const r = await call("/v1/review/list", { limit: 100, sort_dir: "DESC", status: "ALL", last_id });
+      const r = await call("/v1/review/list", { limit: 100, sort_dir: "DESC", status: "ALL", last_id }, cred);
       const revs = r.reviews || [];
       out.push(...revs);
       last_id = r.last_id || "";
@@ -113,10 +119,10 @@ async function reviewsAll() {
   } catch (e) { /* нет доступа к отзывам — не критично */ }
   return out;
 }
-function normalizeLive(inf, at, revs, dict) {
+function normalizeLive(inf, at, revs, dict, brandForce) {
   const attrs = at?.attributes || [];
   const brandRaw = attrs.find((a) => a.id === 85)?.values?.[0]?.value || "";
-  const brand = brandOf(brandRaw);
+  const brand = brandForce || brandOf(brandRaw);
   const rawImages = (inf.images && inf.images.length ? inf.images : at?.images) || [];
   // главное (брендовое) фото — как показывает витрина Ozon — ставим первым
   const primary = at?.primary_image || rawImages[0];
@@ -152,32 +158,32 @@ function normalizeLive(inf, at, revs, dict) {
   };
 }
 // словарь атрибутов категории: id → читаемое название
-async function fetchDict(catId, typeId) {
-  const r = await call("/v1/description-category/attribute", { description_category_id: catId, type_id: typeId, language: "DEFAULT" });
+async function fetchDict(cred, catId, typeId) {
+  const r = await call("/v1/description-category/attribute", { description_category_id: catId, type_id: typeId, language: "DEFAULT" }, cred);
   const arr = r.result || r.attributes || [];
   const map = {}; for (const a of arr) map[a.id] = a.name;
   return map;
 }
-async function buildLive() {
-  const listItems = await listAll();
+async function buildCabinet(cred) {
+  const listItems = await listAll(cred);
   const offerIds = listItems.map((i) => i.offer_id).filter(Boolean);
   if (!offerIds.length) return { products: [], reviews: [] };
   const skuToOffer = {};
   for (const it of listItems) if (it.sku) skuToOffer[it.sku] = it.offer_id;
 
   const infos = await chunked(offerIds, 100, async (ids) => {
-    const r = await call("/v3/product/info/list", { offer_id: ids });
+    const r = await call("/v3/product/info/list", { offer_id: ids }, cred);
     return r.items || r.result?.items || [];
   });
   for (const inf of infos) for (const s of inf.sources || []) if (s.sku) skuToOffer[s.sku] = inf.offer_id;
 
   const attrs = await chunked(offerIds, 100, async (ids) => {
-    const r = await call("/v4/product/info/attributes", { filter: { offer_id: ids, visibility: "ALL" }, limit: 1000 });
+    const r = await call("/v4/product/info/attributes", { filter: { offer_id: ids, visibility: "ALL" }, limit: 1000 }, cred);
     return r.result || r.items || [];
   });
   const attrByOffer = Object.fromEntries(attrs.map((a) => [a.offer_id, a]));
 
-  const rawReviews = await reviewsAll();
+  const rawReviews = await reviewsAll(cred);
   const revByOffer = {};
   for (const rv of rawReviews) {
     const off = skuToOffer[rv.sku];
@@ -190,7 +196,7 @@ async function buildLive() {
   const mediaMap = {};
   await mapLimit(mediaRevs, 8, async (rv) => {
     try {
-      const inf = await call("/v1/review/info", { review_id: rv.id });
+      const inf = await call("/v1/review/info", { review_id: rv.id }, cred);
       mediaMap[rv.id] = {
         photos: (inf.photos || []).map((p) => p.url).filter(Boolean),
         videos: (inf.videos || []).map((v) => v.url || v.link || v.preview_url).filter(Boolean),
@@ -201,18 +207,30 @@ async function buildLive() {
   // словари атрибутов по уникальным (категория, тип) — для полных характеристик
   const pairs = [...new Set(infos.map((i) => i.description_category_id + "_" + i.type_id))];
   const dicts = {};
-  for (const pr of pairs) { const [c, t] = pr.split("_"); try { dicts[pr] = await fetchDict(+c, +t); } catch { dicts[pr] = {}; } }
+  for (const pr of pairs) { const [c, t] = pr.split("_"); try { dicts[pr] = await fetchDict(cred, +c, +t); } catch { dicts[pr] = {}; } }
 
-  const products = infos.map((inf) => normalizeLive(inf, attrByOffer[inf.offer_id], revByOffer[inf.offer_id] || [], dicts[inf.description_category_id + "_" + inf.type_id] || {}));
+  const products = infos.map((inf) => {
+    _offerCred[inf.offer_id] = cred;
+    return normalizeLive(inf, attrByOffer[inf.offer_id], revByOffer[inf.offer_id] || [], dicts[inf.description_category_id + "_" + inf.type_id] || {}, cred.brand);
+  });
   const reviews = [];
   for (const [off, list] of Object.entries(revByOffer))
     for (const rv of list) {
       const m = mediaMap[rv.id] || { photos: [], videos: [] };
       if ((rv.text && rv.text.trim()) || m.photos.length || m.videos.length)
-        reviews.push({ id: rv.id, productId: off, author: "Покупатель Ozon", rating: rv.rating || 5,
+        reviews.push({ id: rv.id, productId: off, author: `Покупатель ${cred.brand}`, rating: rv.rating || 5,
           text: rv.text || "", pros: "", cons: "", photos: m.photos, videos: m.videos, createdAt: rv.published_at });
     }
   return { products, reviews };
+}
+// собрать все аккаунты в один каталог
+async function buildLive() {
+  const all = { products: [], reviews: [] };
+  for (const cred of CABS) {
+    try { const r = await buildCabinet(cred); all.products.push(...r.products); all.reviews.push(...r.reviews); }
+    catch (e) { console.error(`Ozon [${cred.brand}] ошибка:`, e.message); }
+  }
+  return all;
 }
 
 // ---------- описания (лениво, только live; демо — из карточки) ----------
@@ -220,7 +238,7 @@ const _descCache = {};
 async function getDescription(offerId) {
   if (offerId in _descCache) return _descCache[offerId];
   if (MODE !== "live") { const p = (_cache?.products || []).find((x) => x.id === offerId); return (_descCache[offerId] = p?.desc || ""); }
-  try { const r = await call("/v1/product/info/description", { offer_id: offerId }); _descCache[offerId] = r?.result?.description || ""; }
+  try { const r = await call("/v1/product/info/description", { offer_id: offerId }, _offerCred[offerId]); _descCache[offerId] = r?.result?.description || ""; }
   catch { _descCache[offerId] = ""; }
   return _descCache[offerId];
 }
