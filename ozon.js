@@ -109,7 +109,10 @@ function normalizeLive(inf, at, revs) {
   const attrs = at?.attributes || [];
   const brandRaw = attrs.find((a) => a.id === 85)?.values?.[0]?.value || "";
   const brand = brandOf(brandRaw);
-  const images = (inf.images && inf.images.length ? inf.images : at?.images) || [];
+  const rawImages = (inf.images && inf.images.length ? inf.images : at?.images) || [];
+  // главное (брендовое) фото — как показывает витрина Ozon — ставим первым
+  const primary = at?.primary_image || rawImages[0];
+  const images = primary ? [primary, ...rawImages.filter((i) => i !== primary)] : rawImages;
   const price = numify(inf.price), old = numify(inf.old_price);
   const rev = revs.length;
   const rate = rev ? +(revs.reduce((s, r) => s + (r.rating || 5), 0) / rev).toFixed(1) : 4.9;
