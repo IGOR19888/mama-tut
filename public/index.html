@@ -292,7 +292,11 @@
   .pdp-rate>span,.pdp-rate>a,.pdp-rate>b{white-space:nowrap}
   .pdp-rate .st{color:var(--star)}
   .pdp-headcard{margin-bottom:16px;padding:20px 22px}
-  .pdp-headcard .pdp-rate{margin:12px 0 0}
+  .pdp-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .mchip{display:inline-flex;align-items:center;gap:5px;background:var(--surface-2);border-radius:9px;padding:6px 11px;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;text-decoration:none;line-height:1}
+  .mchip .st{color:var(--star)}
+  .mchip-link{cursor:pointer;color:var(--accent)}
+  .mchip-mut{color:var(--muted)}
   .pdp-desc{margin:18px 0;line-height:1.6}
   .specs{border-collapse:collapse;width:100%;font-size:14px}
   .specs td{padding:10px 0;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.4}
@@ -300,7 +304,7 @@
   .specs td:last-child{font-weight:600}
   .specs tr:last-child td{border-bottom:none}
   .specs td:last-child{font-weight:600}
-  .pdp-h1{font-family:"Onest",sans-serif;font-weight:700;font-size:24px;line-height:1.25;letter-spacing:-.01em;margin:0 0 10px}
+  .pdp-h1{font-family:"Onest",sans-serif;font-weight:700;font-size:20px;line-height:1.3;letter-spacing:-.01em;margin:0;text-wrap:balance}
   .pdp-rate .st{color:var(--star)}
   .bb-strip{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,#7C3AED,#005BFF);color:#fff;font-weight:700;font-size:13px;padding:6px 12px;border-radius:10px;margin-bottom:12px}
   .bb-price{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -729,7 +733,12 @@ async function viewProduct(id){
       <div class="pl-info">
         <div class="panel pdp-headcard">
           <h1 class="pdp-h1">${esc(p.title)}</h1>
-          <div class="pdp-rate"><span class="st">★</span> <b>${p.rate||"—"}</b> · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</a> · <span>💬 ${Math.max(1,Math.round((p.rev||0)/25))} вопросов</span> · <span class="muted">арт. ${esc(p.sku||p.id)}</span></div>
+          <div class="pdp-meta">
+            <span class="mchip"><span class="st">★</span> ${p.rate||"—"}</span>
+            <a class="mchip mchip-link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</a>
+            <span class="mchip">💬 ${Math.max(1,Math.round((p.rev||0)/25))} вопр.</span>
+            <span class="mchip mchip-mut">арт. ${esc(p.sku||p.id)}</span>
+          </div>
         </div>
       ${p.specs&&p.specs.length?`<div class="panel" style="margin-top:14px"><div class="h-sub">О товаре</div>
         <table class="specs"><tbody>${(p.specs||[]).map(([k,v],i)=>`<tr class="${i>=6?"spec-more":""}" ${i>=6?"hidden":""}><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table>
