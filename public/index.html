@@ -121,6 +121,7 @@
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:35px}
   .card .rate{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
   .card .rate .st{color:var(--star)}
+  .stock-l{font-size:11.5px;color:var(--sale);font-weight:600;margin-top:4px}
   .card .foot{margin-top:auto;padding-top:10px}
   .addbtn{width:100%;border:none;border-radius:9px;background:var(--action);color:#fff;font-weight:700;padding:11px;font-size:14px;cursor:pointer;
     transition:transform .12s cubic-bezier(.34,1.56,.64,1),filter .12s}
@@ -186,10 +187,17 @@
   .card .ttl{cursor:pointer} .card .ttl:hover{color:var(--accent)}
   /* реальные фото Ozon (URL) в местах, где раньше были эмодзи */
   .pic{width:100%;height:100%;object-fit:contain;display:block}
-  .card .ph .pic{position:absolute;inset:0;padding:10px}
-  .stage .pic{padding:6%}
+  .card .ph .pic{position:absolute;inset:0;padding:8px}
+  .stage .pic{padding:5%}
   .thumb .pic{padding:3px}
   .cartline .em .pic,.od-ic .pic,.ord-imgs .im .pic,.acc-ava .pic{padding:3px}
+  /* белый фон под реальными фото Ozon (у них своя подложка) */
+  .card .ph:has(img){background:#fff}
+  .stage:has(img){background:#fff}
+  .thumb:has(img){background:#fff}
+  .cartline .em:has(img),.od-ic:has(img),.ord-imgs .im:has(img){background:#fff}
+  :root:not([data-theme="light"]) .card .ph:has(img),:root[data-theme="dark"] .card .ph:has(img),
+  :root:not([data-theme="light"]) .stage:has(img),:root[data-theme="dark"] .stage:has(img){background:#f4f6fb}
 
   /* form controls */
   .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
@@ -235,6 +243,19 @@
   .specs td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}
   .specs td:first-child{color:var(--muted);width:45%}
   .specs td:last-child{font-weight:600}
+  .pdp-h1{font-family:"Unbounded";font-size:22px;line-height:1.3;letter-spacing:-.01em;margin:18px 0 8px}
+  .pdp-rate .st{color:var(--star)}
+  .bb-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .bb-p{font-family:"Unbounded";font-weight:800;font-size:30px;color:var(--accent);letter-spacing:-.02em}
+  .bb-old{color:var(--muted);text-decoration:line-through;font-size:16px}
+  .bb-disc{background:var(--sale);color:#fff;font-weight:800;font-size:13px;padding:3px 8px;border-radius:7px}
+  .bb-stock{color:var(--sale);font-weight:700;font-size:13px;margin-top:6px}
+  .bb-deliv{border-top:1px solid var(--line);margin-top:14px;padding-top:14px;display:flex;flex-direction:column;gap:10px;font-size:13px}
+  .bb-deliv .dl{display:flex;gap:8px;align-items:flex-start}
+  .bb-checked{color:var(--good);font-weight:700;font-size:13px;margin-top:10px}
+  .seller-card{display:flex;gap:12px;align-items:center;margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
+  .sc-logo{width:42px;height:42px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none;text-transform:uppercase}
+  .sc-name{font-weight:700;font-size:14px}
   .buybox{position:sticky;top:150px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
   .buybox .p{font-family:"Unbounded";font-weight:800;font-size:30px;color:var(--accent);letter-spacing:-.02em}
   .buybox .old{color:var(--muted);text-decoration:line-through;font-size:16px;margin-left:8px}
@@ -556,6 +577,7 @@ function card(p){
       <div class="prc"><span class="p mono">${fmt(p.price)}</span>${p.old?`<span class="old mono">${fmt(p.old)}</span>`:""}</div>
       <div class="ttl" onclick="go('#/product/${p.id}')">${esc(p.title)}</div>
       <div class="rate"><span class="st">★</span> ${p.rate} · ${(p.rev||0).toLocaleString("ru-RU")} отз.</div>
+      ${p.stock&&p.stock<200?`<div class="stock-l">Осталось ${p.stock} шт</div>`:""}
       <div class="foot" id="foot-${p.id}">${stepperOrBtn(p.id,q)}</div>
     </div></div>`;
 }
@@ -636,31 +658,40 @@ async function viewProduct(id){
         <div class="thumbs" id="thumbs">${gal.map((g,i)=>`<div class="thumb ${i?"":"on"}" onclick="pdpPic(${i})">${media(g)}</div>`).join("")}</div>
         <div class="stage" id="stage">${media(gal[0])}</div>
       </div>
-      <div class="pdp-desc panel"><div class="h-sub">Описание</div>${esc(p.desc||p.sub||"")}</div>
-      ${p.specs?`<div class="panel" style="margin-top:16px"><div class="h-sub">Характеристики</div>
-        <table class="specs"><tbody>${p.specs.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table></div>`:""}
+      <h1 class="pdp-h1">${esc(p.title)}</h1>
+      <div class="pdp-rate"><span class="st">★</span> ${p.rate||"—"} · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${p.rev||revs.length} отзывов</a> · арт. ${esc(p.sku||p.id)}</div>
+      <div class="panel"><div class="h-sub">О товаре</div>
+        <table class="specs"><tbody>${(p.specs||[]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table></div>
+      ${p.desc?`<div class="panel" style="margin-top:16px"><div class="h-sub">Описание</div><div style="line-height:1.6;white-space:pre-line">${esc(p.desc)}</div></div>`:""}
       <div class="panel" style="margin-top:16px" id="revs">
-        <div class="reviews-head"><div><div class="big-rate">${p.rate||"—"}</div><div class="muted" style="font-size:12px">★★★★★</div></div>
-          <div><div style="font-weight:700">${(p.rev||revs.length)} отзывов</div>
+        <div class="reviews-head"><div><div class="big-rate">${p.rate||"—"}</div><div class="st" style="font-size:13px">${"★".repeat(Math.round(p.rate||5))}${"☆".repeat(5-Math.round(p.rate||5))}</div></div>
+          <div><div style="font-weight:700">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</div>
           ${user?`<button class="btn btn-out btn-sm" style="margin-top:8px" onclick="openReview('${p.id}')">Оставить отзыв</button>`:`<div class="muted" style="font-size:13px;margin-top:6px">Войдите, чтобы оставить отзыв</div>`}</div></div>
         <div id="revList">${revs.length?revs.map(reviewHTML).join(""):`<div class="muted">Отзывов пока нет — будьте первым!</div>`}</div>
       </div>
     </div>
     <div>
       <div class="buybox">
-        <div class="pdp-sub">${esc(p.brand)} · арт. ${esc(p.sku||p.id)}</div>
-        <h1 style="font-size:18px;font-family:Unbounded;margin:2px 0 10px">${esc(p.title)}</h1>
-        <div><span class="p mono">${fmt(p.price)}</span>${p.old?`<span class="old mono">${fmt(p.old)}</span>`:""}</div>
-        ${d?`<div class="save">Скидка ${d}% · выгода ${fmt(p.old-p.price)}</div>`:""}
-        <div class="cb"><span>💜</span> Кэшбэк ${Math.round(p.price*0.05)} баллов</div>
-        <div class="cb"><span>🚚</span> Доставка бесплатно, 2–3 дня</div>
-        <div class="cb"><span>✓</span> В наличии: ${p.stock||"много"} шт</div>
-        <div id="pdpFoot" style="margin-top:14px">${pdpBuy(id,q)}</div>
-        <button class="btn btn-out btn-block" style="margin-top:10px" onclick="toggleFav('${id}',event)">${fav.has(id)?"♥ В избранном":"♡ В избранное"}</button>
+        <div class="bb-price"><span class="bb-p mono">${fmt(p.price)}</span>${p.old?`<span class="bb-old mono">${fmt(p.old)}</span>`:""}${d?`<span class="bb-disc">−${d}%</span>`:""}</div>
+        ${p.stock?`<div class="bb-stock">Осталось ${p.stock} шт</div>`:""}
+        <div id="pdpFoot" style="margin-top:12px">${pdpBuy(id,q)}</div>
+        <button class="btn btn-out btn-block" style="margin-top:10px" onclick="buyNow('${id}')">Купить сейчас</button>
+        <div class="bb-deliv">
+          <div class="dl"><span>🚚</span><div><b>Курьером</b> — завтра · <span style="color:var(--good);font-weight:700">бесплатно</span></div></div>
+          <div class="dl"><span>🏬</span><div><b>В пункт выдачи</b> — 1–2 дня · <span style="color:var(--good);font-weight:700">бесплатно</span></div></div>
+        </div>
+        <div class="cb" style="margin-top:12px"><span>💜</span> Кэшбэк ${Math.round(p.price*0.05)} баллов на счёт</div>
+        <div class="bb-checked">✓ Товар проверен · оригинал от производителя</div>
+        <button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="toggleFav('${id}',event)">${fav.has(id)?"♥ В избранном":"♡ В избранное"}</button>
+      </div>
+      <div class="seller-card">
+        <div class="sc-logo">${(p.brand[0]||"M")}</div>
+        <div style="flex:1"><div class="sc-name">${esc(p.seller||p.brand)}</div><div class="muted" style="font-size:12.5px">★ 4.9 · Официальный магазин</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="toast('Чат с продавцом — скоро 💬')">Чат</button>
       </div>
     </div>
   </div>
-  ${rel.length?`<div class="section-t" style="margin-top:34px">С этим товаром берут</div>
+  ${rel.length?`<div class="section-t" style="margin-top:34px">Похожее от ${esc(p.brand)}</div>
     <div class="prod-scroll">${rel.map(card).join("")}</div>`:""}`;
 }
 function pdpBuy(id,q){
@@ -670,6 +701,7 @@ function pdpBuy(id,q){
     : `<button class="btn btn-primary btn-block" style="height:48px" onclick="setPdp('${id}',1)">В корзину</button>`;
 }
 function setPdp(id,n){setQty(id,n);const f=document.getElementById("pdpFoot");if(f)f.innerHTML=pdpBuy(id,cart[id]||0)}
+function buyNow(id){if(!cart[id]){cart[id]=1;saveCart();refreshCounts()}go("#/checkout")}
 let _PGAL=[];
 function pdpPic(i){const g=[...document.querySelectorAll("#thumbs .thumb")];const stage=document.getElementById("stage");
   g.forEach((t,k)=>t.classList.toggle("on",k===i));stage.innerHTML=media(_PGAL[i])}
