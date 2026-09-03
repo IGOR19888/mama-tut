@@ -1,12 +1,10 @@
 // Интеграция с Ozon Seller API (https://api-seller.ozon.ru).
-// Тянет реальный каталог продавца (оба бренда) + цены + характеристики + отзывы,
-// нормализует в нашу схему товаров. Ключей нет → работает на демо-каталоге (data/ozon-demo.json).
+// Тянет реальный каталог продавца + цены + характеристики + отзывы, нормализует в нашу схему.
+// Ключей нет → работает на демо-каталоге (data/ozon-demo.json). Ошибка live → фолбэк на демо.
 //
-// Ключи (секрет, только из окружения; НИКОГДА не коммитить):
-//   OZON_CLIENT_ID, OZON_API_KEY
+// Ключи (секрет, только из окружения; НИКОГДА не коммитить): OZON_CLIENT_ID, OZON_API_KEY
 const https = require("https");
 
-const BASE = "https://api-seller.ozon.ru";
 const CLIENT_ID = process.env.OZON_CLIENT_ID || "";
 const API_KEY = process.env.OZON_API_KEY || "";
 const MODE = CLIENT_ID && API_KEY ? "live" : "demo";
@@ -15,189 +13,199 @@ const MODE = CLIENT_ID && API_KEY ? "live" : "demo";
 function call(path, body) {
   return new Promise((resolve, reject) => {
     const data = JSON.stringify(body || {});
-    const req = https.request(
-      BASE + path,
-      {
-        method: "POST",
-        headers: {
-          "Client-Id": CLIENT_ID,
-          "Api-Key": API_KEY,
-          "Content-Type": "application/json",
-          "Content-Length": Buffer.byteLength(data),
-        },
+    const req = https.request("https://api-seller.ozon.ru" + path, {
+      method: "POST",
+      headers: {
+        "Client-Id": CLIENT_ID, "Api-Key": API_KEY,
+        "Content-Type": "application/json", "Content-Length": Buffer.byteLength(data),
       },
-      (res) => {
-        let buf = "";
-        res.on("data", (c) => (buf += c));
-        res.on("end", () => {
-          let json = null;
-          try { json = JSON.parse(buf); } catch {}
-          if (res.statusCode >= 200 && res.statusCode < 300) resolve(json || {});
-          else reject(new Error(`Ozon ${path} → ${res.statusCode}: ${buf.slice(0, 300)}`));
-        });
-      }
-    );
-    req.on("error", reject);
-    req.write(data);
-    req.end();
+    }, (res) => {
+      let buf = "";
+      res.on("data", (c) => (buf += c));
+      res.on("end", () => {
+        let json = null; try { json = JSON.parse(buf); } catch {}
+        if (res.statusCode >= 200 && res.statusCode < 300) resolve(json || {});
+        else reject(new Error(`Ozon ${path} → ${res.statusCode}: ${buf.slice(0, 200)}`));
+      });
+    });
+    req.on("error", reject); req.write(data); req.end();
   });
 }
 
-// ---------- нормализация Ozon → наша схема ----------
-const attr = (attrs, name) => (attrs || []).find((a) => a.name === name)?.value || "";
-function normalize(o) {
+// ---------- категория по названию (для фильтра-чипов) ----------
+function inferCat(name = "") {
+  const n = name.toLowerCase();
+  if (/подгузник|трусик/.test(n)) return "Подгузники";
+  if (/салфет/.test(n)) return "Салфетки";
+  if (/пелён|пелен/.test(n)) return "Пелёнки";
+  if (/стирк|порош|кондиционер для бель/.test(n)) return "Стирка";
+  if (/посуд|уборк|чист/.test(n)) return "Бытовая химия";
+  if (/шампун|пена|купан|мыло|гель для душ|гель для купан/.test(n)) return "Купание";
+  if (/крем|масло|молочко|присыпк|паста|бальзам|уход/.test(n)) return "Уход";
+  if (/бутылоч|соск|поильник|кормл/.test(n)) return "Кормление";
+  if (/набор/.test(n)) return "Наборы";
+  return "Товары";
+}
+const brandOf = (raw) => (/lulu|лулу/i.test(raw || "") ? "LULU" : "Mepsi");
+const numify = (s) => +String(s ?? "").replace(/[^\d.]/g, "") || 0;
+
+// ---------- нормализация DEMO (data/ozon-demo.json, форма близка к Ozon) ----------
+const attrVal = (attrs, name) => (attrs || []).find((a) => a.name === name)?.value || "";
+function normalizeDemo(o) {
   const attrs = o.attributes || [];
-  const brandRaw = attr(attrs, "Бренд") || o.brand || "";
-  const brand = /lulu/i.test(brandRaw) ? "LULU" : /mepsi|мепси/i.test(brandRaw) ? "Mepsi" : (brandRaw || "Mepsi");
+  const brand = brandOf(attrVal(attrs, "Бренд") || o.brand);
   const skip = new Set(["Бренд", "Тип", "Краткое описание"]);
   const specs = attrs.filter((a) => !skip.has(a.name) && a.value).map((a) => [a.name, String(a.value)]);
-  const price = +String(o.price || "").replace(/\s/g, "") || 0;
-  const old = +String(o.old_price || "").replace(/\s/g, "") || 0;
+  const price = numify(o.price), old = numify(o.old_price);
   return {
-    id: String(o.offer_id || o.sku || o.id),
-    sku: o.sku,
-    brand,
-    cat: attr(attrs, "Тип") || "Товары",
-    title: o.name || "",
-    price,
-    old: old && old > price ? old : undefined,
-    rate: o.rating || 4.9,
-    rev: o.reviews_count || 0,
-    em: o.primary_image || "📦",
-    gallery: (o.images && o.images.length ? o.images : [o.primary_image || "📦"]),
-    sub: attr(attrs, "Краткое описание") || "",
-    desc: o.description || "",
-    specs,
+    id: String(o.offer_id || o.sku), sku: o.sku, brand, cat: attrVal(attrs, "Тип") || "Товары",
+    title: o.name || "", price, old: old > price ? old : undefined,
+    rate: o.rating || 4.9, rev: o.reviews_count || 0,
+    em: o.primary_image || "📦", gallery: (o.images?.length ? o.images : [o.primary_image || "📦"]),
+    sub: attrVal(attrs, "Краткое описание") || "", desc: o.description || "", specs,
     seller: o.seller || (brand === "LULU" ? "LULU (официальный)" : "Mepsi"),
-    stock: o.stocks?.present ?? 50,
-    badge: o.badge || undefined,
+    stock: o.stocks?.present ?? 50, badge: o.badge || undefined,
   };
 }
-function normalizeReview(r, productId) {
-  return {
-    id: r.id || "orev_" + Math.random().toString(36).slice(2, 9),
-    productId,
-    author: r.author || r.author_name || "Покупатель Ozon",
-    rating: r.rating || 5,
-    text: r.text || r.comment || "",
-    pros: r.pros || "",
-    cons: r.cons || "",
-    photos: r.photos || [],
-    createdAt: r.published_at || r.createdAt || new Date().toISOString(),
-  };
+function normalizeDemoReview(r, productId) {
+  return { id: r.id || "orev_" + Math.random().toString(36).slice(2, 9), productId,
+    author: r.author || "Покупатель Ozon", rating: r.rating || 5, text: r.text || "",
+    pros: r.pros || "", cons: r.cons || "", photos: r.photos || [], createdAt: r.published_at || new Date().toISOString() };
 }
+function demoRaw() { try { return require("./data/ozon-demo.json"); } catch { return []; } }
 
-// ---------- источник: live (Ozon) или demo ----------
-let _cache = null; // { products:[], reviews:[], mode, count, syncedAt, error }
-
-// DEMO: читаем сгенерированный каталог в форме Ozon и прогоняем через тот же нормализатор
-function demoRaw() {
-  try { return require("./data/ozon-demo.json"); } catch { return []; }
-}
-
-// LIVE: собираем каталог из реальных ручек Ozon Seller API
-async function liveRaw() {
-  // 1) список товаров продавца
-  const list = await call("/v3/product/list", { filter: { visibility: "ALL" }, limit: 1000 });
-  const items = list?.result?.items || [];
-  const offerIds = items.map((i) => i.offer_id).filter(Boolean);
-  if (!offerIds.length) return [];
-
-  // 2) базовая инфа + 3) цены + 4) характеристики (батчами)
-  const info = await call("/v3/product/info/list", { offer_id: offerIds });
-  const infoItems = info?.items || info?.result?.items || [];
-
-  let prices = [];
-  try {
-    const pr = await call("/v5/product/info/prices", { filter: { offer_id: offerIds, visibility: "ALL" }, limit: 1000 });
-    prices = pr?.items || pr?.result?.items || [];
-  } catch (e) { /* цены опциональны */ }
-  const priceByOffer = {};
-  for (const p of prices) priceByOffer[p.offer_id] = p.price || p;
-
-  let attributes = [];
-  try {
-    const at = await call("/v4/product/info/attributes", { filter: { offer_id: offerIds, visibility: "ALL" }, limit: 1000 });
-    attributes = at?.result || at?.items || [];
-  } catch (e) { /* атрибуты опциональны */ }
-  const attrByOffer = {};
-  for (const a of attributes) attrByOffer[a.offer_id] = a;
-
-  // 5) собрать «Ozon-объект» на каждый товар в форме, понятной normalize()
-  return infoItems.map((it) => {
-    const price = priceByOffer[it.offer_id] || {};
-    const at = attrByOffer[it.offer_id] || {};
-    const attrs = (at.attributes || []).map((a) => ({
-      name: a.attribute_id, // будет заменено словарём ниже при необходимости
-      value: (a.values || []).map((v) => v.value).join(", "),
-    }));
-    return {
-      offer_id: it.offer_id,
-      sku: it.sku || (it.sources && it.sources[0]?.sku),
-      name: it.name,
-      price: price.price || price.marketing_price || "",
-      old_price: price.old_price || "",
-      primary_image: it.primary_image || (it.images && it.images[0]) || "📦",
-      images: it.images || [],
-      description: at.description || "",
-      attributes: attrs.length ? attrs : [{ name: "Бренд", value: at.brand || "" }],
-      rating: it.rating,
-      reviews_count: 0,
-      stocks: { present: it.stocks?.present ?? it.fbo_stocks ?? 50 },
-      seller: "",
-    };
-  });
-}
-
-// LIVE отзывы (best-effort; требует подписки Premium Plus, иначе пропускаем)
-async function liveReviews() {
-  try {
-    const r = await call("/v1/review/list", { limit: 100, sort_dir: "DESC", status: "ALL" });
-    const revs = r?.reviews || r?.result || [];
-    return revs.map((rv) => normalizeReview(rv, String(rv.sku || rv.product_sku || rv.offer_id)));
-  } catch (e) {
-    return []; // нет доступа к API отзывов — не критично
+// ---------- LIVE: сбор из реальных ручек Ozon ----------
+async function listAll() {
+  let items = [], last_id = "";
+  for (let guard = 0; guard < 10; guard++) {
+    const r = await call("/v3/product/list", { filter: { visibility: "ALL" }, limit: 1000, last_id });
+    const res = r.result || {};
+    const page = res.items || [];
+    items = items.concat(page);
+    last_id = res.last_id || "";
+    if (!page.length || !last_id) break;
   }
+  return items;
+}
+async function chunked(offerIds, size, fn) {
+  const out = [];
+  for (let i = 0; i < offerIds.length; i += size) out.push(...(await fn(offerIds.slice(i, i + size))));
+  return out;
+}
+async function reviewsAll() {
+  let out = [], last_id = "";
+  try {
+    for (let guard = 0; guard < 30; guard++) {
+      const r = await call("/v1/review/list", { limit: 100, sort_dir: "DESC", status: "ALL", last_id });
+      const revs = r.reviews || [];
+      out.push(...revs);
+      last_id = r.last_id || "";
+      if (!r.has_next || !revs.length) break;
+    }
+  } catch (e) { /* нет доступа к отзывам — не критично */ }
+  return out;
+}
+function normalizeLive(inf, at, revs) {
+  const attrs = at?.attributes || [];
+  const brandRaw = attrs.find((a) => a.id === 85)?.values?.[0]?.value || "";
+  const brand = brandOf(brandRaw);
+  const images = (inf.images && inf.images.length ? inf.images : at?.images) || [];
+  const price = numify(inf.price), old = numify(inf.old_price);
+  const rev = revs.length;
+  const rate = rev ? +(revs.reduce((s, r) => s + (r.rating || 5), 0) / rev).toFixed(1) : 4.9;
+  const RU = { g: "г", kg: "кг", mg: "мг", mm: "мм", cm: "см", m: "м" };
+  const u = (x) => RU[x] || x;
+  const specs = [["Бренд", brand]];
+  if (at?.weight) specs.push(["Вес", `${at.weight} ${u(at.weight_unit) || "г"}`]);
+  if (at?.height && at?.width && at?.depth) specs.push(["Габариты", `${at.height}×${at.width}×${at.depth} ${u(at.dimension_unit) || "мм"}`]);
+  if (at?.barcode) specs.push(["Штрихкод", String(at.barcode)]);
+  return {
+    id: inf.offer_id, sku: inf.sources?.[0]?.sku || inf.id, brand, cat: inferCat(inf.name),
+    title: inf.name || "", price, old: old > price ? old : undefined,
+    rate, rev, em: at?.primary_image || images[0] || "📦",
+    gallery: images.length ? images : [at?.primary_image || "📦"],
+    sub: "", desc: "", specs, seller: brand === "LULU" ? "LULU (Ozon)" : "Mepsi (Ozon)",
+    stock: inf.has_fbo_stocks || inf.has_fbs_stocks ? 50 : 0,
+    badge: rev >= 100 ? "хит" : undefined,
+  };
+}
+async function buildLive() {
+  const listItems = await listAll();
+  const offerIds = listItems.map((i) => i.offer_id).filter(Boolean);
+  if (!offerIds.length) return { products: [], reviews: [] };
+  const skuToOffer = {};
+  for (const it of listItems) if (it.sku) skuToOffer[it.sku] = it.offer_id;
+
+  const infos = await chunked(offerIds, 100, async (ids) => {
+    const r = await call("/v3/product/info/list", { offer_id: ids });
+    return r.items || r.result?.items || [];
+  });
+  for (const inf of infos) for (const s of inf.sources || []) if (s.sku) skuToOffer[s.sku] = inf.offer_id;
+
+  const attrs = await chunked(offerIds, 100, async (ids) => {
+    const r = await call("/v4/product/info/attributes", { filter: { offer_id: ids, visibility: "ALL" }, limit: 1000 });
+    return r.result || r.items || [];
+  });
+  const attrByOffer = Object.fromEntries(attrs.map((a) => [a.offer_id, a]));
+
+  const rawReviews = await reviewsAll();
+  const revByOffer = {};
+  for (const rv of rawReviews) {
+    const off = skuToOffer[rv.sku];
+    if (!off) continue;
+    (revByOffer[off] = revByOffer[off] || []).push(rv);
+  }
+
+  const products = infos.map((inf) => normalizeLive(inf, attrByOffer[inf.offer_id], revByOffer[inf.offer_id] || []));
+  const reviews = [];
+  for (const [off, list] of Object.entries(revByOffer))
+    for (const rv of list)
+      if (rv.text && rv.text.trim())
+        reviews.push({ id: rv.id, productId: off, author: "Покупатель Ozon", rating: rv.rating || 5,
+          text: rv.text, pros: "", cons: "", photos: [], createdAt: rv.published_at });
+  return { products, reviews };
 }
 
+// ---------- описания (лениво, только live; демо — из карточки) ----------
+const _descCache = {};
+async function getDescription(offerId) {
+  if (offerId in _descCache) return _descCache[offerId];
+  if (MODE !== "live") { const p = (_cache?.products || []).find((x) => x.id === offerId); return (_descCache[offerId] = p?.desc || ""); }
+  try { const r = await call("/v1/product/info/description", { offer_id: offerId }); _descCache[offerId] = r?.result?.description || ""; }
+  catch { _descCache[offerId] = ""; }
+  return _descCache[offerId];
+}
+
+// ---------- сборка + кэш ----------
+let _cache = null;
 async function build() {
   if (MODE === "demo") {
     const raw = demoRaw();
-    const products = raw.map(normalize);
-    const reviews = raw.flatMap((o) => (o.reviews || []).map((r) => normalizeReview(r, String(o.offer_id))));
-    return { mode: "demo", products, reviews, count: products.length, syncedAt: new Date().toISOString(), error: null };
+    return { mode: "demo", products: raw.map(normalizeDemo),
+      reviews: raw.flatMap((o) => (o.reviews || []).map((r) => normalizeDemoReview(r, String(o.offer_id)))),
+      syncedAt: new Date().toISOString(), error: null };
   }
-  // live
-  const raw = await liveRaw();
-  const products = raw.map(normalize);
-  let reviews = await liveReviews();
-  // если Ozon-отзывы недоступны — оставляем пусто (пользовательские отзывы всё равно работают)
-  return { mode: "live", products, reviews, count: products.length, syncedAt: new Date().toISOString(), error: null };
+  const { products, reviews } = await buildLive();
+  return { mode: "live", products, reviews, syncedAt: new Date().toISOString(), error: null };
 }
-
-// публичное API модуля
 async function sync() {
-  try { _cache = await build(); }
+  try { _cache = await build(); if (_cache.mode === "live" && !_cache.products.length) throw new Error("live: пустой каталог"); }
   catch (e) {
-    // при ошибке live — не роняем магазин, откатываемся на демо
     const raw = demoRaw();
-    _cache = { mode: MODE === "live" ? "live-fallback" : "demo", products: raw.map(normalize),
-      reviews: raw.flatMap((o) => (o.reviews || []).map((r) => normalizeReview(r, String(o.offer_id)))),
-      count: raw.length, syncedAt: new Date().toISOString(), error: e.message };
+    _cache = { mode: MODE === "live" ? "live-fallback" : "demo", products: raw.map(normalizeDemo),
+      reviews: raw.flatMap((o) => (o.reviews || []).map((r) => normalizeDemoReview(r, String(o.offer_id)))),
+      syncedAt: new Date().toISOString(), error: e.message };
     console.error("Ozon sync error:", e.message);
   }
   return _cache;
 }
 async function getCache() { return _cache || (await sync()); }
-const products = () => (_cache ? _cache.products : demoRaw().map(normalize));
+const products = () => (_cache ? _cache.products : demoRaw().map(normalizeDemo));
 const reviewsFor = (productId) => (_cache ? _cache.reviews.filter((r) => r.productId === productId) : []);
 const status = () => ({
-  mode: _cache?.mode || MODE,
-  hasKeys: MODE === "live",
-  count: _cache?.count ?? 0,
-  reviews: _cache?.reviews?.length ?? 0,
-  syncedAt: _cache?.syncedAt || null,
-  error: _cache?.error || null,
+  mode: _cache?.mode || MODE, hasKeys: MODE === "live",
+  count: _cache?.products?.length ?? 0, reviews: _cache?.reviews?.length ?? 0,
+  syncedAt: _cache?.syncedAt || null, error: _cache?.error || null,
 });
 
-module.exports = { MODE, sync, getCache, products, reviewsFor, status, normalize };
+module.exports = { MODE, sync, getCache, products, reviewsFor, getDescription, status };

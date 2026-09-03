@@ -167,10 +167,12 @@ const compiled = new Map();
 
 // ===== каталог =====
 route("GET", "/api/products", (req, res) => json(res, 200, products()));
-route("GET", "/api/products/:id", (req, res, p) => {
+route("GET", "/api/products/:id", async (req, res, p) => {
   const item = products().find((x) => x.id === p.id);
   if (!item) return json(res, 404, { error: "Товар не найден" });
-  json(res, 200, { ...item, reviews: reviewsForProduct(item.id) });
+  let desc = item.desc;
+  try { const d = await ozon.getDescription(item.id); if (d) desc = d; } catch {}
+  json(res, 200, { ...item, desc, reviews: reviewsForProduct(item.id) });
 });
 route("GET", "/api/products/:id/reviews", (req, res, p) => {
   json(res, 200, reviewsForProduct(p.id));
@@ -429,5 +431,5 @@ server.listen(PORT, async () => {
   console.log(`Mepsi & LULU запущен: http://localhost:${PORT}`);
   console.log(`Данные:  ${DATA_DIR}`);
   const s = await ozon.sync();
-  console.log(`Каталог Ozon [${s.mode}]: ${s.count} товаров, ${s.reviews?.length ?? ozon.status().reviews} отзывов` + (s.error ? ` (ошибка: ${s.error})` : ""));
+  console.log(`Каталог Ozon [${s.mode}]: ${s.products.length} товаров, ${s.reviews.length} отзывов` + (s.error ? ` (ошибка: ${s.error})` : ""));
 });
