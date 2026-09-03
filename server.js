@@ -427,9 +427,18 @@ const server = http.createServer(async (req, res) => {
   res.writeHead(405); res.end("Method Not Allowed");
 });
 
+const SYNC_MS = Number(process.env.OZON_SYNC_MINUTES || 30) * 60 * 1000;
+async function runSync(tag) {
+  const s = await ozon.sync();
+  console.log(`[${new Date().toISOString()}] Каталог Ozon ${tag} [${s.mode}]: ${s.products.length} товаров, ${s.reviews.length} отзывов` + (s.error ? ` (ошибка: ${s.error})` : ""));
+}
 server.listen(PORT, async () => {
   console.log(`Mepsi & LULU запущен: http://localhost:${PORT}`);
   console.log(`Данные:  ${DATA_DIR}`);
-  const s = await ozon.sync();
-  console.log(`Каталог Ozon [${s.mode}]: ${s.products.length} товаров, ${s.reviews.length} отзывов` + (s.error ? ` (ошибка: ${s.error})` : ""));
+  await runSync("(старт)");
+  // полная авто-синхронизация с Ozon: отзывы, цены, товары обновляются сами
+  if (ozon.MODE === "live") {
+    setInterval(() => runSync("(авто)").catch((e) => console.error("sync err", e.message)), SYNC_MS);
+    console.log(`Авто-синхронизация с Ozon каждые ${SYNC_MS / 60000} мин.`);
+  }
 });

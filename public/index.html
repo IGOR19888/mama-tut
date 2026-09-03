@@ -366,7 +366,16 @@
   .buybox .old{color:var(--muted);text-decoration:line-through;font-size:16px;margin-left:8px}
   .buybox .save{color:var(--sale);font-weight:700;font-size:13px;margin:6px 0 12px}
   .buybox .cb{display:flex;gap:8px;font-size:13px;color:var(--muted);margin:10px 0;align-items:center}
-  .reviews-head{display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+  .reviews-head{display:flex;gap:28px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+  .rh-score{text-align:center;flex:none}
+  .rate-bars{flex:1;min-width:180px;max-width:300px;display:flex;flex-direction:column;gap:5px}
+  .rbar{display:flex;align-items:center;gap:8px;font-size:12px}
+  .rbar-n{color:var(--muted);width:26px;white-space:nowrap}
+  .rbar-t{flex:1;height:7px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+  .rbar-f{height:100%;background:var(--star);border-radius:99px;transition:width .3s}
+  .rbar-c{color:var(--muted);width:30px;text-align:right}
+  .rh-act{margin-left:auto;flex:none}
+  @media(max-width:520px){.rate-bars{max-width:none}.rh-act{margin-left:0;width:100%}}
   .big-rate{font-family:"Unbounded";font-size:48px;font-weight:800;line-height:1}
   .review{border-bottom:1px solid var(--line);padding:14px 0}
   .review .ra{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
@@ -792,9 +801,11 @@ async function viewProduct(id){
           ?`<div class="pht pht-v" onclick="openVideo('${esc(m.u)}')"><span class="pht-play">▶</span></div>`
           :`<div class="pht" onclick="openLb('${esc(m.u)}')">${media(m.u)}</div>`).join("")}${umedia.length>5?`<div class="pht more" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">+${(umedia.length-5).toLocaleString("ru-RU")}</div>`:""}</div></div>`:""}
       <div class="panel" style="margin-top:16px" id="revs">
-        <div class="reviews-head"><div><div class="big-rate">${p.rate||"—"}</div><div class="st" style="font-size:13px">${"★".repeat(Math.round(p.rate||5))}${"☆".repeat(5-Math.round(p.rate||5))}</div></div>
-          <div><div style="font-weight:700">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</div>
-          ${user?`<button class="btn btn-out btn-sm" style="margin-top:8px" onclick="openReview('${p.id}')">Оставить отзыв</button>`:`<div class="muted" style="font-size:13px;margin-top:6px">Войдите, чтобы оставить отзыв</div>`}</div></div>
+        <div class="reviews-head">
+          <div class="rh-score"><div class="big-rate">${p.rate||"—"}</div><div class="st" style="font-size:14px">${"★".repeat(Math.round(p.rate||5))}${"☆".repeat(5-Math.round(p.rate||5))}</div><div class="muted" style="font-size:12.5px;margin-top:2px">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</div></div>
+          ${(()=>{const dist=[5,4,3,2,1].map(n=>revs.filter(r=>r.rating===n).length);const dmax=Math.max(...dist,1);return `<div class="rate-bars">${[5,4,3,2,1].map((n,i)=>`<div class="rbar"><span class="rbar-n">${n}★</span><div class="rbar-t"><div class="rbar-f" style="width:${Math.round(dist[i]/dmax*100)}%"></div></div><span class="rbar-c">${dist[i]}</span></div>`).join("")}</div>`;})()}
+          <div class="rh-act">${user?`<button class="btn btn-primary btn-sm" onclick="openReview('${p.id}')">Оставить отзыв</button>`:`<div class="muted" style="font-size:13px">Войдите, чтобы оставить отзыв</div>`}</div>
+        </div>
         <div id="revList">${revs.length?revs.map((r,i)=>reviewHTML(r,i>=3)).join(""):`<div class="muted">Отзывов пока нет — будьте первым!</div>`}</div>
         ${revs.length>3?`<button class="collapse-btn" id="revBtn" onclick="toggleReviews()">Показать все отзывы (${revs.length}) <span>↓</span></button>`:""}
       </div>
