@@ -258,12 +258,14 @@
   .pdp{display:grid;grid-template-columns:minmax(0,1fr) 384px;gap:24px;align-items:start;margin-top:8px}
   .pdp-left{min-width:0}
   .pl-top{display:grid;grid-template-columns:64px 501px minmax(0,1fr);gap:24px;align-items:start;margin-bottom:8px}
+  .pl-top .thumbs,.pl-top .stage{position:sticky;top:150px;align-self:start}
   .pl-top .thumbs{display:flex;flex-direction:column;gap:10px}
   .pl-info{min-width:0}
   .pcol-info{min-width:0}
   .pcol-buy{min-width:0}
   .pdp-below{max-width:none;margin-top:24px}
-  .pdp-descbody{line-height:1.65;white-space:pre-line;font-size:14px}
+  .pdp-descbody{line-height:1.7;white-space:pre-line;font-size:14.5px;max-width:840px}
+  .pdp-descbody.clamp{max-height:220px;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent);mask-image:linear-gradient(180deg,#000 72%,transparent)}
   .collapse-btn{width:100%;margin-top:14px;border:none;background:var(--surface-2);color:var(--accent);border-radius:12px;padding:12px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
   .collapse-btn:hover{filter:brightness(.97)}
   .review .ra{display:flex;gap:12px;align-items:center;margin-bottom:8px;justify-content:flex-start}
@@ -744,9 +746,7 @@ async function viewProduct(id){
         <table class="specs"><tbody>${(p.specs||[]).map(([k,v],i)=>`<tr class="${i>=6?"spec-more":""}" ${i>=6?"hidden":""}><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table>
         ${p.specs.length>6?`<button class="collapse-btn" id="specsBtn" onclick="toggleSpecs()">Все характеристики (${p.specs.length}) <span>↓</span></button>`:""}
         ${p.desc?`<a class="link" style="display:inline-block;margin-top:12px" onclick="document.getElementById('descblock').scrollIntoView({behavior:'smooth'})">Перейти к описанию ↓</a>`:""}</div>`:""}
-      </div>
-     </div>
-      ${p.desc?`<div class="panel" id="descblock" style="margin-top:16px"><div class="h-sub">Описание</div><div class="pdp-descbody">${esc(cleanDesc(p.desc))}</div></div>`:""}
+      ${p.desc?(()=>{const dc=cleanDesc(p.desc);const long=dc.length>420;return `<div class="panel" id="descblock" style="margin-top:16px"><div class="h-sub">Описание</div><div class="pdp-descbody ${long?"clamp":""}" id="descBody">${esc(dc)}</div>${long?`<button class="collapse-btn" id="descBtn" onclick="document.getElementById('descBody').classList.remove('clamp');this.remove()">Показать полностью <span>↓</span></button>`:""}</div>`;})():""}
       <div class="panel" style="margin-top:16px"><div class="h-sub">Фото и видео покупателей</div>
         <div class="ph-strip">${(uphotos.length?uphotos.slice(0,5):gal.slice(0,5)).map(u=>`<div class="pht">${media(u)}</div>`).join("")}<div class="pht more">+${(p.rev||0).toLocaleString("ru-RU")}</div></div></div>
       <div class="panel" style="margin-top:16px" id="revs">
@@ -756,6 +756,8 @@ async function viewProduct(id){
         <div id="revList">${revs.length?revs.map((r,i)=>reviewHTML(r,i>=3)).join(""):`<div class="muted">Отзывов пока нет — будьте первым!</div>`}</div>
         ${revs.length>3?`<button class="collapse-btn" id="revBtn" onclick="toggleReviews()">Показать все отзывы (${revs.length}) <span>↓</span></button>`:""}
       </div>
+      </div>
+     </div>
     </div>
     <div class="pcol-buy">
       <div class="buybox">
