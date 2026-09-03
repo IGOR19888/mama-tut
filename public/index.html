@@ -279,6 +279,39 @@
   .pht{width:74px;height:74px;border-radius:10px;overflow:hidden;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
   .pht .pic{width:100%;height:100%;object-fit:cover}
   .pht.more{font-weight:800;color:var(--accent);font-size:15px;background:var(--accent-soft)}
+  .pht{cursor:pointer;transition:transform .12s} .pht:hover{transform:scale(1.05)}
+  /* правый блок Ozon + магазин */
+  .bb-cart{flex-direction:column;gap:1px;height:auto;padding:11px 12px}
+  .bb-cart small{font-weight:500;font-size:12px;opacity:.9}
+  .bb-heart{width:56px;flex:none;border:2px solid var(--line);background:var(--surface);border-radius:12px;font-size:22px;cursor:pointer;color:var(--accent);transition:.12s}
+  .bb-heart:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .dl2{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .dl2:last-of-type{border-bottom:none}
+  .dl-ic{width:22px;text-align:center;font-size:16px;flex:none}
+  .dl-b{flex:1;min-width:0}.dl-b b{font-weight:600}.dl-b .muted{font-size:12.5px;margin-top:1px}
+  .dl-stock{color:var(--sale);font-weight:700}
+  .dl-arr{color:var(--muted);font-size:18px;flex:none}
+  .dl-tag{background:var(--surface-2);border-radius:8px;padding:5px 9px;font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;flex:none}
+  .store-head{display:flex;justify-content:space-between;align-items:center;margin:14px 0 12px}
+  .store-head b{font-family:"Unbounded";font-size:16px}
+  .store-sub{border:none;background:var(--surface-2);color:var(--ink);border-radius:10px;padding:8px 14px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+  .store-card{display:flex;align-items:center;gap:12px;background:linear-gradient(120deg,#0b1b4d,#1e3a8a);border-radius:14px;padding:14px;color:#fff;margin-bottom:6px}
+  .store-logo{width:44px;height:44px;border-radius:12px;background:#fff;color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none;text-transform:uppercase}
+  .store-name{font-weight:800;font-size:15px}.store-go{font-size:12.5px;opacity:.85}
+  .store-rate{background:rgba(255,255,255,.15);border-radius:10px;padding:7px 9px;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;line-height:1.15}
+  .store-rate .st{color:var(--star)}
+  .store-chat{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:10px;padding:7px 10px;font:inherit;font-weight:700;font-size:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+  .store-row{display:flex;justify-content:space-between;align-items:center;padding:13px 2px;border-bottom:1px solid var(--line);font-weight:600;font-size:14px;cursor:pointer}
+  .store-row:last-child{border-bottom:none}
+  .store-num{background:var(--surface-2);border-radius:8px;padding:2px 10px;font-size:12.5px;color:var(--muted);font-weight:700}
+  /* фото в отзывах + лайтбокс */
+  .rev-photos{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .rev-ph{width:64px;height:64px;border-radius:9px;overflow:hidden;cursor:pointer;background:var(--surface-2)}
+  .rev-ph .pic{object-fit:cover}
+  .lb{position:fixed;inset:0;z-index:80;background:rgba(10,14,31,.88);display:flex;align-items:center;justify-content:center;padding:30px;opacity:0;pointer-events:none;transition:.2s}
+  .lb.open{opacity:1;pointer-events:auto}
+  .lb img{max-width:92vw;max-height:88vh;border-radius:12px;background:#fff;box-shadow:var(--shadow-lg)}
+  .lb-x{position:absolute;top:20px;right:24px;background:rgba(255,255,255,.2);border:none;color:#fff;width:46px;height:46px;border-radius:50%;font-size:26px;cursor:pointer;line-height:1}
   .pdp-media{display:grid;grid-template-columns:64px 1fr;gap:12px}
   .thumbs{display:flex;flex-direction:column;gap:10px}
   .thumb{width:64px;height:64px;border-radius:12px;border:2px solid var(--line);background:var(--surface-2);
@@ -535,6 +568,8 @@
   <div class="modal" id="authBox"></div>
 </div>
 
+<div class="lb" id="lb" onclick="closeLb()"><button class="lb-x" onclick="closeLb()">×</button><img id="lbImg" src="" alt="" onclick="event.stopPropagation()"></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -748,7 +783,7 @@ async function viewProduct(id){
         ${p.desc?`<a class="link" style="display:inline-block;margin-top:12px" onclick="document.getElementById('descblock').scrollIntoView({behavior:'smooth'})">Перейти к описанию ↓</a>`:""}</div>`:""}
       ${p.desc?(()=>{const dc=cleanDesc(p.desc);const long=dc.length>420;return `<div class="panel" id="descblock" style="margin-top:16px"><div class="h-sub">Описание</div><div class="pdp-descbody ${long?"clamp":""}" id="descBody">${esc(dc)}</div>${long?`<button class="collapse-btn" id="descBtn" onclick="document.getElementById('descBody').classList.remove('clamp');this.remove()">Показать полностью <span>↓</span></button>`:""}</div>`;})():""}
       <div class="panel" style="margin-top:16px"><div class="h-sub">Фото и видео покупателей</div>
-        <div class="ph-strip">${(uphotos.length?uphotos.slice(0,5):gal.slice(0,5)).map(u=>`<div class="pht">${media(u)}</div>`).join("")}<div class="pht more">+${(p.rev||0).toLocaleString("ru-RU")}</div></div></div>
+        <div class="ph-strip">${(uphotos.length?uphotos.slice(0,5):gal.slice(0,5)).map(u=>`<div class="pht" ${isImg(u)?`onclick="openLb('${esc(u)}')"`:""}>${media(u)}</div>`).join("")}<div class="pht more" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">+${(p.rev||0).toLocaleString("ru-RU")}</div></div></div>
       <div class="panel" style="margin-top:16px" id="revs">
         <div class="reviews-head"><div><div class="big-rate">${p.rate||"—"}</div><div class="st" style="font-size:13px">${"★".repeat(Math.round(p.rate||5))}${"☆".repeat(5-Math.round(p.rate||5))}</div></div>
           <div><div style="font-weight:700">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</div>
@@ -764,24 +799,29 @@ async function viewProduct(id){
         ${d?`<div class="bb-strip">🔥 Скидки недели${p.stock?` · осталось ${p.stock}`:""}</div>`:""}
         <div class="bb-price"><span class="bb-p mono">${fmt(p.price)}</span>${d?`<span class="bb-disc">−${d}%</span>`:""}</div>
         ${p.old?`<div class="bb-oldrow"><span class="bb-old mono">${fmt(p.old)}</span><span class="muted">без скидки</span></div>`:""}
-        <div class="bb-later"><span>🕓</span><div><b>Оплатить позже</b> — без % и переплат<br>частями на 6 · 12 · 24 мес</div></div>
-        <div id="pdpFoot" style="margin-top:12px">${pdpBuy(id,q)}</div>
+        <div class="bb-later"><span>🕓</span><div><b>Оплатить позже</b> — без % · частями на 6 · 12 · 24 мес</div></div>
+        <div style="display:flex;gap:10px;margin-top:12px"><div id="pdpFoot" style="flex:1;min-width:0">${pdpBuy(id,q)}</div><button class="bb-heart" onclick="toggleFav('${id}',event)">${fav.has(id)?"♥":"♡"}</button></div>
         <button class="btn btn-out btn-block" style="margin-top:10px" onclick="buyNow('${id}')">Купить сейчас</button>
-        <button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="toggleFav('${id}',event)">${fav.has(id)?"♥ В избранном":"♡ В избранное"}</button>
       </div>
       <div class="buybox" style="margin-top:14px">
-        <div class="h-sub" style="margin-bottom:12px">Доставка и возврат</div>
-        <div class="dl"><span>📍</span><div><b>Москва</b><div class="muted" style="font-size:12.5px">Со склада Mepsi · напрямую от производителя</div></div></div>
-        <div class="dl"><span>🚚</span><div><b>Курьером — завтра</b><div class="muted" style="font-size:12.5px">бесплатно</div></div></div>
-        <div class="dl"><span>🏬</span><div><b>Пункты выдачи и постаматы — 1–2 дня</b><div class="muted" style="font-size:12.5px">бесплатно · входит в заказ</div></div></div>
-        <div class="dl"><span>↩️</span><div><b>Можно вернуть в течение 15 дней</b></div></div>
-        <div class="cb" style="margin-top:6px"><span>💜</span> Кэшбэк ${Math.round(p.price*0.05)} баллов на счёт</div>
-        <div class="bb-checked">✓ Товар проверен · оригинал</div>
+        <div class="h-sub" style="margin-bottom:4px">Доставка и возврат</div>
+        <div class="dl2"><span class="dl-ic">📍</span><div class="dl-b"><b>Москва</b><div class="muted">Со склада Mepsi · напрямую от производителя</div></div><span class="dl-arr">›</span></div>
+        <div class="dl2"><span class="dl-ic">✅</span><div class="dl-b"><b>В наличии</b> — <span class="dl-stock">осталось ${p.stock||8} шт!</span></div></div>
+        <div class="dl2"><span class="dl-ic">🚚</span><div class="dl-b"><b>Курьером — завтра</b><div class="muted">бесплатно</div></div><span class="dl-tag">Входит в заказ</span></div>
+        <div class="dl2"><span class="dl-ic">🏬</span><div class="dl-b"><b>Пункты выдачи — 1–2 дня</b><div class="muted">бесплатно</div></div></div>
+        <div class="dl2"><span class="dl-ic">↩️</span><div class="dl-b"><b>Можно вернуть в течение 15 дней</b></div><span class="dl-arr">›</span></div>
+        <div class="cb" style="margin-top:10px"><span>💜</span> Кэшбэк ${Math.round(p.price*0.05)} баллов · <span style="color:var(--good);font-weight:700">Товар проверен</span></div>
       </div>
-      <div class="seller-card">
-        <div class="sc-logo">${(p.brand[0]||"M")}</div>
-        <div style="flex:1"><div class="sc-name">${esc(p.seller||p.brand)}</div><div class="muted" style="font-size:12.5px">★ 4.9 · Официальный магазин · 1.5M заказов</div></div>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Чат с продавцом — скоро 💬')">Чат</button>
+      <div class="store-head"><b>Магазин</b><button class="store-sub" onclick="toast('Вы подписались на ${esc(p.brand)} 💙')">♡ Подписаться</button></div>
+      <div class="buybox" style="margin-top:0;padding:14px">
+        <div class="store-card">
+          <div class="store-logo">${(p.brand[0]||"M")}</div>
+          <div style="flex:1"><div class="store-name">${esc(p.seller||p.brand)} 👑</div><div class="store-go">Перейти ›</div></div>
+          <div class="store-rate"><span class="st">★</span> 4.9</div>
+          <button class="store-chat" onclick="toast('Чат с магазином — скоро 💬')"><span>💬</span>Чат</button>
+        </div>
+        <div class="store-row"><span>📦 Заказы</span><span class="store-num">1.5M</span></div>
+        <div class="store-row" onclick="toast('О магазине — скоро')"><span>ℹ️ О магазине</span><span class="dl-arr">›</span></div>
       </div>
     </div>
   </div>
@@ -796,7 +836,7 @@ function pdpBuy(id,q){
   return q>0
     ? `<div class="stepper" style="height:48px">${["−",q,"+"].map((x,i)=>i===1?`<span class="q mono">${q} шт</span>`:`<button onclick="setPdp('${id}',${i===0?q-1:q+1})">${x}</button>`).join("")}</div>
        <button class="btn btn-ink btn-block" style="margin-top:10px" onclick="go('#/cart')">Перейти в корзину</button>`
-    : `<button class="btn btn-primary btn-block" style="height:48px" onclick="setPdp('${id}',1)">В корзину</button>`;
+    : `<button class="btn btn-primary btn-block bb-cart" onclick="setPdp('${id}',1)"><b>В корзину</b><small>Доставим завтра</small></button>`;
 }
 function setPdp(id,n){setQty(id,n);const f=document.getElementById("pdpFoot");if(f)f.innerHTML=pdpBuy(id,cart[id]||0)}
 function buyNow(id){if(!cart[id]){cart[id]=1;saveCart();refreshCounts()}go("#/checkout")}
@@ -806,7 +846,10 @@ function pdpPic(i){const g=[...document.querySelectorAll("#thumbs .thumb")];cons
 function reviewHTML(r,hidden){const dt=r.createdAt?new Date(r.createdAt).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"";return `<div class="review ${hidden?"rev-more":""}" ${hidden?"hidden":""}>
   <div class="ra"><div class="rav">${(esc(r.author||"П")[0]||"П").toUpperCase()}</div><div style="flex:1"><span class="an">${esc(r.author||"Покупатель")}</span>${dt?`<div class="rd">${dt}</div>`:""}</div><span class="rs">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</span></div>
   ${r.pros?`<div class="rp"><b>Плюсы:</b> ${esc(r.pros)}</div>`:""}${r.cons?`<div class="rp"><b>Минусы:</b> ${esc(r.cons)}</div>`:""}
-  ${r.text?`<div class="rp rt">${esc(r.text)}</div>`:""}</div>`}
+  ${r.text?`<div class="rp rt">${esc(r.text)}</div>`:""}
+  ${r.photos&&r.photos.length?`<div class="rev-photos">${r.photos.map(u=>`<div class="rev-ph" onclick="openLb('${esc(u)}')">${media(u)}</div>`).join("")}</div>`:""}</div>`}
+function openLb(url){const el=document.getElementById("lb"),img=document.getElementById("lbImg");img.src=url;el.classList.add("open")}
+function closeLb(){document.getElementById("lb").classList.remove("open")}
 function toggleSpecs(){document.querySelectorAll(".spec-more").forEach(r=>r.hidden=false);const b=document.getElementById("specsBtn");if(b)b.remove()}
 function toggleReviews(){document.querySelectorAll(".rev-more").forEach(r=>r.hidden=false);const b=document.getElementById("revBtn");if(b)b.remove()}
 
@@ -1212,22 +1255,32 @@ function secSecurity(){
 }
 
 /* отзыв (модалка через prompt-подобную панель в auth-модалке) */
+let _rvPhotos=[];
 function openReview(pid){
-  const p=getP(pid);authIntent=null;
+  const p=getP(pid);authIntent=null;_rvPhotos=[];
   document.getElementById("authBox").innerHTML=`<button class="close-x" onclick="closeAuth()">×</button>
     <h2>Оценить товар</h2><div class="lead">${esc(p?p.title:"")}</div>
     <div class="field"><label>Оценка</label><select class="inp" id="rv_rate">${[5,4,3,2,1].map(n=>`<option value="${n}">${"★".repeat(n)} (${n})</option>`).join("")}</select></div>
     <div class="field"><label>Достоинства</label><input class="inp" id="rv_pros"></div>
     <div class="field"><label>Недостатки</label><input class="inp" id="rv_cons"></div>
     <div class="field"><label>Комментарий</label><textarea class="inp" id="rv_text"></textarea></div>
+    <div class="field"><label>Фото и видео</label>
+      <label class="btn btn-ghost btn-sm" style="align-self:flex-start;cursor:pointer">📷 Добавить фото<input type="file" accept="image/*" multiple hidden onchange="rvAddPhotos(this)"></label>
+      <div class="rev-photos" id="rvPhotos"></div></div>
     <button class="btn btn-primary btn-block" onclick="submitReview('${pid}')">Отправить отзыв</button>`;
   document.getElementById("authModal").classList.add("open");
 }
+function rvAddPhotos(inp){
+  [...inp.files].slice(0,5).forEach(f=>{if(f.size>3e6){toast("Фото до 3 МБ");return}
+    const r=new FileReader();r.onload=e=>{_rvPhotos.push(e.target.result);renderRvPhotos()};r.readAsDataURL(f)});
+  inp.value="";
+}
+function renderRvPhotos(){const el=document.getElementById("rvPhotos");if(el)el.innerHTML=_rvPhotos.map((u,i)=>`<div class="rev-ph" style="position:relative"><img class="pic" src="${u}"><button onclick="_rvPhotos.splice(${i},1);renderRvPhotos()" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:var(--sale);color:#fff;cursor:pointer;font-size:12px">×</button></div>`).join("")}
 async function submitReview(pid){
   try{await api("POST","/api/reviews",{productId:pid,rating:+document.getElementById("rv_rate").value,
-    pros:document.getElementById("rv_pros").value,cons:document.getElementById("rv_cons").value,text:document.getElementById("rv_text").value});
-    reviewed.add(pid);localStorage.setItem("mt_reviewed",JSON.stringify([...reviewed]));
-    closeAuth();toast("Спасибо за отзыв! ⭐");const r=parseRoute();render();
+    pros:document.getElementById("rv_pros").value,cons:document.getElementById("rv_cons").value,text:document.getElementById("rv_text").value,photos:_rvPhotos});
+    reviewed.add(pid);localStorage.setItem("mt_reviewed",JSON.stringify([...reviewed]));_rvPhotos=[];
+    closeAuth();toast("Спасибо за отзыв! ⭐");render();
   }catch(e){toast(e.message)}
 }
 
