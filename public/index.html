@@ -96,7 +96,7 @@
   .cat.on{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 
   /* product grid */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:16px;margin-top:8px}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;
     transition:transform .18s cubic-bezier(.2,0,0,1),box-shadow .18s,border-color .18s}
   .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--accent-soft)}
@@ -187,8 +187,8 @@
   .card .ttl{cursor:pointer} .card .ttl:hover{color:var(--accent)}
   /* реальные фото Ozon (URL) в местах, где раньше были эмодзи */
   .pic{width:100%;height:100%;object-fit:contain;display:block}
-  .card .ph{aspect-ratio:1/1.16}
-  .card .ph .pic{position:absolute;inset:0;padding:0}
+  .card .ph{aspect-ratio:1/1.2}
+  .card .ph .pic{position:absolute;inset:0;padding:0;object-fit:cover;object-position:center top}
   /* карточка в стиле Ozon */
   .card .ribbon{position:absolute;left:0;bottom:0;background:var(--accent);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px 3px 8px;border-radius:0 10px 0 12px;z-index:2}
   .card .ribbon.hit{background:var(--sale)}
