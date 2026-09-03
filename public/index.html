@@ -264,6 +264,15 @@
   .pcol-buy{min-width:0}
   .pdp-below{max-width:none;margin-top:24px}
   .pdp-descbody{line-height:1.65;white-space:pre-line;font-size:14px}
+  .collapse-btn{width:100%;margin-top:14px;border:none;background:var(--surface-2);color:var(--accent);border-radius:12px;padding:12px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+  .collapse-btn:hover{filter:brightness(.97)}
+  .review .ra{display:flex;gap:12px;align-items:center;margin-bottom:8px;justify-content:flex-start}
+  .rav{width:40px;height:40px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;flex:none}
+  .review .an{font-weight:700;font-size:14px}
+  .rd{font-size:12px;color:var(--muted);margin-top:1px}
+  .review .rs{color:var(--star);font-size:14px;white-space:nowrap}
+  .review .rt{margin-top:4px;line-height:1.5}
+  .review{padding:16px 0}
   .ph-strip{display:flex;gap:8px;flex-wrap:wrap}
   .pht{width:74px;height:74px;border-radius:10px;overflow:hidden;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
   .pht .pic{width:100%;height:100%;object-fit:cover}
@@ -286,8 +295,10 @@
   .pdp-headcard .pdp-rate{margin:12px 0 0}
   .pdp-desc{margin:18px 0;line-height:1.6}
   .specs{border-collapse:collapse;width:100%;font-size:14px}
-  .specs td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}
-  .specs td:first-child{color:var(--muted);width:45%}
+  .specs td{padding:10px 0;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.4}
+  .specs td:first-child{color:var(--muted);width:44%;padding-right:18px}
+  .specs td:last-child{font-weight:600}
+  .specs tr:last-child td{border-bottom:none}
   .specs td:last-child{font-weight:600}
   .pdp-h1{font-family:"Onest",sans-serif;font-weight:700;font-size:24px;line-height:1.25;letter-spacing:-.01em;margin:0 0 10px}
   .pdp-rate .st{color:var(--star)}
@@ -721,7 +732,8 @@ async function viewProduct(id){
           <div class="pdp-rate"><span class="st">★</span> <b>${p.rate||"—"}</b> · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</a> · <span>💬 ${Math.max(1,Math.round((p.rev||0)/25))} вопросов</span> · <span class="muted">арт. ${esc(p.sku||p.id)}</span></div>
         </div>
       ${p.specs&&p.specs.length?`<div class="panel" style="margin-top:14px"><div class="h-sub">О товаре</div>
-        <table class="specs"><tbody>${(p.specs||[]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table>
+        <table class="specs"><tbody>${(p.specs||[]).map(([k,v],i)=>`<tr class="${i>=6?"spec-more":""}" ${i>=6?"hidden":""}><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table>
+        ${p.specs.length>6?`<button class="collapse-btn" id="specsBtn" onclick="toggleSpecs()">Все характеристики (${p.specs.length}) <span>↓</span></button>`:""}
         ${p.desc?`<a class="link" style="display:inline-block;margin-top:12px" onclick="document.getElementById('descblock').scrollIntoView({behavior:'smooth'})">Перейти к описанию ↓</a>`:""}</div>`:""}
       </div>
      </div>
@@ -732,7 +744,8 @@ async function viewProduct(id){
         <div class="reviews-head"><div><div class="big-rate">${p.rate||"—"}</div><div class="st" style="font-size:13px">${"★".repeat(Math.round(p.rate||5))}${"☆".repeat(5-Math.round(p.rate||5))}</div></div>
           <div><div style="font-weight:700">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</div>
           ${user?`<button class="btn btn-out btn-sm" style="margin-top:8px" onclick="openReview('${p.id}')">Оставить отзыв</button>`:`<div class="muted" style="font-size:13px;margin-top:6px">Войдите, чтобы оставить отзыв</div>`}</div></div>
-        <div id="revList">${revs.length?revs.map(reviewHTML).join(""):`<div class="muted">Отзывов пока нет — будьте первым!</div>`}</div>
+        <div id="revList">${revs.length?revs.map((r,i)=>reviewHTML(r,i>=3)).join(""):`<div class="muted">Отзывов пока нет — будьте первым!</div>`}</div>
+        ${revs.length>3?`<button class="collapse-btn" id="revBtn" onclick="toggleReviews()">Показать все отзывы (${revs.length}) <span>↓</span></button>`:""}
       </div>
     </div>
     <div class="pcol-buy">
@@ -779,10 +792,12 @@ function buyNow(id){if(!cart[id]){cart[id]=1;saveCart();refreshCounts()}go("#/ch
 let _PGAL=[];
 function pdpPic(i){const g=[...document.querySelectorAll("#thumbs .thumb")];const stage=document.getElementById("stage");
   g.forEach((t,k)=>t.classList.toggle("on",k===i));stage.innerHTML=media(_PGAL[i])}
-function reviewHTML(r){return `<div class="review">
-  <div class="ra"><span class="an">${esc(r.author||"Покупатель")}</span><span class="rs">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</span></div>
+function reviewHTML(r,hidden){const dt=r.createdAt?new Date(r.createdAt).toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"}):"";return `<div class="review ${hidden?"rev-more":""}" ${hidden?"hidden":""}>
+  <div class="ra"><div class="rav">${(esc(r.author||"П")[0]||"П").toUpperCase()}</div><div style="flex:1"><span class="an">${esc(r.author||"Покупатель")}</span>${dt?`<div class="rd">${dt}</div>`:""}</div><span class="rs">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</span></div>
   ${r.pros?`<div class="rp"><b>Плюсы:</b> ${esc(r.pros)}</div>`:""}${r.cons?`<div class="rp"><b>Минусы:</b> ${esc(r.cons)}</div>`:""}
-  <div class="rp">${esc(r.text||"")}</div></div>`}
+  ${r.text?`<div class="rp rt">${esc(r.text)}</div>`:""}</div>`}
+function toggleSpecs(){document.querySelectorAll(".spec-more").forEach(r=>r.hidden=false);const b=document.getElementById("specsBtn");if(b)b.remove()}
+function toggleReviews(){document.querySelectorAll(".rev-more").forEach(r=>r.hidden=false);const b=document.getElementById("revBtn");if(b)b.remove()}
 
 /* ==================== КОРЗИНА ==================== */
 function viewCart(){
