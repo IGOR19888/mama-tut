@@ -255,7 +255,7 @@
   .chip{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12px;padding:4px 10px;border-radius:7px}
 
   /* ---------- product page (PDP) ---------- */
-  .pdp{display:grid;grid-template-columns:76px 360px minmax(0,1fr) 320px;gap:18px;align-items:start;margin-top:8px}
+  .pdp{display:grid;grid-template-columns:72px 400px minmax(0,1fr) 340px;gap:18px;align-items:start;margin-top:8px}
   .pdp .thumbs{display:flex;flex-direction:column;gap:10px}
   .pcol-info{min-width:0}
   .pcol-buy{min-width:0}
@@ -271,27 +271,34 @@
   .pdp.bLULU .stage,.pdp.bLULU .thumb.on{background:linear-gradient(135deg,#EDE4FF,#FFE4F6)}
   .pdp-main h1{font-family:"Unbounded";font-size:24px;line-height:1.25;margin:2px 0 8px;letter-spacing:-.01em}
   .pdp-sub{color:var(--muted);font-size:14px;margin-bottom:10px}
-  .pdp-rate{display:flex;gap:14px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:16px}
+  .pdp-rate{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:13px;color:var(--muted);margin-bottom:16px}
+  .pdp-rate>span,.pdp-rate>a{white-space:nowrap}
   .pdp-rate .st{color:var(--star)}
   .pdp-desc{margin:18px 0;line-height:1.6}
   .specs{border-collapse:collapse;width:100%;font-size:14px}
   .specs td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}
   .specs td:first-child{color:var(--muted);width:45%}
   .specs td:last-child{font-weight:600}
-  .pdp-h1{font-family:"Unbounded";font-size:22px;line-height:1.3;letter-spacing:-.01em;margin:18px 0 8px}
+  .pdp-h1{font-family:"Onest",sans-serif;font-weight:700;font-size:22px;line-height:1.3;letter-spacing:-.01em;margin:0 0 8px}
   .pdp-rate .st{color:var(--star)}
-  .bb-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-  .bb-p{font-family:"Unbounded";font-weight:800;font-size:30px;color:var(--accent);letter-spacing:-.02em}
+  .bb-strip{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,#7C3AED,#005BFF);color:#fff;font-weight:700;font-size:13px;padding:6px 12px;border-radius:10px;margin-bottom:12px}
+  .bb-price{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .bb-p{font-family:"Unbounded";font-weight:800;font-size:32px;color:var(--good);letter-spacing:-.02em}
+  .bb-oldrow{display:flex;align-items:baseline;gap:8px;margin-top:4px;font-size:13px}
   .bb-old{color:var(--muted);text-decoration:line-through;font-size:16px}
   .bb-disc{background:var(--sale);color:#fff;font-weight:800;font-size:13px;padding:3px 8px;border-radius:7px}
+  .bb-later{margin-top:12px;background:var(--surface-2);border-radius:10px;padding:9px 12px;font-size:12.5px;color:var(--ink)}
   .bb-stock{color:var(--sale);font-weight:700;font-size:13px;margin-top:6px}
+  .dl{display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-size:13.5px}
+  .dl b{font-weight:600}
   .bb-deliv{border-top:1px solid var(--line);margin-top:14px;padding-top:14px;display:flex;flex-direction:column;gap:10px;font-size:13px}
-  .bb-deliv .dl{display:flex;gap:8px;align-items:flex-start}
+  .bb-deliv .dl{padding:0}
   .bb-checked{color:var(--good);font-weight:700;font-size:13px;margin-top:10px}
   .seller-card{display:flex;gap:12px;align-items:center;margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
   .sc-logo{width:42px;height:42px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none;text-transform:uppercase}
   .sc-name{font-weight:700;font-size:14px}
-  .buybox{position:sticky;top:150px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  .buybox{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  .pcol-buy{position:sticky;top:150px}
   .buybox .p{font-family:"Unbounded";font-weight:800;font-size:30px;color:var(--accent);letter-spacing:-.02em}
   .buybox .old{color:var(--muted);text-decoration:line-through;font-size:16px;margin-left:8px}
   .buybox .save{color:var(--sale);font-weight:700;font-size:13px;margin:6px 0 12px}
@@ -696,28 +703,33 @@ async function viewProduct(id){
     <div class="stage" id="stage">${media(gal[0])}</div>
     <div class="pcol-info">
       <h1 class="pdp-h1">${esc(p.title)}</h1>
-      <div class="pdp-rate"><span class="st">★</span> ${p.rate||"—"} · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</a> · арт. ${esc(p.sku||p.id)}</div>
-      <div class="panel" style="margin-top:14px"><div class="h-sub">О товаре</div>
+      <div class="pdp-rate"><span class="st">★</span> ${p.rate||"—"} · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</a> · <span>💬 ${Math.max(1,Math.round((p.rev||0)/25))} вопросов</span> · <span class="muted">арт. ${esc(p.sku||p.id)}</span></div>
+      ${p.specs&&p.specs.length?`<div class="panel" style="margin-top:14px"><div class="h-sub">О товаре</div>
         <table class="specs"><tbody>${(p.specs||[]).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</tbody></table>
-        ${p.desc?`<a class="link" style="display:inline-block;margin-top:12px" onclick="document.getElementById('descblock').scrollIntoView({behavior:'smooth'})">Перейти к описанию ↓</a>`:""}</div>
+        ${p.desc?`<a class="link" style="display:inline-block;margin-top:12px" onclick="document.getElementById('descblock').scrollIntoView({behavior:'smooth'})">Перейти к описанию ↓</a>`:""}</div>`:""}
     </div>
     <div class="pcol-buy">
       <div class="buybox">
-        <div class="bb-price"><span class="bb-p mono">${fmt(p.price)}</span>${p.old?`<span class="bb-old mono">${fmt(p.old)}</span>`:""}${d?`<span class="bb-disc">−${d}%</span>`:""}</div>
-        ${p.stock?`<div class="bb-stock">Осталось ${p.stock} шт</div>`:""}
+        ${d?`<div class="bb-strip">🔥 Скидки недели${p.stock?` · осталось ${p.stock}`:""}</div>`:""}
+        <div class="bb-price"><span class="bb-p mono">${fmt(p.price)}</span>${d?`<span class="bb-disc">−${d}%</span>`:""}</div>
+        ${p.old?`<div class="bb-oldrow"><span class="bb-old mono">${fmt(p.old)}</span><span class="muted">без скидки</span></div>`:""}
+        <div class="bb-later">🕓 Оплатить позже — без % · частями по 6 · 12 · 24 мес</div>
         <div id="pdpFoot" style="margin-top:12px">${pdpBuy(id,q)}</div>
         <button class="btn btn-out btn-block" style="margin-top:10px" onclick="buyNow('${id}')">Купить сейчас</button>
-        <div class="bb-deliv">
-          <div class="dl"><span>🚚</span><div><b>Курьером</b> — завтра · <span style="color:var(--good);font-weight:700">бесплатно</span></div></div>
-          <div class="dl"><span>🏬</span><div><b>В пункт выдачи</b> — 1–2 дня · <span style="color:var(--good);font-weight:700">бесплатно</span></div></div>
-        </div>
-        <div class="cb" style="margin-top:12px"><span>💜</span> Кэшбэк ${Math.round(p.price*0.05)} баллов на счёт</div>
-        <div class="bb-checked">✓ Товар проверен · оригинал от производителя</div>
-        <button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="toggleFav('${id}',event)">${fav.has(id)?"♥ В избранном":"♡ В избранное"}</button>
+        <button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="toggleFav('${id}',event)">${fav.has(id)?"♥ В избранном":"♡ В избранное"}</button>
+      </div>
+      <div class="buybox" style="margin-top:14px">
+        <div class="h-sub" style="margin-bottom:12px">Доставка и возврат</div>
+        <div class="dl"><span>📍</span><div><b>Москва</b><div class="muted" style="font-size:12.5px">Со склада Mepsi · напрямую от производителя</div></div></div>
+        <div class="dl"><span>🚚</span><div><b>Курьером — завтра</b><div class="muted" style="font-size:12.5px">бесплатно</div></div></div>
+        <div class="dl"><span>🏬</span><div><b>Пункты выдачи и постаматы — 1–2 дня</b><div class="muted" style="font-size:12.5px">бесплатно · входит в заказ</div></div></div>
+        <div class="dl"><span>↩️</span><div><b>Можно вернуть в течение 15 дней</b></div></div>
+        <div class="cb" style="margin-top:6px"><span>💜</span> Кэшбэк ${Math.round(p.price*0.05)} баллов на счёт</div>
+        <div class="bb-checked">✓ Товар проверен · оригинал</div>
       </div>
       <div class="seller-card">
         <div class="sc-logo">${(p.brand[0]||"M")}</div>
-        <div style="flex:1"><div class="sc-name">${esc(p.seller||p.brand)}</div><div class="muted" style="font-size:12.5px">★ 4.9 · Официальный магазин</div></div>
+        <div style="flex:1"><div class="sc-name">${esc(p.seller||p.brand)}</div><div class="muted" style="font-size:12.5px">★ 4.9 · Официальный магазин · 1.5M заказов</div></div>
         <button class="btn btn-ghost btn-sm" onclick="toast('Чат с продавцом — скоро 💬')">Чат</button>
       </div>
     </div>
