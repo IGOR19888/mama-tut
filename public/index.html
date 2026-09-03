@@ -195,6 +195,28 @@
   .prc.disc .p{color:var(--sale)}
   .prc .dp{color:var(--sale);font-weight:700;font-size:13px;margin-left:2px}
   .card .rate .rv{color:var(--muted)}
+  /* каталог Ozon: сортировка, чипы, сайдбар фильтров */
+  .cat-head{display:flex;align-items:center;gap:16px;margin:26px 0 12px}
+  .sortsel{margin-left:auto}
+  .sortsel select{height:40px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:0 34px 0 14px;font:inherit;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;
+    appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235c668c' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+  #activeChips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  #activeChips:empty{display:none}
+  .fchip{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border-radius:999px;padding:7px 14px;font-weight:700;font-size:13px;cursor:pointer}
+  .cat-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px;align-items:start}
+  .filters{position:sticky;top:150px}
+  .fgroup{padding:16px 0;border-bottom:1px solid var(--line)}
+  .fgroup:first-child{padding-top:0}
+  .fgroup h4{font-size:15px;font-weight:700;margin:0 0 10px}
+  .fitem{display:block;padding:6px 0;font-size:14px;color:var(--muted);cursor:pointer;text-decoration:none}
+  .fitem:hover{color:var(--accent)} .fitem.on{color:var(--accent);font-weight:700}
+  .fprice{display:flex;gap:8px}
+  .fprice input{width:100%;height:38px;border:1px solid var(--line);border-radius:9px;padding:0 10px;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);outline:none}
+  .fprice input:focus{border-color:var(--action)}
+  .fcheck{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:14px;cursor:pointer;color:var(--ink)}
+  .fcheck .box{width:20px;height:20px;border:2px solid var(--line);border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+  .fcheck.on .box{background:var(--accent);border-color:var(--accent)}
+  @media(max-width:900px){.cat-layout{grid-template-columns:1fr}.filters{position:static;order:2}}
   .stage .pic{padding:5%}
   .thumb .pic{padding:3px}
   .cartline .em .pic,.od-ic .pic,.ord-imgs .im .pic,.acc-ava .pic{padding:3px}
@@ -459,10 +481,26 @@
     </div>
   </div>
 
-  <div class="section-t" id="catalogTitle">Каталог <span class="all" id="resCount"></span></div>
-  <div class="cats" id="cats"></div>
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="noRes" hidden>Ничего не нашлось 🔍 Попробуй другой запрос.</div>
+  <div class="cat-head">
+    <div class="section-t" id="catalogTitle" style="margin:0">Каталог <span class="all" id="resCount"></span></div>
+    <div class="sortsel">
+      <select id="sortSel" onchange="setSort(this.value)">
+        <option value="pop">Популярные</option>
+        <option value="price-asc">Сначала дешёвые</option>
+        <option value="price-desc">Сначала дорогие</option>
+        <option value="rate">Высокий рейтинг</option>
+        <option value="disc">Скидка</option>
+      </select>
+    </div>
+  </div>
+  <div id="activeChips"></div>
+  <div class="cat-layout">
+    <aside class="filters" id="filters"></aside>
+    <div class="cat-main">
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="noRes" hidden>Ничего не нашлось 🔍 Сбросьте фильтры.</div>
+    </div>
+  </div>
  </div>
  <div id="view-route" hidden></div>
 </main>
@@ -512,7 +550,7 @@ const cleanDesc=h=>String(h||"").replace(/<\s*br\s*\/?>/gi,"\n").replace(/<\/(p|
   .replace(/<li[^>]*>/gi,"• ").replace(/<[^>]+>/g,"").replace(/&nbsp;/gi," ").replace(/\n{3,}/g,"\n\n").trim();
 
 /* ---------- состояние ---------- */
-let brand="all",cat="all",q="";
+let brand="all",cat="all",q="",sort="pop",fMinP="",fMaxP="",fDisc=false,fRate=false;
 let cart=JSON.parse(localStorage.getItem("mt_cart")||"{}");
 let fav=new Set(JSON.parse(localStorage.getItem("mt_fav")||"[]"));
 let reviewed=new Set(JSON.parse(localStorage.getItem("mt_reviewed")||"[]"));
@@ -573,14 +611,52 @@ function filtered(){
   return PRODUCTS.filter(p=>
     (brand==="all"||p.brand===brand)&&
     (cat==="all"||p.cat===cat)&&
+    (!fMinP||p.price>=+fMinP)&&(!fMaxP||p.price<=+fMaxP)&&
+    (!fDisc||p.old)&&(!fRate||p.rate>=4.8)&&
     (!q||p.title.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)));
 }
-function renderCats(){
-  const src=PRODUCTS.filter(p=>brand==="all"||p.brand===brand);
-  const cs=["all",...new Set(src.map(p=>p.cat))];
-  document.getElementById("cats").innerHTML=cs.map(c=>
-    `<button class="cat ${c===cat?"on":""}" onclick="setCat('${c}')">${c==="all"?"Все категории":c}</button>`).join("");
+function renderFilters(){
+  const el=document.getElementById("filters"); if(!el) return;
+  const src=PRODUCTS.filter(p=>(brand==="all"||p.brand===brand));
+  const cats=[...new Set(src.map(p=>p.cat))];
+  const brands=[...new Set(PRODUCTS.map(p=>p.brand))];
+  const dirty=cat!=="all"||fMinP||fMaxP||fDisc||fRate||brand!=="all";
+  el.innerHTML=`
+    <div class="fgroup"><h4>Категория</h4>
+      <a class="fitem ${cat==="all"?"on":""}" onclick="setCat('all')">Все категории</a>
+      ${cats.map(c=>`<a class="fitem ${cat===c?"on":""}" onclick="setCat('${c}')">${esc(c)}</a>`).join("")}</div>
+    <div class="fgroup"><h4>Цена, ₽</h4>
+      <div class="fprice"><input id="fmin" placeholder="от" value="${fMinP}" inputmode="numeric"><input id="fmax" placeholder="до" value="${fMaxP}" inputmode="numeric"></div>
+      <button class="btn btn-ghost btn-sm btn-block" style="margin-top:8px" onclick="applyPrice()">Применить</button></div>
+    <div class="fgroup"><h4>Бренд</h4>
+      ${brands.map(b=>`<label class="fcheck ${brand===b?"on":""}" onclick="setBrand(brand==='${b}'?'all':'${b}')"><span class="box">${brand===b?"✓":""}</span>${esc(b)}</label>`).join("")}</div>
+    <div class="fgroup">
+      <label class="fcheck ${fDisc?"on":""}" onclick="fDisc=!fDisc;renderGrid()"><span class="box">${fDisc?"✓":""}</span>Со скидкой</label>
+      <label class="fcheck ${fRate?"on":""}" onclick="fRate=!fRate;renderGrid()"><span class="box">${fRate?"✓":""}</span>Высокий рейтинг 4.8+</label></div>
+    ${dirty?`<button class="btn btn-out btn-sm btn-block" style="margin-top:12px" onclick="resetFilters()">Сбросить фильтры</button>`:""}`;
 }
+function sortList(list){
+  const a=[...list];
+  if(sort==="price-asc")a.sort((x,y)=>x.price-y.price);
+  else if(sort==="price-desc")a.sort((x,y)=>y.price-x.price);
+  else if(sort==="rate")a.sort((x,y)=>(y.rate-x.rate)||((y.rev||0)-(x.rev||0)));
+  else if(sort==="disc")a.sort((x,y)=>disc(y)-disc(x));
+  else a.sort((x,y)=>(y.rev||0)-(x.rev||0));
+  return a;
+}
+function renderChips(){
+  const el=document.getElementById("activeChips"); if(!el)return;
+  const c=[];
+  if(brand!=="all")c.push(`<span class="fchip" onclick="setBrand('all')">Бренд: ${esc(brand)} ✕</span>`);
+  if(cat!=="all")c.push(`<span class="fchip" onclick="setCat('all')">${esc(cat)} ✕</span>`);
+  if(fDisc)c.push(`<span class="fchip" onclick="fDisc=false;renderGrid()">Со скидкой ✕</span>`);
+  if(fRate)c.push(`<span class="fchip" onclick="fRate=false;renderGrid()">Рейтинг 4.8+ ✕</span>`);
+  if(fMinP||fMaxP)c.push(`<span class="fchip" onclick="fMinP='';fMaxP='';renderGrid()">Цена ${fMinP||0}–${fMaxP||"∞"} ✕</span>`);
+  el.innerHTML=c.join("");
+}
+function setSort(v){sort=v;renderGrid()}
+function applyPrice(){fMinP=(document.getElementById("fmin").value||"").replace(/\D/g,"");fMaxP=(document.getElementById("fmax").value||"").replace(/\D/g,"");renderGrid()}
+function resetFilters(){cat="all";fMinP="";fMaxP="";fDisc=false;fRate=false;renderGrid()}
 function card(p){
   const d=disc(p), q=cart[p.id]||0;
   return `<div class="card b${p.brand}">
@@ -598,19 +674,20 @@ function card(p){
     </div></div>`;
 }
 function renderGrid(){
-  const list=filtered();
+  const list=sortList(filtered());
   document.getElementById("grid").innerHTML=list.map(card).join("");
   document.getElementById("noRes").hidden=list.length>0;
   document.getElementById("resCount").textContent=list.length?`${list.length} товаров`:"";
+  renderFilters();renderChips();
+  const ss=document.getElementById("sortSel");if(ss)ss.value=sort;
 }
 function setBrand(b){
   brand=b;cat="all";go("#/");
   document.documentElement.setAttribute("data-brand",b==="LULU"?"lulu":"");
   document.querySelectorAll(".btab").forEach(t=>t.classList.toggle("on",t.dataset.b===b));
-  document.getElementById("hero").style.display=b==="all"?"":"none";
-  renderCats();renderGrid();window.scrollTo({top:0,behavior:"smooth"});
+  renderGrid();window.scrollTo({top:0,behavior:"smooth"});
 }
-function setCat(c){cat=c;renderCats();renderGrid()}
+function setCat(c){cat=c;renderGrid()}
 document.getElementById("q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();
   if(parseRoute().name!=="home"){go("#/");}
   document.getElementById("hero").style.display=q?"none":(brand==="all"?"":"none");renderGrid()});
@@ -639,7 +716,7 @@ const VIEW=()=>document.getElementById("view-route");
 async function render(){
   const r=parseRoute();
   const home=document.getElementById("view-home"),vr=VIEW();
-  if(r.name==="home"){home.hidden=false;vr.hidden=true;vr.innerHTML="";renderCats();renderGrid();return}
+  if(r.name==="home"){home.hidden=false;vr.hidden=true;vr.innerHTML="";renderGrid();return}
   home.hidden=true;vr.hidden=false;
   vr.innerHTML=`<div class="empty2">Загрузка…</div>`;
   window.scrollTo({top:0});
