@@ -225,7 +225,9 @@
   .chip{display:inline-block;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12px;padding:4px 10px;border-radius:7px}
 
   /* ---------- product page (PDP) ---------- */
-  .pdp{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:26px;align-items:start;margin-top:8px}
+  .pdp{display:grid;grid-template-columns:minmax(0,430px) minmax(0,1fr) 340px;gap:24px;align-items:start;margin-top:8px}
+  .pcol-info{min-width:0}
+  .stage{max-height:430px}
   .pdp-media{display:grid;grid-template-columns:64px 1fr;gap:12px}
   .thumbs{display:flex;flex-direction:column;gap:10px}
   .thumb{width:64px;height:64px;border-radius:12px;border:2px solid var(--line);background:var(--surface-2);
@@ -653,11 +655,13 @@ async function viewProduct(id){
   VIEW().innerHTML=`
   ${crumbs([{t:"Главная",h:"#/"},{t:p.brand,h:"#/"},{t:p.cat,h:"#/"},{t:p.title}])}
   <div class="pdp b${p.brand}">
-    <div>
+    <div class="pcol-media">
       <div class="pdp-media">
         <div class="thumbs" id="thumbs">${gal.map((g,i)=>`<div class="thumb ${i?"":"on"}" onclick="pdpPic(${i})">${media(g)}</div>`).join("")}</div>
         <div class="stage" id="stage">${media(gal[0])}</div>
       </div>
+    </div>
+    <div class="pcol-info">
       <h1 class="pdp-h1">${esc(p.title)}</h1>
       <div class="pdp-rate"><span class="st">★</span> ${p.rate||"—"} · <a class="link" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">${p.rev||revs.length} отзывов</a> · арт. ${esc(p.sku||p.id)}</div>
       <div class="panel"><div class="h-sub">О товаре</div>
@@ -670,7 +674,7 @@ async function viewProduct(id){
         <div id="revList">${revs.length?revs.map(reviewHTML).join(""):`<div class="muted">Отзывов пока нет — будьте первым!</div>`}</div>
       </div>
     </div>
-    <div>
+    <div class="pcol-buy">
       <div class="buybox">
         <div class="bb-price"><span class="bb-p mono">${fmt(p.price)}</span>${p.old?`<span class="bb-old mono">${fmt(p.old)}</span>`:""}${d?`<span class="bb-disc">−${d}%</span>`:""}</div>
         ${p.stock?`<div class="bb-stock">Осталось ${p.stock} шт</div>`:""}
