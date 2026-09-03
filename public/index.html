@@ -275,11 +275,14 @@
   .review .rs{color:var(--star);font-size:14px;white-space:nowrap}
   .review .rt{margin-top:4px;line-height:1.5}
   .review{padding:16px 0}
-  .ph-strip{display:flex;gap:8px;flex-wrap:wrap}
-  .pht{width:74px;height:74px;border-radius:10px;overflow:hidden;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
+  .ph-strip{display:flex;gap:10px;flex-wrap:wrap}
+  .pht{width:112px;height:112px;border-radius:14px;overflow:hidden;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:30px;flex:none;cursor:pointer;position:relative;transition:transform .15s,box-shadow .15s}
+  .pht:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 10px 28px rgba(0,91,255,.30)}
   .pht .pic{width:100%;height:100%;object-fit:cover}
-  .pht.more{font-weight:800;color:var(--accent);font-size:15px;background:var(--accent-soft)}
-  .pht{cursor:pointer;transition:transform .12s} .pht:hover{transform:scale(1.05)}
+  .pht.more{font-weight:800;color:var(--accent);font-size:21px;background:var(--accent-soft)}
+  .pht-v{background:linear-gradient(135deg,#1f2937,#334155)}
+  .pht-play{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;padding-left:3px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  @media(max-width:760px){.pht{width:88px;height:88px}}
   /* правый блок Ozon + магазин */
   .bb-cart{flex-direction:column;gap:1px;height:auto;padding:11px 12px}
   .bb-cart small{font-weight:500;font-size:12px;opacity:.9}
@@ -310,7 +313,7 @@
   .rev-ph .pic{object-fit:cover}
   .lb{position:fixed;inset:0;z-index:80;background:rgba(10,14,31,.88);display:flex;align-items:center;justify-content:center;padding:30px;opacity:0;pointer-events:none;transition:.2s}
   .lb.open{opacity:1;pointer-events:auto}
-  .lb img{max-width:92vw;max-height:88vh;border-radius:12px;background:#fff;box-shadow:var(--shadow-lg)}
+  .lb img,.lb video{max-width:92vw;max-height:88vh;border-radius:12px;background:#fff;box-shadow:var(--shadow-lg)}
   .lb-x{position:absolute;top:20px;right:24px;background:rgba(255,255,255,.2);border:none;color:#fff;width:46px;height:46px;border-radius:50%;font-size:26px;cursor:pointer;line-height:1}
   .pdp-media{display:grid;grid-template-columns:64px 1fr;gap:12px}
   .thumbs{display:flex;flex-direction:column;gap:10px}
@@ -568,7 +571,7 @@
   <div class="modal" id="authBox"></div>
 </div>
 
-<div class="lb" id="lb" onclick="closeLb()"><button class="lb-x" onclick="closeLb()">×</button><img id="lbImg" src="" alt="" onclick="event.stopPropagation()"></div>
+<div class="lb" id="lb" onclick="closeLb()"><button class="lb-x" onclick="closeLb()">×</button><div id="lbInner" onclick="event.stopPropagation()"></div></div>
 
 <div class="toast" id="toast"></div>
 
@@ -760,6 +763,8 @@ async function viewProduct(id){
   const rel=PRODUCTS.filter(x=>x.brand===p.brand&&x.id!==p.id).slice(0,8);
   const recs=[...PRODUCTS].filter(x=>x.id!==p.id).sort((a,b)=>(b.rev||0)-(a.rev||0)).slice(0,8);
   const uphotos=revs.filter(r=>r.photos&&r.photos.length).flatMap(r=>r.photos);
+  const uvideos=revs.filter(r=>r.videos&&r.videos.length).flatMap(r=>r.videos);
+  const umedia=[...uvideos.map(v=>({t:"v",u:v})),...uphotos.map(ph=>({t:"p",u:ph}))];
   VIEW().innerHTML=`
   ${crumbs([{t:"Главная",h:"#/"},{t:p.brand,h:"#/"},{t:p.cat,h:"#/"},{t:p.title}])}
   <div class="pdp b${p.brand}">
@@ -782,8 +787,10 @@ async function viewProduct(id){
         ${p.specs.length>6?`<button class="collapse-btn" id="specsBtn" onclick="toggleSpecs()">Все характеристики (${p.specs.length}) <span>↓</span></button>`:""}
         ${p.desc?`<a class="link" style="display:inline-block;margin-top:12px" onclick="document.getElementById('descblock').scrollIntoView({behavior:'smooth'})">Перейти к описанию ↓</a>`:""}</div>`:""}
       ${p.desc?(()=>{const dc=cleanDesc(p.desc);const long=dc.length>420;return `<div class="panel" id="descblock" style="margin-top:16px"><div class="h-sub">Описание</div><div class="pdp-descbody ${long?"clamp":""}" id="descBody">${esc(dc)}</div>${long?`<button class="collapse-btn" id="descBtn" onclick="document.getElementById('descBody').classList.remove('clamp');this.remove()">Показать полностью <span>↓</span></button>`:""}</div>`;})():""}
-      <div class="panel" style="margin-top:16px"><div class="h-sub">Фото и видео покупателей</div>
-        <div class="ph-strip">${(uphotos.length?uphotos.slice(0,5):gal.slice(0,5)).map(u=>`<div class="pht" ${isImg(u)?`onclick="openLb('${esc(u)}')"`:""}>${media(u)}</div>`).join("")}<div class="pht more" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">+${(p.rev||0).toLocaleString("ru-RU")}</div></div></div>
+      ${umedia.length?`<div class="panel" style="margin-top:16px"><div class="h-sub">Фото и видео покупателей</div>
+        <div class="ph-strip">${umedia.slice(0,5).map(m=>m.t==="v"
+          ?`<div class="pht pht-v" onclick="openVideo('${esc(m.u)}')"><span class="pht-play">▶</span></div>`
+          :`<div class="pht" onclick="openLb('${esc(m.u)}')">${media(m.u)}</div>`).join("")}${umedia.length>5?`<div class="pht more" onclick="document.getElementById('revs').scrollIntoView({behavior:'smooth'})">+${(umedia.length-5).toLocaleString("ru-RU")}</div>`:""}</div></div>`:""}
       <div class="panel" style="margin-top:16px" id="revs">
         <div class="reviews-head"><div><div class="big-rate">${p.rate||"—"}</div><div class="st" style="font-size:13px">${"★".repeat(Math.round(p.rate||5))}${"☆".repeat(5-Math.round(p.rate||5))}</div></div>
           <div><div style="font-weight:700">${(p.rev||revs.length).toLocaleString("ru-RU")} отзывов</div>
@@ -848,8 +855,12 @@ function reviewHTML(r,hidden){const dt=r.createdAt?new Date(r.createdAt).toLocal
   ${r.pros?`<div class="rp"><b>Плюсы:</b> ${esc(r.pros)}</div>`:""}${r.cons?`<div class="rp"><b>Минусы:</b> ${esc(r.cons)}</div>`:""}
   ${r.text?`<div class="rp rt">${esc(r.text)}</div>`:""}
   ${r.photos&&r.photos.length?`<div class="rev-photos">${r.photos.map(u=>`<div class="rev-ph" onclick="openLb('${esc(u)}')">${media(u)}</div>`).join("")}</div>`:""}</div>`}
-function openLb(url){const el=document.getElementById("lb"),img=document.getElementById("lbImg");img.src=url;el.classList.add("open")}
-function closeLb(){document.getElementById("lb").classList.remove("open")}
+function openMedia(url,isVid){const el=document.getElementById("lb");
+  document.getElementById("lbInner").innerHTML=isVid?`<video src="${esc(url)}" controls autoplay playsinline></video>`:`<img src="${esc(url)}" alt="">`;
+  el.classList.add("open")}
+function openLb(url){openMedia(url,false)}
+function openVideo(url){openMedia(url,true)}
+function closeLb(){const el=document.getElementById("lb");el.classList.remove("open");document.getElementById("lbInner").innerHTML=""}
 function toggleSpecs(){document.querySelectorAll(".spec-more").forEach(r=>r.hidden=false);const b=document.getElementById("specsBtn");if(b)b.remove()}
 function toggleReviews(){document.querySelectorAll(".rev-more").forEach(r=>r.hidden=false);const b=document.getElementById("revBtn");if(b)b.remove()}
 

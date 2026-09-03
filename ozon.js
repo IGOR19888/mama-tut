@@ -92,6 +92,14 @@ async function chunked(offerIds, size, fn) {
   for (let i = 0; i < offerIds.length; i += size) out.push(...(await fn(offerIds.slice(i, i + size))));
   return out;
 }
+// параллельная обработка с ограничением одновременных запросов
+async function mapLimit(arr, limit, fn) {
+  let i = 0;
+  const workers = Array.from({ length: Math.min(limit, arr.length) }, async () => {
+    while (i < arr.length) { const idx = i++; await fn(arr[idx]); }
+  });
+  await Promise.all(workers);
+}
 async function reviewsAll() {
   let out = [], last_id = "";
   try {
@@ -177,6 +185,19 @@ async function buildLive() {
     (revByOffer[off] = revByOffer[off] || []).push(rv);
   }
 
+  // реальные фото/видео отзывов — /v1/review/info по отзывам с медиа (с ограничением)
+  const mediaRevs = rawReviews.filter((rv) => (rv.photos_amount || 0) > 0 || (rv.videos_amount || 0) > 0).slice(0, 150);
+  const mediaMap = {};
+  await mapLimit(mediaRevs, 8, async (rv) => {
+    try {
+      const inf = await call("/v1/review/info", { review_id: rv.id });
+      mediaMap[rv.id] = {
+        photos: (inf.photos || []).map((p) => p.url).filter(Boolean),
+        videos: (inf.videos || []).map((v) => v.url || v.link || v.preview_url).filter(Boolean),
+      };
+    } catch {}
+  });
+
   // словари атрибутов по уникальным (категория, тип) — для полных характеристик
   const pairs = [...new Set(infos.map((i) => i.description_category_id + "_" + i.type_id))];
   const dicts = {};
@@ -185,10 +206,12 @@ async function buildLive() {
   const products = infos.map((inf) => normalizeLive(inf, attrByOffer[inf.offer_id], revByOffer[inf.offer_id] || [], dicts[inf.description_category_id + "_" + inf.type_id] || {}));
   const reviews = [];
   for (const [off, list] of Object.entries(revByOffer))
-    for (const rv of list)
-      if (rv.text && rv.text.trim())
+    for (const rv of list) {
+      const m = mediaMap[rv.id] || { photos: [], videos: [] };
+      if ((rv.text && rv.text.trim()) || m.photos.length || m.videos.length)
         reviews.push({ id: rv.id, productId: off, author: "Покупатель Ozon", rating: rv.rating || 5,
-          text: rv.text, pros: "", cons: "", photos: [], createdAt: rv.published_at });
+          text: rv.text || "", pros: "", cons: "", photos: m.photos, videos: m.videos, createdAt: rv.published_at });
+    }
   return { products, reviews };
 }
 
