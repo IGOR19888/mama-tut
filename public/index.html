@@ -187,8 +187,8 @@
   .card .ttl{cursor:pointer} .card .ttl:hover{color:var(--accent)}
   /* реальные фото Ozon (URL) в местах, где раньше были эмодзи */
   .pic{width:100%;height:100%;object-fit:contain;display:block}
-  .card .ph{aspect-ratio:1/1.06}
-  .card .ph .pic{position:absolute;inset:0;padding:2px}
+  .card .ph{aspect-ratio:1/1.16}
+  .card .ph .pic{position:absolute;inset:0;padding:0}
   /* карточка в стиле Ozon */
   .card .ribbon{position:absolute;left:0;bottom:0;background:var(--accent);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px 3px 8px;border-radius:0 10px 0 12px;z-index:2}
   .card .ribbon.hit{background:var(--sale)}
@@ -481,26 +481,10 @@
     </div>
   </div>
 
-  <div class="cat-head">
-    <div class="section-t" id="catalogTitle" style="margin:0">Каталог <span class="all" id="resCount"></span></div>
-    <div class="sortsel">
-      <select id="sortSel" onchange="setSort(this.value)">
-        <option value="pop">Популярные</option>
-        <option value="price-asc">Сначала дешёвые</option>
-        <option value="price-desc">Сначала дорогие</option>
-        <option value="rate">Высокий рейтинг</option>
-        <option value="disc">Скидка</option>
-      </select>
-    </div>
-  </div>
-  <div id="activeChips"></div>
-  <div class="cat-layout">
-    <aside class="filters" id="filters"></aside>
-    <div class="cat-main">
-      <div class="grid" id="grid"></div>
-      <div class="empty" id="noRes" hidden>Ничего не нашлось 🔍 Сбросьте фильтры.</div>
-    </div>
-  </div>
+  <div class="section-t" id="catalogTitle">Каталог <span class="all" id="resCount"></span></div>
+  <div class="cats" id="cats"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="noRes" hidden>Ничего не нашлось 🔍 Попробуй другой запрос.</div>
  </div>
  <div id="view-route" hidden></div>
 </main>
@@ -611,52 +595,14 @@ function filtered(){
   return PRODUCTS.filter(p=>
     (brand==="all"||p.brand===brand)&&
     (cat==="all"||p.cat===cat)&&
-    (!fMinP||p.price>=+fMinP)&&(!fMaxP||p.price<=+fMaxP)&&
-    (!fDisc||p.old)&&(!fRate||p.rate>=4.8)&&
     (!q||p.title.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q)));
 }
-function renderFilters(){
-  const el=document.getElementById("filters"); if(!el) return;
-  const src=PRODUCTS.filter(p=>(brand==="all"||p.brand===brand));
-  const cats=[...new Set(src.map(p=>p.cat))];
-  const brands=[...new Set(PRODUCTS.map(p=>p.brand))];
-  const dirty=cat!=="all"||fMinP||fMaxP||fDisc||fRate||brand!=="all";
-  el.innerHTML=`
-    <div class="fgroup"><h4>Категория</h4>
-      <a class="fitem ${cat==="all"?"on":""}" onclick="setCat('all')">Все категории</a>
-      ${cats.map(c=>`<a class="fitem ${cat===c?"on":""}" onclick="setCat('${c}')">${esc(c)}</a>`).join("")}</div>
-    <div class="fgroup"><h4>Цена, ₽</h4>
-      <div class="fprice"><input id="fmin" placeholder="от" value="${fMinP}" inputmode="numeric"><input id="fmax" placeholder="до" value="${fMaxP}" inputmode="numeric"></div>
-      <button class="btn btn-ghost btn-sm btn-block" style="margin-top:8px" onclick="applyPrice()">Применить</button></div>
-    <div class="fgroup"><h4>Бренд</h4>
-      ${brands.map(b=>`<label class="fcheck ${brand===b?"on":""}" onclick="setBrand(brand==='${b}'?'all':'${b}')"><span class="box">${brand===b?"✓":""}</span>${esc(b)}</label>`).join("")}</div>
-    <div class="fgroup">
-      <label class="fcheck ${fDisc?"on":""}" onclick="fDisc=!fDisc;renderGrid()"><span class="box">${fDisc?"✓":""}</span>Со скидкой</label>
-      <label class="fcheck ${fRate?"on":""}" onclick="fRate=!fRate;renderGrid()"><span class="box">${fRate?"✓":""}</span>Высокий рейтинг 4.8+</label></div>
-    ${dirty?`<button class="btn btn-out btn-sm btn-block" style="margin-top:12px" onclick="resetFilters()">Сбросить фильтры</button>`:""}`;
+function renderCats(){
+  const src=PRODUCTS.filter(p=>brand==="all"||p.brand===brand);
+  const cs=["all",...new Set(src.map(p=>p.cat))];
+  document.getElementById("cats").innerHTML=cs.map(c=>
+    `<button class="cat ${c===cat?"on":""}" onclick="setCat('${c}')">${c==="all"?"Все категории":c}</button>`).join("");
 }
-function sortList(list){
-  const a=[...list];
-  if(sort==="price-asc")a.sort((x,y)=>x.price-y.price);
-  else if(sort==="price-desc")a.sort((x,y)=>y.price-x.price);
-  else if(sort==="rate")a.sort((x,y)=>(y.rate-x.rate)||((y.rev||0)-(x.rev||0)));
-  else if(sort==="disc")a.sort((x,y)=>disc(y)-disc(x));
-  else a.sort((x,y)=>(y.rev||0)-(x.rev||0));
-  return a;
-}
-function renderChips(){
-  const el=document.getElementById("activeChips"); if(!el)return;
-  const c=[];
-  if(brand!=="all")c.push(`<span class="fchip" onclick="setBrand('all')">Бренд: ${esc(brand)} ✕</span>`);
-  if(cat!=="all")c.push(`<span class="fchip" onclick="setCat('all')">${esc(cat)} ✕</span>`);
-  if(fDisc)c.push(`<span class="fchip" onclick="fDisc=false;renderGrid()">Со скидкой ✕</span>`);
-  if(fRate)c.push(`<span class="fchip" onclick="fRate=false;renderGrid()">Рейтинг 4.8+ ✕</span>`);
-  if(fMinP||fMaxP)c.push(`<span class="fchip" onclick="fMinP='';fMaxP='';renderGrid()">Цена ${fMinP||0}–${fMaxP||"∞"} ✕</span>`);
-  el.innerHTML=c.join("");
-}
-function setSort(v){sort=v;renderGrid()}
-function applyPrice(){fMinP=(document.getElementById("fmin").value||"").replace(/\D/g,"");fMaxP=(document.getElementById("fmax").value||"").replace(/\D/g,"");renderGrid()}
-function resetFilters(){cat="all";fMinP="";fMaxP="";fDisc=false;fRate=false;renderGrid()}
 function card(p){
   const d=disc(p), q=cart[p.id]||0;
   return `<div class="card b${p.brand}">
@@ -674,20 +620,19 @@ function card(p){
     </div></div>`;
 }
 function renderGrid(){
-  const list=sortList(filtered());
+  const list=filtered();
   document.getElementById("grid").innerHTML=list.map(card).join("");
   document.getElementById("noRes").hidden=list.length>0;
   document.getElementById("resCount").textContent=list.length?`${list.length} товаров`:"";
-  renderFilters();renderChips();
-  const ss=document.getElementById("sortSel");if(ss)ss.value=sort;
 }
 function setBrand(b){
   brand=b;cat="all";go("#/");
   document.documentElement.setAttribute("data-brand",b==="LULU"?"lulu":"");
   document.querySelectorAll(".btab").forEach(t=>t.classList.toggle("on",t.dataset.b===b));
-  renderGrid();window.scrollTo({top:0,behavior:"smooth"});
+  document.getElementById("hero").style.display=b==="all"?"":"none";
+  renderCats();renderGrid();window.scrollTo({top:0,behavior:"smooth"});
 }
-function setCat(c){cat=c;renderGrid()}
+function setCat(c){cat=c;renderCats();renderGrid()}
 document.getElementById("q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();
   if(parseRoute().name!=="home"){go("#/");}
   document.getElementById("hero").style.display=q?"none":(brand==="all"?"":"none");renderGrid()});
@@ -716,7 +661,7 @@ const VIEW=()=>document.getElementById("view-route");
 async function render(){
   const r=parseRoute();
   const home=document.getElementById("view-home"),vr=VIEW();
-  if(r.name==="home"){home.hidden=false;vr.hidden=true;vr.innerHTML="";renderGrid();return}
+  if(r.name==="home"){home.hidden=false;vr.hidden=true;vr.innerHTML="";renderCats();renderGrid();return}
   home.hidden=true;vr.hidden=false;
   vr.innerHTML=`<div class="empty2">Загрузка…</div>`;
   window.scrollTo({top:0});
