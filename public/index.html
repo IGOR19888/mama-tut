@@ -187,8 +187,9 @@
   .card .ttl{cursor:pointer} .card .ttl:hover{color:var(--accent)}
   /* реальные фото Ozon (URL) в местах, где раньше были эмодзи */
   .pic{width:100%;height:100%;object-fit:contain;display:block}
-  .card .ph{aspect-ratio:1/1.2}
-  .card .ph .pic{position:absolute;inset:0;padding:0;object-fit:cover;object-position:center top}
+  .card .ph{aspect-ratio:auto;display:block;overflow:hidden;min-height:160px}
+  .card .ph .em{display:block;text-align:center;font-size:88px;line-height:1.4}
+  .card .ph .pic{position:static;width:100%;height:auto;display:block}
   /* карточка в стиле Ozon */
   .card .ribbon{position:absolute;left:0;bottom:0;background:var(--accent);color:#fff;font-size:10.5px;font-weight:700;padding:3px 10px 3px 8px;border-radius:0 10px 0 12px;z-index:2}
   .card .ribbon.hit{background:var(--sale)}
