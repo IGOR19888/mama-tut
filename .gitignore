@@ -6,6 +6,10 @@ data/otp.json
 data/returns.json
 data/reviews.json
 
+# секреты — НИКОГДА не коммитить (ключи Ozon и пр.)
+.env
+.env.local
+
 # системное
 .DS_Store
 node_modules/

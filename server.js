@@ -7,6 +7,19 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
+// --- загрузка .env локально (на Railway переменные уже в окружении) ---
+try {
+  const envPath = path.join(__dirname, ".env");
+  if (fs.existsSync(envPath)) {
+    for (const line of fs.readFileSync(envPath, "utf-8").split("\n")) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+      if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+    }
+  }
+} catch {}
+// Интеграция с Ozon (читает OZON_CLIENT_ID/OZON_API_KEY из окружения при require).
+const ozon = require("./ozon");
+
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, "public");
 // Каталог правится вручную и лежит рядом с кодом.
@@ -36,11 +49,12 @@ function read(file, fallback) {
   try { return JSON.parse(fs.readFileSync(file, "utf-8")); } catch { return fallback; }
 }
 function write(file, obj) { fs.writeFileSync(file, JSON.stringify(obj, null, 2)); }
-const products = () => read(PRODUCTS_FILE, []);
-const seedReviews = () => {
-  if (!fs.existsSync(F.reviews)) write(F.reviews, require("./data/seed-reviews.json"));
-  return read(F.reviews, []);
-};
+// Каталог берём из интеграции Ozon (live при ключах, иначе demo-каталог).
+const products = () => ozon.products();
+// Пользовательские отзывы (оставленные в нашем ЛК) — отдельно от отзывов Ozon.
+const userReviews = () => read(F.reviews, []);
+// Все отзывы товара = отзывы Ozon + оставленные покупателями у нас.
+const reviewsForProduct = (id) => [...userReviews().filter((r) => r.productId === id), ...ozon.reviewsFor(id)];
 
 // ---------- http helpers ----------
 function json(res, code, obj) {
@@ -156,12 +170,15 @@ route("GET", "/api/products", (req, res) => json(res, 200, products()));
 route("GET", "/api/products/:id", (req, res, p) => {
   const item = products().find((x) => x.id === p.id);
   if (!item) return json(res, 404, { error: "Товар не найден" });
-  const revs = seedReviews().filter((r) => r.productId === item.id);
-  json(res, 200, { ...item, reviews: revs });
+  json(res, 200, { ...item, reviews: reviewsForProduct(item.id) });
 });
 route("GET", "/api/products/:id/reviews", (req, res, p) => {
-  json(res, 200, seedReviews().filter((r) => r.productId === p.id));
+  json(res, 200, reviewsForProduct(p.id));
 });
+// Статус интеграции Ozon
+route("GET", "/api/ozon/status", (req, res) => json(res, 200, ozon.status()));
+// Пересинхронизировать каталог из Ozon
+route("POST", "/api/ozon/sync", async (req, res) => { await ozon.sync(); json(res, 200, ozon.status()); });
 
 // ===== авторизация =====
 // Шаг 1: запросить код (phone/email)
@@ -358,7 +375,7 @@ route("POST", "/api/reviews", auth(async (req, res, _p, body, u) => {
     author: publicUser(u).name || "Покупатель", rating: Math.min(5, Math.max(1, parseInt(body.rating, 10) || 5)),
     text: String(body.text || "").slice(0, 2000), pros: body.pros || "", cons: body.cons || "",
     createdAt: now(), photos: body.photos || [] };
-  const list = seedReviews(); list.unshift(r); write(F.reviews, list);
+  const list = userReviews(); list.unshift(r); write(F.reviews, list);
   json(res, 201, { review: r });
 }));
 
@@ -408,8 +425,9 @@ const server = http.createServer(async (req, res) => {
   res.writeHead(405); res.end("Method Not Allowed");
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`Mepsi & LULU запущен: http://localhost:${PORT}`);
-  console.log(`Каталог: ${PRODUCTS_FILE}`);
   console.log(`Данные:  ${DATA_DIR}`);
+  const s = await ozon.sync();
+  console.log(`Каталог Ozon [${s.mode}]: ${s.count} товаров, ${s.reviews?.length ?? ozon.status().reviews} отзывов` + (s.error ? ` (ошибка: ${s.error})` : ""));
 });
