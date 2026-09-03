@@ -1,0 +1,7 @@
+# данные заказов — не храним в репозитории (пишутся в Volume на сервере)
+data/orders.json
+
+# системное
+.DS_Store
+node_modules/
+*.log
