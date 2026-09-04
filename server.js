@@ -25,7 +25,9 @@ const PUBLIC_DIR = path.join(__dirname, "public");
 // Каталог правится вручную и лежит рядом с кодом.
 const PRODUCTS_FILE = path.join(__dirname, "data", "products.json");
 // Всё изменяемое — в постоянный том (Volume) на проде, локально в ./data.
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
+// Приоритет: явный DATA_DIR → авто-том Railway (RAILWAY_VOLUME_MOUNT_PATH) → ./data.
+// Благодаря авто-тому данные переживают редеплой даже без ручной переменной DATA_DIR.
+const DATA_DIR = process.env.DATA_DIR || process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, "data");
 const F = {
   users: path.join(DATA_DIR, "users.json"),
   sessions: path.join(DATA_DIR, "sessions.json"),
@@ -35,6 +37,7 @@ const F = {
   otp: path.join(DATA_DIR, "otp.json"),
 };
 fs.mkdirSync(DATA_DIR, { recursive: true });
+console.log("DATA_DIR =", DATA_DIR); // видно в логах Railway — куда реально пишем
 
 const MIME = {
   ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8",
@@ -189,6 +192,18 @@ route("GET", "/api/products/:id", async (req, res, p) => {
 });
 route("GET", "/api/products/:id/reviews", (req, res, p) => {
   json(res, 200, reviewsForProduct(p.id));
+});
+// Health: видно снаружи, пишем ли на постоянный том (Volume) или в эфемерную ./data
+route("GET", "/api/health", (req, res) => {
+  const localDefault = path.join(__dirname, "data");
+  json(res, 200, {
+    ok: true,
+    dataDir: DATA_DIR,
+    persistent: DATA_DIR !== localDefault, // true = данные переживают редеплой
+    volumeMount: process.env.RAILWAY_VOLUME_MOUNT_PATH || null,
+    users: Object.keys(read(F.users, {})).length,
+    orders: read(F.orders, []).length,
+  });
 });
 // Статус интеграции Ozon
 route("GET", "/api/ozon/status", (req, res) => json(res, 200, ozon.status()));
