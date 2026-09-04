@@ -599,7 +599,35 @@
 
 <div class="toast" id="toast"></div>
 
+<div id="dbgPanel" style="position:fixed;left:8px;bottom:8px;z-index:99999;background:#0b1030;color:#7CFF9B;font:12px/1.45 ui-monospace,Menlo,monospace;padding:10px 12px;border-radius:10px;max-width:min(92vw,460px);max-height:44vh;overflow:auto;box-shadow:0 8px 30px rgba(0,0,0,.4);border:1px solid #2b3566">
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:6px">
+    <b style="color:#fff">Диагностика</b>
+    <span id="dbgHead" style="color:#9fb0e0"></span>
+    <button onclick="document.getElementById('dbgPanel').style.display='none'" style="margin-left:auto;background:#2b3566;border:none;color:#fff;border-radius:6px;padding:2px 8px;cursor:pointer">скрыть</button>
+  </div>
+  <div id="dbgBody" style="white-space:pre-wrap;word-break:break-word"></div>
+</div>
+
 <script>
+/* ВРЕМЕННАЯ видимая диагностика — покажет прямо на странице, что происходит при
+   загрузке каталога и нажатии «В корзину». После починки уберём. */
+window.__log=[];
+function dbg(msg){
+  try{
+    var ts=new Date().toLocaleTimeString("ru-RU");
+    window.__log.unshift("["+ts+"] "+msg);
+    if(window.__log.length>14)window.__log.length=14;
+    var body=document.getElementById("dbgBody");if(body)body.textContent=window.__log.join("\n");
+    var head=document.getElementById("dbgHead");
+    if(head){
+      var pc=(typeof PRODUCTS!=="undefined"&&PRODUCTS)?PRODUCTS.length:"?";
+      var cc="?";try{cc=(typeof cartCount==="function")?cartCount():"?";}catch(e){cc="ERR"}
+      head.textContent="товаров:"+pc+" · в корзине:"+cc;
+    }
+  }catch(e){}
+}
+window.addEventListener("error",function(e){dbg("JS-ОШИБКА: "+(e.message||"?")+" @ "+((e.filename||"").split("/").pop())+":"+(e.lineno||""));});
+window.addEventListener("unhandledrejection",function(e){dbg("promise-ошибка: "+((e.reason&&(e.reason.message||e.reason))||"?"));});
 const FALLBACK=[
  {id:"m1",brand:"Mepsi",cat:"Подгузники",title:"Подгузники-трусики Comfort, размер 4, 44 шт",price:1743,old:2490,rate:4.9,rev:1280,em:"🧷",badge:"хит"},
  {id:"m2",brand:"Mepsi",cat:"Салфетки",title:"Влажные салфетки Sensitive, 120 шт",price:199,rate:4.8,rev:860,em:"🧻"},
@@ -667,9 +695,11 @@ const saveFav=()=>localStorage.setItem("mt_fav",JSON.stringify([...fav]));
 async function api(method,path,body){
   const h={};if(token)h["Authorization"]="Bearer "+token;
   if(body)h["Content-Type"]="application/json";
-  const r=await fetch(path,{method,headers:h,body:body?JSON.stringify(body):undefined});
+  let r;
+  try{r=await fetch(path,{method,headers:h,body:body?JSON.stringify(body):undefined});}
+  catch(e){try{dbg("СЕТЬ упала: "+method+" "+path+" — "+e.message);}catch(_){}throw e;}
   let d={};try{d=await r.json()}catch{}
-  if(!r.ok)throw new Error(d.error||"Ошибка");
+  if(!r.ok){try{dbg("API "+r.status+": "+method+" "+path+" — "+(d.error||""));}catch(_){}throw new Error(d.error||"Ошибка");}
   return d;
 }
 
@@ -697,9 +727,11 @@ const cartSubtotal=(lines=cartLines())=>lines.reduce((s,{p,q})=>s+p.price*q,0);
 const cartOldtotal=(lines=cartLines())=>lines.reduce((s,{p,q})=>s+((p.old||p.price)*q),0);
 function setQty(id,n,ev){
   if(ev)ev.stopPropagation();
+  try{dbg('setQty: id='+id+' n='+n+' getP='+(getP(id)?'найден':'НЕТ в каталоге'));}catch(e){}
   if(n<=0){delete cart[id];}
   else{const p=getP(id)||(cart[id]&&cart[id].p);cart[id]={q:n,p:snap(p)||(cart[id]&&cart[id].p)||null,sel:cart[id]?cart[id].sel!==false:true};}
   saveCart();
+  try{dbg('после add: в корзине='+cartCount()+', позиций='+cartLines().length);}catch(e){}
   const f=document.getElementById("foot-"+id);if(f)f.innerHTML=stepperOrBtn(id,qOf(id));
   refreshCounts();
   const route=parseRoute();
@@ -1511,7 +1543,7 @@ document.getElementById("theme").onclick=()=>{const r=document.documentElement,c
 /* ==================== старт ==================== */
 (async()=>{
   let productsOk=false;
-  try{const d=await (await fetch("/api/products")).json();if(Array.isArray(d)&&d.length){PRODUCTS=d;productsOk=true;}}catch(e){}
+  try{const d=await (await fetch("/api/products")).json();if(Array.isArray(d)&&d.length){PRODUCTS=d;productsOk=true;}dbg("каталог загружен: "+(Array.isArray(d)?d.length:"не массив")+" товаров");}catch(e){dbg("каталог НЕ загрузился: "+e.message+" (показываю запасные "+PRODUCTS.length+")");}
   // восстановить снимки и убрать «мёртвые» позиции — только если каталог реально загрузился
   if(productsOk)pruneCart();
   if(token){try{const r=await api("GET","/api/auth/me");user=r.user;if(!user){token=null;localStorage.removeItem("mt_token")}
