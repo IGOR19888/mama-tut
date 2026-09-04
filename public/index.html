@@ -651,7 +651,8 @@ let PRODUCTS=FALLBACK.slice();
 const fmt=n=>Math.round(n).toLocaleString("ru-RU")+" ₽";
 const disc=p=>p.old?Math.round((p.old-p.price)/p.old*100):0;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const getP=id=>PRODUCTS.find(p=>p.id===id);
+const getP=id=>{if(id==null)return undefined;let p=PRODUCTS.find(x=>x.id===id);if(p)return p;
+  try{const d=decodeURIComponent(id);if(d!==id){p=PRODUCTS.find(x=>x.id===d);}}catch{}return p;};
 const isImg=v=>typeof v==="string"&&v.startsWith("http");
 const media=v=>isImg(v)?`<img class="pic" src="${esc(v)}" loading="lazy" alt="">`:(v||"📦");
 // описания Ozon приходят как HTML — превращаем в чистый текст с абзацами
@@ -727,9 +728,10 @@ const cartSubtotal=(lines=cartLines())=>lines.reduce((s,{p,q})=>s+p.price*q,0);
 const cartOldtotal=(lines=cartLines())=>lines.reduce((s,{p,q})=>s+((p.old||p.price)*q),0);
 function setQty(id,n,ev){
   if(ev)ev.stopPropagation();
-  try{dbg('setQty: id='+id+' n='+n+' getP='+(getP(id)?'найден':'НЕТ в каталоге'));}catch(e){}
+  const _p0=getP(id); if(_p0)id=_p0.id; // канонический id (кириллица могла прийти кодированной из хеша)
+  try{dbg('setQty: id='+id+' n='+n+' getP='+(_p0?'найден':'НЕТ в каталоге'));}catch(e){}
   if(n<=0){delete cart[id];}
-  else{const p=getP(id)||(cart[id]&&cart[id].p);cart[id]={q:n,p:snap(p)||(cart[id]&&cart[id].p)||null,sel:cart[id]?cart[id].sel!==false:true};}
+  else{const p=_p0||(cart[id]&&cart[id].p);cart[id]={q:n,p:snap(p)||(cart[id]&&cart[id].p)||null,sel:cart[id]?cart[id].sel!==false:true};}
   saveCart();
   try{dbg('после add: в корзине='+cartCount()+', позиций='+cartLines().length);}catch(e){}
   const f=document.getElementById("foot-"+id);if(f)f.innerHTML=stepperOrBtn(id,qOf(id));
@@ -826,7 +828,9 @@ function closeD(){document.getElementById("overlay").classList.remove("open");do
 function go(hash){if(location.hash===hash)render();else location.hash=hash}
 function parseRoute(){
   const h=location.hash.replace(/^#/,"")||"/";
-  const parts=h.split("/").filter(Boolean); // ["product","m1"]
+  // раскодируем сегменты: id товара с кириллицей (МП_0552) браузер хранит в хеше
+  // как %D0%9C%D0%9F_0552 — без декодирования getP не находит товар и корзина пуста.
+  const parts=h.split("/").filter(Boolean).map(x=>{try{return decodeURIComponent(x)}catch{return x}});
   if(!parts.length)return{name:"home"};
   const[a,b]=parts;
   if(a==="product")return{name:"product",id:b};
