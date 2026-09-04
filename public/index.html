@@ -393,6 +393,20 @@
   .cartline .ct{font-size:14px;line-height:1.35;margin-bottom:6px}
   .cartline .cpr{font-weight:800;color:var(--accent);font-size:17px}
   .cartline .oldp{color:var(--muted);text-decoration:line-through;font-size:13px;margin-left:6px;font-weight:400}
+  /* Ozon-корзина: чекбоксы, группы, действия у позиции */
+  .cbx{width:22px;height:22px;border:2px solid var(--line);border-radius:7px;flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:13px;font-weight:800;background:var(--surface);transition:.12s;user-select:none}
+  .cbx.on{background:var(--action);border-color:var(--action)}
+  .cbx:hover{border-color:var(--action)}
+  .cart-toolbar{display:flex;align-items:center;gap:12px;font-size:14px}
+  .cart-clear{border:none;background:none;color:var(--muted);font:inherit;font-weight:600;font-size:13px;cursor:pointer;padding:4px 8px;border-radius:8px}
+  .cart-clear:hover{color:var(--sale);background:var(--surface-2)}
+  .cart-group-h{font-weight:700;font-size:14px;color:var(--muted);background:var(--surface-2);padding:10px 14px;border-radius:11px;margin-bottom:4px}
+  .cprice{text-align:right;min-width:92px;flex:none}
+  .oldp2{color:var(--muted);text-decoration:line-through;font-size:13px;margin-top:2px}
+  .cline-actions{display:flex;gap:6px;margin-top:8px}
+  .ci-ic{width:30px;height:30px;border:1px solid var(--line);background:var(--surface);border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);display:flex;align-items:center;justify-content:center;line-height:1}
+  .ci-ic:hover{border-color:var(--accent);color:var(--accent)}
+  .ci-ic.on{color:var(--sale);border-color:var(--sale)}
   .summary{position:sticky;top:150px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
   .summary .r{display:flex;justify-content:space-between;margin-bottom:10px;font-size:14px;color:var(--muted)}
   .summary .r b{color:var(--ink)}
@@ -618,14 +632,31 @@ const cleanDesc=h=>String(h||"").replace(/<\s*br\s*\/?>/gi,"\n").replace(/<\/(p|
 
 /* ---------- состояние ---------- */
 let brand="all",cat="all",q="",sort="pop",fMinP="",fMaxP="",fDisc=false,fRate=false;
+// Корзина: { id: { q:кол-во, p:снимок товара, sel:выбран к оформлению } }.
+// Снимок гарантирует, что позиция не пропадёт, даже если товара уже нет в текущем
+// каталоге PRODUCTS (после авто-синка Ozon). Привязана к аккаунту через /api/cart.
 let cart=JSON.parse(localStorage.getItem("mt_cart")||"{}");
+for(const k in cart){ if(typeof cart[k]==="number") cart[k]={q:cart[k],p:null,sel:true}; } // миграция старого формата
 let fav=new Set(JSON.parse(localStorage.getItem("mt_fav")||"[]"));
 let reviewed=new Set(JSON.parse(localStorage.getItem("mt_reviewed")||"[]"));
 let token=localStorage.getItem("mt_token")||null;
 let user=null;               // публичный профиль (или null)
 let CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0,pickup:"p1"}; // состояние оформления
 
-const saveCart=()=>localStorage.setItem("mt_cart",JSON.stringify(cart));
+const snap=p=>p?{id:p.id,title:p.title,price:p.price,old:p.old||0,em:p.em,brand:p.brand,cat:p.cat,seller:p.seller,stock:p.stock}:null;
+let _cartSyncT;
+function saveCart(){
+  localStorage.setItem("mt_cart",JSON.stringify(cart));
+  if(user){clearTimeout(_cartSyncT);_cartSyncT=setTimeout(()=>{
+    api("PUT","/api/cart",{items:cartToItems()}).catch(()=>{});
+  },400);}
+}
+const cartToItems=()=>Object.entries(cart).map(([id,x])=>({id,qty:x.q,sel:x.sel!==false,p:x.p||snap(getP(id))}));
+function applyServerCart(items){
+  const next={};
+  (items||[]).forEach(it=>{ if(!it||!it.id)return; next[it.id]={q:Math.max(1,it.qty||1),p:it.p||snap(getP(it.id)),sel:it.sel!==false}; });
+  cart=next; localStorage.setItem("mt_cart",JSON.stringify(cart));
+}
 const saveFav=()=>localStorage.setItem("mt_fav",JSON.stringify([...fav]));
 
 /* ---------- API ---------- */
@@ -639,28 +670,44 @@ async function api(method,path,body){
 }
 
 /* ---------- корзина ---------- */
-const cartCount=()=>Object.values(cart).reduce((a,b)=>a+b,0);
-const cartLines=()=>Object.entries(cart).map(([id,q])=>({p:getP(id),q})).filter(x=>x.p);
-const cartSubtotal=()=>cartLines().reduce((s,{p,q})=>s+p.price*q,0);
+const qOf=id=>(cart[id]&&cart[id].q)||0;
+const selOf=id=>!!cart[id]&&cart[id].sel!==false;
+const cartCount=()=>Object.values(cart).reduce((a,x)=>a+((x&&x.q)||0),0);
+const cartLines=()=>Object.entries(cart).map(([id,x])=>({p:getP(id)||(x&&x.p),q:(x&&x.q)||0,sel:x&&x.sel!==false})).filter(x=>x.p&&x.q>0);
+const selLines=()=>cartLines().filter(l=>l.sel);
+const cartSubtotal=(lines=cartLines())=>lines.reduce((s,{p,q})=>s+p.price*q,0);
+const cartOldtotal=(lines=cartLines())=>lines.reduce((s,{p,q})=>s+((p.old||p.price)*q),0);
 function setQty(id,n,ev){
   if(ev)ev.stopPropagation();
-  if(n<=0)delete cart[id];else cart[id]=n;
+  if(n<=0){delete cart[id];}
+  else{const p=getP(id)||(cart[id]&&cart[id].p);cart[id]={q:n,p:snap(p)||(cart[id]&&cart[id].p)||null,sel:cart[id]?cart[id].sel!==false:true};}
   saveCart();
-  const f=document.getElementById("foot-"+id);if(f)f.innerHTML=stepperOrBtn(id,cart[id]||0);
+  const f=document.getElementById("foot-"+id);if(f)f.innerHTML=stepperOrBtn(id,qOf(id));
   refreshCounts();
   const route=parseRoute();
   if(route.name==="cart"||route.name==="checkout")render();
   if(n===1)toast("Добавлено в корзину 🛒");
 }
+function toggleSel(id){if(cart[id])cart[id].sel=!(cart[id].sel!==false);saveCart();render();}
+function toggleSelAll(){const lines=cartLines();const allOn=lines.length&&lines.every(l=>l.sel);lines.forEach(l=>{if(cart[l.p.id])cart[l.p.id].sel=!allOn;});saveCart();render();}
+function clearCart(){if(!confirm("Очистить корзину?"))return;cart={};saveCart();refreshCounts();render();}
 function refreshCounts(){
   const cb=document.getElementById("cartBadge"),c=cartCount();
   cb.textContent=c;cb.hidden=c===0;
   const fb=document.getElementById("favBadge");fb.textContent=fav.size;fb.hidden=fav.size===0;
 }
+async function updateOrdersBadge(){
+  const b=document.getElementById("ordBadge");if(!b)return;
+  if(!user){b.hidden=true;return;}
+  try{const os=await api("GET","/api/orders");
+    const act=os.filter(o=>["created","assembling","shipping"].includes(o.status)).length;
+    b.textContent=act;b.hidden=act===0;
+  }catch{b.hidden=true;}
+}
 function stepperOrBtn(id,q){
   return q>0
     ? `<div class="stepper"><button onclick="setQty('${id}',${q-1},event)">−</button><span class="q mono">${q} шт</span><button onclick="setQty('${id}',${q+1},event)">+</button></div>`
-    : `<button class="addbtn" onclick="setQty('${id}',1,event)">🛒 Завтра</button>`;
+    : `<button class="addbtn" onclick="setQty('${id}',1,event)">🛒 В корзину</button>`;
 }
 
 /* ---------- избранное ---------- */
@@ -687,7 +734,7 @@ function renderCats(){
     `<button class="cat ${c===cat?"on":""}" onclick="setCat('${c}')">${c==="all"?"Все категории":c}</button>`).join("");
 }
 function card(p){
-  const d=disc(p), q=cart[p.id]||0;
+  const d=disc(p), q=qOf(p.id);
   return `<div class="card b${p.brand}">
     <div class="ph" onclick="go('#/product/${p.id}')">
       <span class="em">${media(p.em)}</span>
@@ -770,7 +817,7 @@ async function viewProduct(id){
   const gal=p.gallery&&p.gallery.length?p.gallery:[p.em];
   _PGAL=gal;
   const revs=p.reviews||[];
-  const d=disc(p),q=cart[id]||0;
+  const d=disc(p),q=qOf(id);
   const rel=PRODUCTS.filter(x=>x.brand===p.brand&&x.id!==p.id).slice(0,8);
   const recs=[...PRODUCTS].filter(x=>x.id!==p.id).sort((a,b)=>(b.rev||0)-(a.rev||0)).slice(0,8);
   const uphotos=revs.filter(r=>r.photos&&r.photos.length).flatMap(r=>r.photos);
@@ -858,8 +905,8 @@ function pdpBuy(id,q){
        <button class="btn btn-ink btn-block" style="margin-top:10px" onclick="go('#/cart')">Перейти в корзину</button>`
     : `<button class="btn btn-primary btn-block bb-cart" onclick="setPdp('${id}',1)"><b>В корзину</b><small>Доставим завтра</small></button>`;
 }
-function setPdp(id,n){setQty(id,n);const f=document.getElementById("pdpFoot");if(f)f.innerHTML=pdpBuy(id,cart[id]||0)}
-function buyNow(id){if(!cart[id]){cart[id]=1;saveCart();refreshCounts()}go("#/checkout")}
+function setPdp(id,n){setQty(id,n);const f=document.getElementById("pdpFoot");if(f)f.innerHTML=pdpBuy(id,qOf(id))}
+function buyNow(id){if(!qOf(id))setQty(id,1);go("#/checkout")}
 let _PGAL=[];
 function pdpPic(i){const g=[...document.querySelectorAll("#thumbs .thumb")];const stage=document.getElementById("stage");
   g.forEach((t,k)=>t.classList.toggle("on",k===i));stage.innerHTML=media(_PGAL[i])}
@@ -877,45 +924,81 @@ function closeLb(){const el=document.getElementById("lb");el.classList.remove("o
 function toggleSpecs(){document.querySelectorAll(".spec-more").forEach(r=>r.hidden=false);const b=document.getElementById("specsBtn");if(b)b.remove()}
 function toggleReviews(){document.querySelectorAll(".rev-more").forEach(r=>r.hidden=false);const b=document.getElementById("revBtn");if(b)b.remove()}
 
-/* ==================== КОРЗИНА ==================== */
+/* ==================== КОРЗИНА (в формате Ozon) ==================== */
+function cartLineHTML({p,q}){
+  const on=selOf(p.id), lowStock=p.stock&&p.stock<20;
+  return `<div class="cartline">
+    <div class="cbx ${on?"on":""}" onclick="toggleSel('${p.id}')">${on?"✓":""}</div>
+    <div class="em" onclick="go('#/product/${p.id}')" style="cursor:pointer">${media(p.em)}</div>
+    <div class="ci">
+      <div class="ct" style="cursor:pointer" onclick="go('#/product/${p.id}')">${esc(p.title)}</div>
+      ${lowStock?`<div class="stock-l" style="margin:3px 0 0">Осталось ${p.stock} шт</div>`:""}
+      <div class="cline-actions">
+        <button class="ci-ic ${fav.has(p.id)?"on":""}" onclick="toggleFav('${p.id}',event)" title="В избранное">${fav.has(p.id)?"♥":"♡"}</button>
+        <button class="ci-ic" onclick="setQty('${p.id}',0,event)" title="Удалить">🗑</button>
+      </div>
+    </div>
+    <div class="cprice">
+      <div class="cpr" style="color:var(--good)">${fmt(p.price*q)}</div>
+      ${p.old&&p.old>p.price?`<div class="oldp2">${fmt(p.old*q)}</div>`:""}
+    </div>
+    <div class="stepper" style="width:118px">${["−",q,"+"].map((x,i)=>i===1?`<span class="q mono">${q}</span>`:`<button onclick="setQty('${p.id}',${i===0?q-1:q+1},event)">${x}</button>`).join("")}</div>
+  </div>`;
+}
 function viewCart(){
   const lines=cartLines();
   if(!lines.length){VIEW().innerHTML=`${crumbs([{t:"Главная",h:"#/"},{t:"Корзина"}])}
     <div class="empty2"><div class="big">🛒</div><div class="h-sub">Корзина пуста</div>
-    <div class="muted" style="margin-bottom:16px">Добавьте товары из каталога</div>
+    <div class="muted" style="margin-bottom:16px">Загляните в каталог — тысячи товаров Mepsi и LULU напрямую от производителя.</div>
     <button class="btn btn-primary" onclick="go('#/')">В каталог</button></div>`;return}
-  const sub=cartSubtotal();
+  const sel=selLines();
+  const selCount=sel.reduce((a,l)=>a+l.q,0);
+  const sub=cartSubtotal(sel), old=cartOldtotal(sel), discount=Math.max(0,old-sub);
+  const allOn=lines.every(l=>l.sel);
+  // группировка по продавцу/бренду — как «Доставка товаров …» у Ozon
+  const groups={};
+  lines.forEach(l=>{const g=l.p.seller||l.p.brand||"Магазин";(groups[g]=groups[g]||[]).push(l);});
+  const gnames=Object.keys(groups);
   VIEW().innerHTML=`${crumbs([{t:"Главная",h:"#/"},{t:"Корзина"}])}
-  <h1 class="h-title">Корзина · ${cartCount()} тов.</h1>
+  <h1 class="h-title">Корзина <span class="muted" style="font-weight:600;font-size:18px">${cartCount()}</span></h1>
   <div class="cart-grid">
-    <div class="panel">
-      ${lines.map(({p,q})=>`<div class="cartline">
-        <div class="em" onclick="go('#/product/${p.id}')" style="cursor:pointer">${media(p.em)}</div>
-        <div class="ci"><div class="ct" style="cursor:pointer" onclick="go('#/product/${p.id}')">${esc(p.title)}</div>
-          <div class="cpr">${fmt(p.price*q)}${p.old?`<span class="oldp">${fmt(p.old*q)}</span>`:""}</div></div>
-        <div class="stepper" style="width:120px">${["−",q,"+"].map((x,i)=>i===1?`<span class="q mono">${q}</span>`:`<button onclick="setQty('${p.id}',${i===0?q-1:q+1},event)">${x}</button>`).join("")}</div>
-        <button class="btn btn-danger btn-sm" onclick="setQty('${p.id}',0,event)">✕</button>
+    <div>
+      <div class="panel" style="padding:14px 18px">
+        <div class="cart-toolbar">
+          <div class="cbx ${allOn?"on":""}" onclick="toggleSelAll()">${allOn?"✓":""}</div>
+          <span style="font-weight:600">Выбрать всё</span>
+          <span style="flex:1"></span>
+          <button class="cart-clear" onclick="clearCart()">🗑 Очистить</button>
+        </div>
+      </div>
+      ${gnames.map(g=>`<div class="panel" style="margin-top:14px">
+        <div class="cart-group-h">${gnames.length>1?`Доставка товаров ${esc(g)}`:"Доступны для заказа"}</div>
+        ${groups[g].map(cartLineHTML).join("")}
       </div>`).join("")}
     </div>
     <div class="summary">
-      <div class="r"><span>Товары (${cartCount()})</span><b>${fmt(sub)}</b></div>
+      <button class="btn btn-primary btn-block" style="font-size:16px;padding:15px" ${sel.length?"":"disabled style=opacity:.5;cursor:default"} onclick="${sel.length?"go('#/checkout')":""}">Перейти к оформлению</button>
+      <div class="muted" style="font-size:12.5px;margin:12px 0 2px;line-height:1.4">Доступные способы и время доставки можно выбрать при оформлении заказа</div>
+      <div class="grand" style="font-size:15px;margin:16px 0 10px;padding-top:14px"><span>Ваша корзина</span><span class="muted" style="font-size:13px;font-weight:600">${selCount} тов.</span></div>
+      <div class="r"><span>Товары (${selCount})</span><b>${fmt(old)}</b></div>
+      ${discount?`<div class="r"><span>Скидка</span><b style="color:var(--sale)">−${fmt(discount)}</b></div>`:""}
       <div class="r"><span>Доставка</span><b style="color:var(--good)">бесплатно</b></div>
-      <div class="grand"><span>Итого</span><span class="mono">${fmt(sub)}</span></div>
-      <button class="btn btn-primary btn-block" onclick="go('#/checkout')">Оформить заказ</button>
-      <div class="muted" style="font-size:12px;text-align:center;margin-top:10px">Кэшбэк ${Math.round(sub*0.05)} баллов на счёт</div>
+      <div class="grand" style="border-top:1px solid var(--line);padding-top:14px;margin-top:4px"><span>Итого</span><span class="mono" style="color:var(--good)">${fmt(sub)}</span></div>
+      <div class="muted" style="font-size:12px;margin-top:6px">Начислим ${Math.round(sub*0.05)} баллов кэшбэка</div>
     </div>
   </div>`;
 }
 
 /* ==================== ОФОРМЛЕНИЕ (checkout + доставка) ==================== */
 async function viewCheckout(){
-  const lines=cartLines();
+  const lines=selLines();
   if(!lines.length){go("#/cart");return}
   if(!user){openAuth("#/checkout");VIEW().innerHTML=`<div class="empty2"><div class="big">🔐</div>Войдите, чтобы оформить заказ</div>`;return}
   if(!CO.pickup)CO.pickup="p1";
   if(!CO.address&&user.addresses.length)CO.address=(user.addresses.find(a=>a.isDefault)||user.addresses[0]).id;
   if(!CO.card&&user.cards.length)CO.card=(user.cards.find(c=>c.isDefault)||user.cards[0]).id;
-  const sub=cartSubtotal();
+  const selCount=lines.reduce((a,l)=>a+l.q,0);
+  const sub=cartSubtotal(lines);
   let discount=0;
   if(CO.promo)discount=CO.promo.type==="percent"?Math.round(sub*CO.promo.value/100):CO.promo.value;
   const maxPts=Math.min(user.points,sub-discount);const pts=Math.min(CO.points,maxPts);
@@ -963,7 +1046,7 @@ async function viewCheckout(){
       </div>
     </div>
     <div class="summary">
-      <div class="r"><span>Товары (${cartCount()})</span><b>${fmt(sub)}</b></div>
+      <div class="r"><span>Товары (${selCount})</span><b>${fmt(sub)}</b></div>
       ${discount?`<div class="r"><span>Скидка</span><b style="color:var(--sale)">−${fmt(discount)}</b></div>`:""}
       ${pts?`<div class="r"><span>Баллы</span><b style="color:var(--sale)">−${fmt(pts)}</b></div>`:""}
       <div class="r"><span>Доставка</span><b style="color:var(--good)">бесплатно</b></div>
@@ -989,7 +1072,8 @@ async function applyPromo(){
   render();
 }
 async function placeOrder(){
-  const lines=cartLines();
+  const lines=selLines();
+  if(!lines.length)return toast("Выберите товары для заказа");
   const pvz=PVZ.find(v=>v.id===CO.pickup);
   const deliveryObj=CO.delivery==="pickup"
     ? {method:"pickup",point:pvz||null,address:pvz?{city:"",street:pvz.addr,house:"",flat:""}:null}
@@ -999,7 +1083,7 @@ async function placeOrder(){
       promo:CO.promo?.code||null,pointsUsed:CO.points||0,
       delivery:deliveryObj,payment:{method:CO.payMethod},
       eta:CO.delivery==="pickup"?"1–2 дня":"2–3 дня"});
-    user=res.user;cart={};saveCart();refreshCounts();CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0,pickup:"p1"};
+    user=res.user;lines.forEach(({p})=>delete cart[p.id]);saveCart();refreshCounts();updateOrdersBadge();CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0,pickup:"p1"};
     toast("Заказ оформлен ✅ Начислим баллы после получения");go("#/order/"+res.order.id);
   }catch(e){toast(e.message)}
 }
@@ -1165,7 +1249,7 @@ async function viewOrderDetail(id){
   </div>`;
 }
 async function cancelOrder(id){if(!confirm("Отменить заказ?"))return;try{await api("POST","/api/orders/"+id+"/cancel");toast("Заказ отменён");go("#/account/orders")}catch(e){toast(e.message)}}
-async function repeatOrder(id){try{const o=await api("GET","/api/orders/"+id);o.items.forEach(it=>{cart[it.id]=(cart[it.id]||0)+it.qty});saveCart();refreshCounts();toast("Товары добавлены в корзину 🛒");go("#/cart")}catch(e){toast(e.message)}}
+async function repeatOrder(id){try{const o=await api("GET","/api/orders/"+id);o.items.forEach(it=>{const p=getP(it.id);cart[it.id]={q:qOf(it.id)+it.qty,p:snap(p)||{id:it.id,title:it.title,price:it.price,old:0,em:it.em,brand:it.brand,cat:"",seller:it.brand,stock:0},sel:true};});saveCart();refreshCounts();toast("Товары добавлены в корзину 🛒");go("#/cart")}catch(e){toast(e.message)}}
 async function startReturn(orderId){const reason=prompt("Причина возврата:");if(!reason)return;try{await api("POST","/api/returns",{orderId,reason});toast("Заявка на возврат создана");go("#/account/returns")}catch(e){toast(e.message)}}
 async function secReturns(){
   const list=await api("GET","/api/returns");
@@ -1382,13 +1466,18 @@ async function onLogin(r){
   // синхронизируем локальное избранное на сервер
   for(const id of fav){try{await api("POST","/api/favorites/"+id)}catch{}}
   if(user.favorites)user.favorites.forEach(id=>fav.add(id));
-  saveFav();refreshCounts();renderHeaderAuth();closeAuth();
+  // сливаем гостевую корзину с корзиной аккаунта (переносится между устройствами)
+  try{const cr=await api("POST","/api/cart/merge",{items:cartToItems()});applyServerCart(cr.cart);}catch{}
+  saveFav();refreshCounts();updateOrdersBadge();renderHeaderAuth();closeAuth();
   toast(r.isNew?"Аккаунт создан ✅":"С возвращением! 👋");
   if(authIntent){const t=authIntent;authIntent=null;go(t)}else render();
 }
 async function logout(){
   try{await api("POST","/api/auth/logout")}catch{}
-  token=null;user=null;localStorage.removeItem("mt_token");renderHeaderAuth();toast("Вы вышли");go("#/");
+  token=null;user=null;localStorage.removeItem("mt_token");
+  cart={};localStorage.setItem("mt_cart","{}");refreshCounts();
+  const ob=document.getElementById("ordBadge");if(ob)ob.hidden=true;
+  renderHeaderAuth();toast("Вы вышли");go("#/");
 }
 function renderHeaderAuth(){
   const lbl=document.getElementById("accLabel");
@@ -1404,8 +1493,13 @@ document.getElementById("theme").onclick=()=>{const r=document.documentElement,c
 /* ==================== старт ==================== */
 (async()=>{
   try{const d=await (await fetch("/api/products")).json();if(Array.isArray(d)&&d.length)PRODUCTS=d;}catch(e){}
+  // восстановить снимки товаров в корзине из свежего каталога
+  for(const id in cart){ if(cart[id]&&!cart[id].p){const p=getP(id);if(p)cart[id].p=snap(p);} }
   if(token){try{const r=await api("GET","/api/auth/me");user=r.user;if(!user){token=null;localStorage.removeItem("mt_token")}
     else if(user.favorites)user.favorites.forEach(id=>fav.add(id));}catch{token=null;localStorage.removeItem("mt_token")}}
+  // если вошли — подтянуть корзину аккаунта (слить с локальной) и бейдж заказов
+  if(user){try{const cr=await api("POST","/api/cart/merge",{items:cartToItems()});applyServerCart(cr.cart);}catch{} updateOrdersBadge();}
+  localStorage.setItem("mt_cart",JSON.stringify(cart));
   saveFav();renderHeaderAuth();refreshCounts();render();
 })();
 </script>

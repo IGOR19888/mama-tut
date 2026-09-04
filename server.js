@@ -121,7 +121,7 @@ function blankUser(overrides = {}) {
     firstName: "", lastName: "", birthday: "", gender: "",
     phone: null, email: null, telegram: null, max: null,
     points: 500, // приветственные баллы
-    addresses: [], cards: [], favorites: [],
+    addresses: [], cards: [], favorites: [], cart: [],
     settings: { email: true, sms: true, push: true, telegram: true },
     ...overrides,
   };
@@ -130,11 +130,24 @@ function blankUser(overrides = {}) {
 function publicUser(u) {
   if (!u) return null;
   const { id, firstName, lastName, birthday, gender, phone, email, telegram, max,
-          points, addresses, cards, favorites, settings, createdAt } = u;
+          points, addresses, cards, favorites, cart, settings, createdAt } = u;
   const name = [firstName, lastName].filter(Boolean).join(" ") || null;
   return { id, name, firstName, lastName, birthday, gender, phone, email, telegram, max,
-           points, addresses, cards, favorites, settings, createdAt,
+           points, addresses, cards, favorites, cart: cart || [], settings, createdAt,
            channels: { phone: !!phone, email: !!email, telegram: !!telegram, max: !!max } };
+}
+// Нормализуем позицию корзины из тела запроса
+function normCartItem(it) {
+  return {
+    id: String(it.id || ""),
+    qty: Math.max(1, parseInt(it.qty, 10) || 1),
+    sel: it.sel !== false,
+    p: it.p && typeof it.p === "object" ? {
+      id: it.p.id, title: String(it.p.title || "").slice(0, 300), price: +it.p.price || 0,
+      old: +it.p.old || 0, em: it.p.em, brand: it.p.brand || "", cat: it.p.cat || "",
+      seller: it.p.seller || "", stock: it.p.stock || 0,
+    } : null,
+  };
 }
 
 // ---------- OTP (демо: код возвращается в ответе) ----------
@@ -292,6 +305,34 @@ route("POST", "/api/favorites/:id", auth(async (req, res, p, _b, u) => {
 }));
 route("DELETE", "/api/favorites/:id", auth(async (req, res, p, _b, u) => {
   u.favorites = u.favorites.filter((x) => x !== p.id); saveUser(u); json(res, 200, { favorites: u.favorites });
+}));
+
+// ===== корзина (привязана к аккаунту, переносится между устройствами) =====
+route("GET", "/api/cart", auth((req, res, _p, _b, u) => {
+  json(res, 200, { cart: u.cart || [] });
+}));
+// Полная замена корзины (клиент после локального изменения синхронизирует состояние).
+route("PUT", "/api/cart", auth(async (req, res, _p, body, u) => {
+  const items = Array.isArray(body.items) ? body.items : [];
+  u.cart = items.filter((it) => it && it.id).map(normCartItem);
+  saveUser(u);
+  json(res, 200, { cart: u.cart });
+}));
+// Слияние при входе: локальная корзина гостя вливается в серверную (берём большее кол-во).
+route("POST", "/api/cart/merge", auth(async (req, res, _p, body, u) => {
+  const incoming = (Array.isArray(body.items) ? body.items : []).filter((it) => it && it.id).map(normCartItem);
+  const map = new Map((u.cart || []).map((it) => [it.id, normCartItem(it)]));
+  for (const it of incoming) {
+    const cur = map.get(it.id);
+    if (cur) {
+      cur.qty = Math.max(cur.qty, it.qty);
+      cur.sel = cur.sel || it.sel;
+      if (!cur.p && it.p) cur.p = it.p;
+    } else map.set(it.id, it);
+  }
+  u.cart = [...map.values()];
+  saveUser(u);
+  json(res, 200, { cart: u.cart });
 }));
 
 // ===== промокоды =====
