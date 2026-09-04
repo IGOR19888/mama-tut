@@ -632,13 +632,17 @@ const cleanDesc=h=>String(h||"").replace(/<\s*br\s*\/?>/gi,"\n").replace(/<\/(p|
 
 /* ---------- состояние ---------- */
 let brand="all",cat="all",q="",sort="pop",fMinP="",fMaxP="",fDisc=false,fRate=false;
+// Безопасное чтение localStorage: битое значение НЕ должно ронять весь скрипт
+// (иначе не работает вообще ничего — ни добавление, ни рендер).
+const lsGet=(k,fb)=>{try{const v=localStorage.getItem(k);return v==null?fb:JSON.parse(v);}catch{return fb;}};
 // Корзина: { id: { q:кол-во, p:снимок товара, sel:выбран к оформлению } }.
 // Снимок гарантирует, что позиция не пропадёт, даже если товара уже нет в текущем
 // каталоге PRODUCTS (после авто-синка Ozon). Привязана к аккаунту через /api/cart.
-let cart=JSON.parse(localStorage.getItem("mt_cart")||"{}");
+let cart=lsGet("mt_cart",{});
+if(!cart||typeof cart!=="object"||Array.isArray(cart))cart={};
 for(const k in cart){ if(typeof cart[k]==="number") cart[k]={q:cart[k],p:null,sel:true}; } // миграция старого формата
-let fav=new Set(JSON.parse(localStorage.getItem("mt_fav")||"[]"));
-let reviewed=new Set(JSON.parse(localStorage.getItem("mt_reviewed")||"[]"));
+let fav=new Set(Array.isArray(lsGet("mt_fav",[]))?lsGet("mt_fav",[]):[]);
+let reviewed=new Set(Array.isArray(lsGet("mt_reviewed",[]))?lsGet("mt_reviewed",[]):[]);
 let token=localStorage.getItem("mt_token")||null;
 let user=null;               // публичный профиль (или null)
 let CO={address:null,delivery:"courier",payMethod:"card",card:null,promo:null,points:0,pickup:"p1"}; // состояние оформления

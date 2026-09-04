@@ -438,6 +438,12 @@ route("POST", "/api/reviews", auth(async (req, res, _p, body, u) => {
 }));
 
 // ---------- server ----------
+// Заголовки кэша: HTML всегда свежий (иначе браузер зависает на старой версии SPA
+// и «ничего не работает»). Остальную статику можно кэшировать ненадолго.
+function cacheHeaders(ext) {
+  if (ext === ".html" || ext === "") return { "Cache-Control": "no-cache, no-store, must-revalidate" };
+  return { "Cache-Control": "public, max-age=300" };
+}
 function serveStatic(req, res) {
   let rel = decodeURIComponent((req.url.split("?")[0]) || "/");
   if (rel === "/") rel = "/index.html";
@@ -449,12 +455,13 @@ function serveStatic(req, res) {
       if (!path.extname(rel)) {
         return fs.readFile(path.join(PUBLIC_DIR, "index.html"), (e2, html) => {
           if (e2) { res.writeHead(404); return res.end("Not found"); }
-          res.writeHead(200, { "Content-Type": MIME[".html"] }); res.end(html);
+          res.writeHead(200, { "Content-Type": MIME[".html"], ...cacheHeaders(".html") }); res.end(html);
         });
       }
       res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }); return res.end("Не найдено");
     }
-    res.writeHead(200, { "Content-Type": MIME[path.extname(filePath)] || "application/octet-stream" });
+    const ext = path.extname(filePath);
+    res.writeHead(200, { "Content-Type": MIME[ext] || "application/octet-stream", ...cacheHeaders(ext) });
     res.end(data);
   });
 }
