@@ -56,7 +56,8 @@
   .act{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;
     color:var(--muted);font-size:11px;padding:6px 8px;border-radius:9px;position:relative;min-width:54px}
   .act:hover{color:var(--accent);background:var(--surface-2)}
-  .act .ic{font-size:20px}
+  .act .ic{font-size:20px;display:flex;align-items:center;justify-content:center;height:24px}
+  .act .ic svg{width:24px;height:24px;display:block}
   .act .badge{position:absolute;top:2px;right:8px;background:var(--sale);color:#fff;font-size:10px;font-weight:700;
     min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px}
   .trust{background:var(--accent-soft);border-bottom:1px solid var(--line)}
@@ -184,31 +185,47 @@
     .logo .nm{font-size:19px}
     /* мобильная шапка (Ozon): зафиксирована (header уже sticky), компактная.
        Ряд 1: лого + иконки. Ряд 2: Каталог + поиск на всю ширину. */
-    .mainbar .wrap{flex-wrap:wrap;height:auto;padding-top:8px;padding-bottom:8px;gap:8px;row-gap:8px}
+    .mainbar .wrap{flex-wrap:wrap;height:auto;padding-top:7px;padding-bottom:7px;gap:7px;row-gap:8px}
     .logo{order:1;flex:none;min-width:0}
-    .logo .nm{white-space:nowrap;font-size:18px}
-    .acts{order:2;flex:none;gap:2px;margin-left:auto} /* прижать вправо → Каталог+поиск уходят на 2-й ряд */
-    .act{min-width:42px;padding:6px 6px}
-    .act .ic{font-size:22px}
+    .logo .nm{white-space:nowrap;font-size:17px}
+    .acts{order:2;flex:none;gap:0;margin-left:auto} /* прижать вправо → Каталог+поиск на 2-й ряд */
+    .act{min-width:40px;padding:4px}
+    .act .ic svg{width:22px;height:22px}
     .act span:not(.ic):not(.badge){display:none} /* прячем только подпись, НЕ иконку */
-    .act .badge{right:2px;top:0}
-    .catbtn{order:3;flex:none;height:42px;padding:0 14px;font-size:14px}
-    .search{order:4;flex:1 1 auto;height:42px}
+    .act .badge{right:1px;top:-1px;min-width:15px;height:15px;font-size:9px;padding:0 3px}
+    .catbtn{order:3;flex:none;height:40px;padding:0 13px;font-size:13px;border-radius:9px;gap:6px}
+    .search{order:4;flex:1 1 0;min-width:0;height:40px;border-radius:9px}
     .search input{font-size:16px} /* ≥16px — без авто-зума на iOS */
-    .brandbar .wrap{height:46px}
-    .btab{padding:7px 14px;font-size:13px}
+    .search .go{height:30px;padding:0 13px;font-size:13px}
+    .brandbar .wrap{height:44px;gap:6px}
+    .btab{padding:6px 13px;font-size:13px}
     .btab .s{display:none}
     /* каталог: ровно 2 карточки в ряд, как у Ozon */
     .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .card{border-radius:12px}
     .card .ph{min-height:120px}
+    .card .body{padding:9px 9px 10px}
     .card .p{font-size:18px}
-    .card .ttl{font-size:12.5px}
+    .card .old{font-size:11px}
+    .card .prc{min-height:22px}
+    .card .dp{font-size:11px}
+    .card .ttl{font-size:12.5px;margin:5px 0;min-height:32px}
+    .card .rate{font-size:11px}
+    .card .foot{padding-top:8px}
+    .card .ribbon{font-size:9.5px;padding:2px 7px 2px 6px}
+    .card .fav{width:28px;height:28px;font-size:14px}
+    .addbtn{padding:9px;font-size:13px}
+    .stepper button{width:30px;height:30px;font-size:16px}
     .section-t{font-size:18px}
-    /* корзина: перенос степпера на свою строку, чтобы ничего не обрезалось */
-    .cart-grid .cartline{flex-wrap:wrap;row-gap:10px}
-    .cart-grid .cartline .em{width:64px;height:64px}
-    .cart-grid .cprice{margin-left:auto}
-    .cart-grid .cartline .stepper{order:5;margin-left:76px}}
+    /* корзина: аккуратный ряд как у Ozon — картинка сверху, заголовок в 3 строки,
+       степпер на своей строке под товаром */
+    .cart-grid .cartline{flex-wrap:wrap;row-gap:10px;align-items:flex-start;gap:10px}
+    .cart-grid .cartline .cbx{margin-top:24px}
+    .cart-grid .cartline .em{width:72px;height:72px}
+    .cart-grid .cartline .ci{flex:1 1 40%}
+    .cart-grid .cartline .ct{font-size:13px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .cart-grid .cprice{margin-left:auto;text-align:right;padding-top:2px}
+    .cart-grid .cartline .stepper{order:5;margin-left:82px}}
 
   /* ============ ДОБАВЛЕНО: страницы, ЛК, вход — в том же дизайне ============ */
   a{color:inherit}
@@ -580,10 +597,10 @@
     <button class="catbtn" onclick="go('#/');setTimeout(()=>document.getElementById('catalogTitle')?.scrollIntoView({behavior:'smooth'}),50)">☰ Каталог</button>
     <div class="search"><input id="q" placeholder="Искать: подгузники, шампунь, набор…"><button class="go">Найти</button></div>
     <div class="acts">
-      <button class="act" id="accBtn" onclick="go('#/account/main')"><span class="ic">👤</span><span id="accLabel">Войти</span></button>
-      <button class="act" onclick="go('#/account/orders')"><span class="ic">📦</span><span>Заказы</span><span class="badge" id="ordBadge" hidden>0</span></button>
-      <button class="act" onclick="go('#/favorites')"><span class="ic">❤️</span><span>Избранное</span><span class="badge" id="favBadge" hidden>0</span></button>
-      <button class="act" onclick="openCart()"><span class="ic">🛒</span><span>Корзина</span><span class="badge" id="cartBadge" hidden>0</span></button>
+      <button class="act" id="accBtn" onclick="go('#/account/main')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-3.6 3.4-5.6 7.5-5.6s7.5 2 7.5 5.6"/></svg></span><span id="accLabel">Войти</span></button>
+      <button class="act" onclick="go('#/account/orders')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 7.3 12 12 3.5 7.3 12 2.6l8.5 4.7z"/><path d="M3.5 7.3v9.4L12 21.4l8.5-4.7V7.3"/><path d="M12 12v9.4"/></svg></span><span>Заказы</span><span class="badge" id="ordBadge" hidden>0</span></button>
+      <button class="act" onclick="go('#/favorites')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.3s-7.2-4.5-9.6-9C.9 8.4 2.5 4.6 6.1 4.6c2 0 3.3 1.1 3.9 2.2C11 6.4 12 5.4 14 5.4c3.6 0 5.1 3.8 3.6 6.9-2.4 4.5-9.6 8-9.6 8z" transform="translate(0 -.4)"/></svg></span><span>Избранное</span><span class="badge" id="favBadge" hidden>0</span></button>
+      <button class="act" onclick="openCart()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2.2 3.2H5l2.3 11.2a1.4 1.4 0 0 0 1.4 1.1h8.5a1.4 1.4 0 0 0 1.4-1.1L21.5 7H6"/></svg></span><span>Корзина</span><span class="badge" id="cartBadge" hidden>0</span></button>
     </div>
   </div></div>
   <div class="trust"><div class="wrap">
