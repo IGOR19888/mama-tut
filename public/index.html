@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mepsi & LULU</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Unbounded:wght@600;700;800&display=swap">
 <style>
@@ -24,6 +26,7 @@
   }
   :root[data-theme="dark"][data-brand="lulu"]{--accent:#a78bfa;--action:#b79cff;--accent-soft:#2a1e52}
   *{box-sizing:border-box}
+  [hidden]{display:none!important} /* иначе .badge{display:flex} перебивает hidden и показывает «0» */
   body{margin:0;background:var(--bg);color:var(--ink);font-family:"Onest",system-ui,sans-serif;
     line-height:1.5;-webkit-font-smoothing:antialiased}
   .mono{font-variant-numeric:tabular-nums}
@@ -172,8 +175,40 @@
     padding:12px 20px;border-radius:12px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:var(--shadow-lg)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .theme-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
-  @media(max-width:760px){.promos,.specials{grid-template-columns:1fr}.topbar{display:none}.logo .tag{display:none}
-    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.act span:not(.badge){display:none}.act{min-width:40px}}
+  @media(max-width:760px){
+    .promos,.specials{grid-template-columns:1fr}
+    .topbar{display:none}
+    .trust{display:none}
+    .wrap{padding-left:12px;padding-right:12px}
+    .logo .tag{display:none}
+    .logo .nm{font-size:19px}
+    /* мобильная шапка (Ozon): зафиксирована (header уже sticky), компактная.
+       Ряд 1: лого + иконки. Ряд 2: Каталог + поиск на всю ширину. */
+    .mainbar .wrap{flex-wrap:wrap;height:auto;padding-top:8px;padding-bottom:8px;gap:8px;row-gap:8px}
+    .logo{order:1;flex:none;min-width:0}
+    .logo .nm{white-space:nowrap;font-size:18px}
+    .acts{order:2;flex:none;gap:2px;margin-left:auto} /* прижать вправо → Каталог+поиск уходят на 2-й ряд */
+    .act{min-width:42px;padding:6px 6px}
+    .act .ic{font-size:22px}
+    .act span:not(.ic):not(.badge){display:none} /* прячем только подпись, НЕ иконку */
+    .act .badge{right:2px;top:0}
+    .catbtn{order:3;flex:none;height:42px;padding:0 14px;font-size:14px}
+    .search{order:4;flex:1 1 auto;height:42px}
+    .search input{font-size:16px} /* ≥16px — без авто-зума на iOS */
+    .brandbar .wrap{height:46px}
+    .btab{padding:7px 14px;font-size:13px}
+    .btab .s{display:none}
+    /* каталог: ровно 2 карточки в ряд, как у Ozon */
+    .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .card .ph{min-height:120px}
+    .card .p{font-size:18px}
+    .card .ttl{font-size:12.5px}
+    .section-t{font-size:18px}
+    /* корзина: перенос степпера на свою строку, чтобы ничего не обрезалось */
+    .cart-grid .cartline{flex-wrap:wrap;row-gap:10px}
+    .cart-grid .cartline .em{width:64px;height:64px}
+    .cart-grid .cprice{margin-left:auto}
+    .cart-grid .cartline .stepper{order:5;margin-left:76px}}
 
   /* ============ ДОБАВЛЕНО: страницы, ЛК, вход — в том же дизайне ============ */
   a{color:inherit}
